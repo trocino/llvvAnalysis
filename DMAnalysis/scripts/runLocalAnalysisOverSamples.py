@@ -59,11 +59,14 @@ onlytag='all'
 queuelog=''
 
 count=0
+cwd = commands.getstatusoutput('pwd')[1]
 who = commands.getstatusoutput('whoami')[1]
 SCRIPT = open('/tmp/'+who+'/SCRIPT_Submit2batch.sh',"w")
 SCRIPT_L = open('/tmp/'+who+'/SCRIPT_Local.sh',"w")
-SCRIPT_L.writelines('#!bin/sh \n\n')
-SCRIPT_L.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
+SCRIPT_L.writelines('#!/bin/sh \n\n')
+SCRIPT_L.writelines('cd '+cwd+'; \n\n')
+#SCRIPT_L.writelines('eval `scramv1 runtime -csh`; \n\n')
+#SCRIPT_L.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
 
 for o,a in opts:
     if o in("-?", "-h"):
@@ -109,8 +112,10 @@ for proc in procList :
 	mytag = mytag.replace("+","")
         ## split jobs by tag name
         SCRIPT_Temp = open('/tmp/'+who+'/SCRIPT_Local_'+mytag+'.sh',"w")
-        SCRIPT_Temp.writelines('#!bin/sh \n\n')
-        SCRIPT_Temp.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
+        SCRIPT_Temp.writelines('#!/bin/sh \n\n')
+        #SCRIPT_Temp.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
+        SCRIPT_Temp.writelines('cd '+cwd+'; \n\n')
+        #SCRIPT_Temp.writelines('eval `scramv1 runtime -csh`; \n\n')
 
         data = desc['data']
         for d in data :
@@ -138,8 +143,10 @@ for proc in procList :
             mydtag = mydtag.replace("+","")
             ## split jobs by dtag name
             SCRIPT_DTag = open('/tmp/'+who+'/SCRIPT_Local_'+mydtag+'.sh',"w")
-            SCRIPT_DTag.writelines('#!bin/sh \n\n')
-            SCRIPT_DTag.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
+            SCRIPT_DTag.writelines('#!/bin/sh \n\n')
+            #SCRIPT_DTag.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
+            SCRIPT_DTag.writelines('cd '+cwd+'; \n\n')
+            #SCRIPT_DTag.writelines('eval `scramv1 runtime -csh`; \n\n')
 
 
 	    for segment in range(0,split) :
@@ -175,24 +182,40 @@ for proc in procList :
 
 		if(split==1):
 	            	cfgfile=outdir +'/'+ dtag + suffix + '_cfg.py'
+                        outfile=outdir +'/'+ dtag + suffix
 		else:
                         cfgfile=outdir +'/'+ dtag + suffix + '_' + str(segment) + '_cfg.py'
+                        outfile=outdir +'/'+ dtag + suffix + '_' + str(segment)
             	os.system('cat ' + cfg_file + ' | ' + sedcmd + ' > ' + cfgfile)
+
+                if(mctruthmode!=0) : outfile += '_filt'+str(mctruthmode)
+                outfile += '.root'
 
             	if(not subtoBatch) :
                 	os.system(theExecutable + ' ' + cfgfile)
             	else :
 			os.system('mkdir -p ' + queuelog)
-			print('\033[33m submit2batch.sh -q'+queue+' -G'+queuelog+'/'+dtag+str(segment)+'.log'+' -R"' + requirementtoBatch + '" -J' + dtag + str(segment) + ' ${CMSSW_BASE}/bin/${SCRAM_ARCH}/wrapLocalAnalysisRun.sh ' + theExecutable + ' ' + cfgfile + '\033[0m')
-			SCRIPT.writelines('submit2batch.sh -q'+queue+' -G'+queuelog+'/'+dtag+str(segment)+'.log'+' -R"' + requirementtoBatch + '" -J' + dtag + str(segment) + ' ${CMSSW_BASE}/bin/${SCRAM_ARCH}/wrapLocalAnalysisRun.sh ' + theExecutable + ' ' + cfgfile + '\n\n')
-			SCRIPT_L.writelines(theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+str(segment)+'.log'+' & \n\n')
+			print('\033[33m submit2batch.sh -q'+queue+' -G'+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' -R"' + requirementtoBatch + '" -J' + dtag + str(segment) + ' ${CMSSW_BASE}/bin/${SCRAM_ARCH}/wrapLocalAnalysisRun.sh ' + theExecutable + ' ' + cfgfile + '\033[0m')
+                        SCRIPT.writelines('if [ ! -e ' + outfile + ' ]; then\n') 
+			SCRIPT.writelines('  submit2batch.sh -q'+queue+' -G'+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' -R"' + requirementtoBatch + '" -J' + dtag + '_' + str(segment) + ' ${CMSSW_BASE}/bin/${SCRAM_ARCH}/wrapLocalAnalysisRun.sh ' + theExecutable + ' ' + cfgfile + '\n')
+                        SCRIPT.writelines('fi\n\n')
+                        SCRIPT_L.writelines('if [ ! -e ' + outfile + ' ]; then\n') 
+			#SCRIPT_L.writelines('  ' + theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' & \n')
+			SCRIPT_L.writelines('  ' + theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' \n')
+                        SCRIPT_L.writelines('fi\n\n') 
 			count = count + 1
-			if count % 30 == 0: SCRIPT_L.writelines('sleep 25\n\n')
+			#if count % 30 == 0: SCRIPT_L.writelines('sleep 25\n\n')
 
-			SCRIPT_Temp.writelines(theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+str(segment)+'.log'+' & \n\n')
-			SCRIPT_DTag.writelines(theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+str(segment)+'.log'+' & \n\n')
+                        SCRIPT_Temp.writelines('if [ ! -e ' + outfile + ' ]; then\n') 
+			#SCRIPT_Temp.writelines('  ' + theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' & \n')
+			SCRIPT_Temp.writelines('  ' + theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' \n')
+                        SCRIPT_Temp.writelines('fi\n\n') 
+                        SCRIPT_DTag.writelines('if [ ! -e ' + outfile + ' ]; then\n') 
+			#SCRIPT_DTag.writelines('  ' + theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' & \n')
+			SCRIPT_DTag.writelines('  ' + theExecutable + ' ' + cfgfile + ' >& '+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' \n')
+                        SCRIPT_DTag.writelines('fi\n\n') 
 			#sys.exit(0)
-			#os.system('submit2batch.sh -q'+queue+' -G'+queuelog+'/'+dtag+str(segment)+'.log'+' -R"' + requirementtoBatch + '" -J' + dtag + str(segment) + ' ${CMSSW_BASE}/bin/${SCRAM_ARCH}/wrapLocalAnalysisRun.sh ' + theExecutable + ' ' + cfgfile)
+			#os.system('submit2batch.sh -q'+queue+' -G'+queuelog+'/'+dtag+'_'+str(segment)+'.log'+' -R"' + requirementtoBatch + '" -J' + dtag + str(segment) + ' ${CMSSW_BASE}/bin/${SCRAM_ARCH}/wrapLocalAnalysisRun.sh ' + theExecutable + ' ' + cfgfile)
 
             SCRIPT_DTag.writelines('cd -;')
             SCRIPT_DTag.close()
