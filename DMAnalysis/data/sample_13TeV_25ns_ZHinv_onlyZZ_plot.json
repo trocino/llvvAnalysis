@@ -1,0 +1,38 @@
+{
+  "proc": [
+    {
+      "isdata": false, 
+      "color": "842", 
+      "lcolor": "1", 
+      "tag": "ZZ#rightarrow 2l2#nu (Powheg)", 
+      "marker": 842, 
+      "data": [
+        {
+          "dtag": "MC13TeV_ZZTo2L2Nu", 
+          "xsec": 0.564, 
+          "split": 10, 
+          "br": [
+            1
+          ]
+        }
+      ]
+    }, 
+    {
+      "isdata": false, 
+      "color": "832", 
+      "lcolor": "1", 
+      "tag": "ZZ#rightarrow 2l2#nu (amcATnlo)", 
+      "marker": 832, 
+      "data": [
+        {
+          "dtag": "MC13TeV_ZZTo2L2Q", 
+          "xsec": 3.22, 
+          "split": 10, 
+          "br": [
+            1
+          ]
+        }
+      ]
+    } 
+  ]
+}
