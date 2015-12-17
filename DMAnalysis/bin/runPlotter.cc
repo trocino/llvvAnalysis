@@ -511,7 +511,8 @@ void Draw2DHistogramSplitCanvas(JSONWrapper::Object& Root, std::string RootDir, 
 
 
       savePath(c1,outDir,SaveName+"_"+(Process[i])["tag"].toString(),plotExt);
-      savePath(c1,outDir,SaveName+"_"+(Process[i])["tag"].toString(),".pdf");
+      //savePath(c1,outDir,SaveName+"_"+(Process[i])["tag"].toString(),".pdf");
+      savePath(c1,outDir,SaveName+"_"+(Process[i])["tag"].toString(),".root");
       delete c1;
    }
 
@@ -618,7 +619,8 @@ void Draw2DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
    c1->cd(0);
 
    savePath(c1,outDir,SaveName,plotExt);
-   savePath(c1,outDir,SaveName,".pdf");
+   //savePath(c1,outDir,SaveName,".pdf");
+   savePath(c1,outDir,SaveName,".root");
 
    for(unsigned int d=0;d<ObjectToDelete.size();d++){delete ObjectToDelete[d];}ObjectToDelete.clear();
    delete c1;
@@ -1151,7 +1153,8 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
    c1->Update();
    c1->cd();
    savePath(c1,outDir,SaveName,plotExt);
-   savePath(c1,outDir,SaveName,".pdf");
+   //savePath(c1,outDir,SaveName,".pdf");
+   savePath(c1,outDir,SaveName,".root");
 
    delete c1;
    for(unsigned int d=0;d<ObjectToDelete.size();d++){delete ObjectToDelete[d];}ObjectToDelete.clear();
