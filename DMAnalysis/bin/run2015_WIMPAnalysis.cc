@@ -101,8 +101,15 @@ int main(int argc, char* argv[])
 
     WIMPReweighting myWIMPweights(runProcess);
 
+    // Temporary pileup reweighting with simple vector (true PU weights) 
+    double puWeightsNew[100] = {0., 54.0349, 116.125, 40.5246, 16.8051, 3.04448, 1.19776, 1.07217, 1.70808, 2.39848, 2.63249, 2.71243, 2.603, 2.16652, 1.50064, 0.857888, 0.409503, 0.173253, 0.0756125, 0.0399038, 0.0234459, 0.0126852, 0.00577866, 0.0022077, 0.000755718, 0.000269065, 0.000118168, 6.61647e-05, 4.40645e-05, 3.21187e-05, 2.38856e-05, 1.63517e-05, 9.18719e-06, 4.29246e-06, 1.69405e-06, 6.09737e-07, 2.13578e-07, 6.75225e-08, 2.08689e-08, 6.0951e-09, 1.72728e-09, 4.62314e-10, 1.1934e-10, 3.06271e-11, 7.08311e-12, 1.64595e-12, 5.12206e-13, 2.41336e-13, 8.96516e-14, 7.4969e-14, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; 
 
-    //systematics
+
+    // EWK corrections (from table or from plot) 
+    bool useEwkTable = false; 
+
+
+    // Systematics
     bool runSystematics                        = runProcess.getParameter<bool>("runSystematics");
     std::vector<TString> varNames(1,"");
     if(runSystematics) {
@@ -123,10 +130,16 @@ int main(int argc, char* argv[])
             varNames.push_back("_pdfup");
             varNames.push_back("_pdfdown");
         }
+	if( url.Contains("MC13TeV_ZZTo") || 
+	    ((url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) ) { 
+            varNames.push_back("_ewkup"); 
+            varNames.push_back("_ewkdown"); 
+	} 
     }
     size_t nvarsToInclude=varNames.size();
 
-
+    // Print debug information 
+    bool debug(false); 
 
     //tree info
     int evStart     = runProcess.getParameter<int>("evStart");
@@ -300,7 +313,7 @@ int main(int argc, char* argv[])
     if(runOptimization) {
         // for optimization
         cout << "Optimization will be performed for this analysis" << endl;
-        for(double met=60; met<=100; met+=10) {
+        for(double met=60; met<=150; met+=10) {
             for(double balance=0.2; balance<=0.2; balance+=0.05) {
                 for(double dphi=2.7; dphi<2.8; dphi+=0.1) {
                     optim_Cuts1_MET     .push_back(met);
@@ -424,11 +437,12 @@ int main(int argc, char* argv[])
         if(isMC) weight *= genWeight;
         double TotalWeight_plus = 1.0;
         double TotalWeight_minus = 1.0;
-//        if(isMC) {
-//            weight            = LumiWeights->weight(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
-//            TotalWeight_plus  = PuShifters[PUUP]->Eval(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
-//            TotalWeight_minus = PuShifters[PUDOWN]->Eval(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
-//        }
+	// if(isMC) {
+	// weight            = LumiWeights->weight(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
+	// TotalWeight_plus  = PuShifters[PUUP]->Eval(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
+	// TotalWeight_minus = PuShifters[PUDOWN]->Eval(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
+	// } 
+
         Hcutflow->Fill(1,1);
         Hcutflow->Fill(2,weight);
         Hcutflow->Fill(3,weight*TotalWeight_minus);
@@ -437,6 +451,196 @@ int main(int argc, char* argv[])
 
         // add PhysicsEvent_t class, get all tree to physics objects
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
+
+	float ewk_w = 1.; 
+
+	/////// 
+	// EWK correction for ZZ and WZ (ewk_w = 1.0 otherwise) 
+	/// 
+	// WZ 
+	if(isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
+	  TLorentzVector wz_z, wz_w;
+	  TLorentzVector 
+	    nu(0., 0., 0., 0.), l1(0., 0., 0., 0.), 
+	    l2(0., 0., 0., 0.), l3(0., 0., 0., 0.), 
+	    lw(0., 0., 0., 0.), lz1(0., 0., 0., 0.), lz2(0., 0., 0., 0.); 
+	  int nuid(0), l1id(0), l2id(0), l3id(0); 
+	  bool foundNeut(false), foundLep1(false), foundLep2(false), foundLep3(false); 
+	  //std::cout << std::endl; 
+	  //std::cout << " New Event:" << std::endl; 
+	  for(Int_t ipart=0; ipart<ev.nmcparticles; ++ipart) { 
+	    if(ev.mc_status[ipart]!=1) continue; 
+	    //std::cout << " " << ev.mc_id[ipart] << "/" << ev.mc_status[ipart]; 
+	    //continue; 
+
+	    if( !foundNeut && (fabs(ev.mc_id[ipart])==12  || fabs(ev.mc_id[ipart])==14  || fabs(ev.mc_id[ipart])==16 ) ) { 
+	      nu.SetPxPyPzE(ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      nuid = ev.mc_id[ipart]; 
+	      foundNeut = true; 
+	    } 
+	    else if( !foundLep1 && (fabs(ev.mc_id[ipart])==11  || fabs(ev.mc_id[ipart])==13  || fabs(ev.mc_id[ipart])==15 ) ) { 
+	      l1.SetPxPyPzE(ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      l1id = ev.mc_id[ipart]; 
+	      foundLep1 = true; 
+	    } 
+	    else if( foundLep1 && !foundLep2 && (fabs(ev.mc_id[ipart])==11  || fabs(ev.mc_id[ipart])==13  || fabs(ev.mc_id[ipart])==15 ) ) { 
+	      l2.SetPxPyPzE(ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      l2id = ev.mc_id[ipart]; 
+	      foundLep2 = true; 
+	    } 
+	    else if( foundLep1 && foundLep2 && !foundLep3 && (fabs(ev.mc_id[ipart])==11  || fabs(ev.mc_id[ipart])==13  || fabs(ev.mc_id[ipart])==15 ) ) { 
+	      l3.SetPxPyPzE(ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      l3id = ev.mc_id[ipart]; 
+	      foundLep3 = true; 
+	    } 
+	    if(foundNeut && foundLep3) break; 
+	  } // end for nmcparticles 
+
+	  if(nuid!=0 && l1id!=0 && l2id!=0 && l3id!=0) { 
+	    // Now find the right combinations... good luck! 
+	    if( (nuid+l1id)==(nuid/abs(nuid)) && (l2id+l3id)==0  ) { 
+	      lw = l1; lz1 = l2; lz2 = l3; 
+	    } 
+	    if( (nuid+l2id)==(nuid/abs(nuid)) && (l1id+l3id)==0  ) { 
+	      if( fabs((nu+l2).M()-80.) < fabs((nu+lw).M()-80.) ) { 
+		lw = l2; lz1 = l1; lz2 = l3; 
+	      } 
+	    } 
+	    if( (nuid+l3id)==(nuid/abs(nuid)) && (l1id+l2id)==0  ) { 
+	      if( fabs((nu+l3).M()-80.) < fabs((nu+lw).M()-80.) ) { 
+		lw = l3; lz1 = l1; lz2 = l2; 
+	      } 
+	    } 
+	    wz_z = lz1 + lz2; wz_w = nu + lw; 
+
+	    if(debug) {
+	      std::cout << std::endl; 
+	      std::cout << " *** Z: " << lz1.Pt() << "-" << lz2.Pt() << ";  W: " << nu.Pt() << "-" << lw.Pt() << std::endl; 
+	      std::cout << "        nu(" << nuid << "): " << nu.Pt() << ", l1(" << l1id << "): " << l1.Pt() << ", l2(" << l2id << "): " 
+			<< l2.Pt() << ", l3(" << l3id << "): " << l3.Pt() << std::endl; 
+	    } 
+
+	    float wz_min_pt = wz_z.Pt() < wz_w.Pt() ? wz_z.Pt() : wz_w.Pt(); 
+	    if( !useEwkTable ) { 
+	      // Reading by eye from the paper
+	      if(     wz_min_pt<60.)  ewk_w = 1.-(0.9/100.);
+	      else if(wz_min_pt<80.)  ewk_w = 1.-(0.9/100.);
+	      else if(wz_min_pt<100.) ewk_w = 1.-(1.0/100.);
+	      else if(wz_min_pt<120.) ewk_w = 1.-(1.5/100.);
+	      else if(wz_min_pt<140.) ewk_w = 1.-(2.0/100.);
+	      else if(wz_min_pt<160.) ewk_w = 1.-(2.6/100.);
+	      else if(wz_min_pt<180.) ewk_w = 1.-(3.0/100.);
+	      else if(wz_min_pt<200.) ewk_w = 1.-(4.9/100.);
+	      else if(wz_min_pt<220.) ewk_w = 1.-(5.2/100.);
+	      else if(wz_min_pt<240.) ewk_w = 1.-(6.5/100.);
+	      else if(wz_min_pt<260.) ewk_w = 1.-(7.5/100.);
+	      else if(wz_min_pt<280.) ewk_w = 1.-(8.0/100.);
+	      else if(wz_min_pt<300.) ewk_w = 1.-(9.9/100.);
+	      else if(wz_min_pt<320.) ewk_w = 1.-(10.9/100.);
+	      else if(wz_min_pt<340.) ewk_w = 1.-(12.3/100.);
+	      else if(wz_min_pt<360.) ewk_w = 1.-(12.6/100.);
+	      else if(wz_min_pt<380.) ewk_w = 1.-(13.5/100.);
+	      else                    ewk_w = 1.-(14.0/100.);
+	    } // end "if not useEwkTable" 
+	  } // end "if all gen-particles are identified" 
+	  else { 
+	    if(debug) 
+	      std::cout << " ### WARNING: some gen-particles not identified: nu:" << nuid 
+			<< ", l1:" << l1id << ", l2:" << l2id << ", l3:" << l3id << "###" << std::endl; 
+	  } 
+	} // end "if isMC and is WZ" 
+
+	/// 
+	// ZZ 
+	TLorentzVector l1(0.,0.,0.,0.), l2(0.,0.,0.,0.), v1(0.,0.,0.,0.), v2(0.,0.,0.,0.); 
+	if(isMC && (url.Contains("MC13TeV_ZZTo2L2Nu"))) { // No 4l nor 2l2q for now 
+	  // Neutrinos 
+	  bool foundNeut1(false), foundNeut2(false); 
+	  bool foundLept1(false), foundLept2(false); 
+	  int firstNeut(0), firstLept(0); 
+	  int v1id(0), v2id(0), l1id(0), l2id(0); 
+	  for(Int_t ipart=0; ipart<ev.nmcparticles; ++ipart) { 
+	    if(ev.mc_status[ipart]!=1) continue; 
+	    if( !foundNeut1 && 
+		(fabs(ev.mc_id[ipart])==12 || fabs(ev.mc_id[ipart])==14 || fabs(ev.mc_id[ipart])==16 ) ) { 
+	      v1.SetPxPyPzE( ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      foundNeut1 = true; 
+	      firstNeut = ev.mc_id[ipart]; 
+	      v1id = ev.mc_id[ipart]; 
+	    } 
+	    else if( foundNeut1 && !foundNeut2 && 
+		     //(fabs(ev.mc_id[ipart])==12 || fabs(ev.mc_id[ipart])==14 || fabs(ev.mc_id[ipart])==16) && 
+		     ev.mc_id[ipart] + firstNeut == 0 ) { 
+	      v2.SetPxPyPzE( ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      foundNeut2 = true; 
+	      v2id = ev.mc_id[ipart]; 
+	    } 
+	    else if( !foundLept1 && 
+		     (fabs(ev.mc_id[ipart])==11 || fabs(ev.mc_id[ipart])==13 || fabs(ev.mc_id[ipart])==15) ) { 
+	      l1.SetPxPyPzE( ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      foundLept1 = true; 
+	      firstLept = ev.mc_id[ipart]; 
+	      l1id = ev.mc_id[ipart]; 
+	    } 
+	    else if( foundLept1 && !foundLept2 && 
+		     //(fabs(ev.mc_id[ipart])==11 || fabs(ev.mc_id[ipart])==13 || fabs(ev.mc_id[ipart])==15) && 
+		     ev.mc_id[ipart] + firstLept == 0 ) { 
+	      l2.SetPxPyPzE( ev.mc_px[ipart], ev.mc_py[ipart], ev.mc_pz[ipart], ev.mc_en[ipart]); 
+	      foundLept2 = true; 
+	      l2id = ev.mc_id[ipart]; 
+	    } 
+	    if(foundNeut2 && foundLept2) break; 
+	  } // end for mcparticles 
+
+	  if(foundNeut2 && foundLept2) { 
+	    //float z_max_pt=(0.); 
+	    float z_min_pt(0.);
+	    float z1_pt = (l1+l2).Pt(); 
+	    float z2_pt = (v1+v2).Pt();
+	    //z_max_pt = z1_pt<z2_pt ? z2_pt : z1_pt; 
+	    z_min_pt = z1_pt>z2_pt ? z2_pt : z1_pt;
+
+	    if(debug) {
+	      std::cout << std::endl; 
+	      std::cout << " *** Zll pt: " << z1_pt << ";  Zvv: " << z2_pt << ";  Zmin: " << z_min_pt << std::endl; 
+	      std::cout << "        l1(" << l1id << "): " << l1.Pt() << ", l2(" << l2id << "): " << l2.Pt() 
+			<< ", v1(" << v1id << "): " << v1.Pt() << ", v2(" << v2id << "): " << v2.Pt() << std::endl; 
+	    } 
+
+	    if( !useEwkTable ) { 
+	      //Reading by eye from the paper
+	      if(     z_min_pt<60.)  ewk_w = 1.-(4.0/100.);
+	      else if(z_min_pt<80.)  ewk_w = 1.-(5.0/100.);
+	      else if(z_min_pt<100.) ewk_w = 1.-(6.3/100.);
+	      else if(z_min_pt<120.) ewk_w = 1.-(7.6/100.);
+	      else if(z_min_pt<140.) ewk_w = 1.-(9.2/100.);
+	      else if(z_min_pt<160.) ewk_w = 1.-(10.0/100.);
+	      else if(z_min_pt<180.) ewk_w = 1.-(11.4/100.);
+	      else if(z_min_pt<200.) ewk_w = 1.-(12.8/100.);
+	      else if(z_min_pt<220.) ewk_w = 1.-(14.2/100.);
+	      else if(z_min_pt<240.) ewk_w = 1.-(15.6/100.);
+	      else if(z_min_pt<260.) ewk_w = 1.-(17.0/100.);
+	      else if(z_min_pt<280.) ewk_w = 1.-(18.4/100.);
+	      else if(z_min_pt<300.) ewk_w = 1.-(20.0/100.);
+	      else if(z_min_pt<320.) ewk_w = 1.-(21.2/100.);
+	      else if(z_min_pt<340.) ewk_w = 1.-(22.4/100.);
+	      else if(z_min_pt<360.) ewk_w = 1.-(23.6/100.);
+	      else if(z_min_pt<380.) ewk_w = 1.-(24.8/100.);
+	      else                   ewk_w = 1.-(26.0/100.);
+	    } // end "if not useEwkTable" 
+	  } // end "foundNeut2 and foundLept2" 
+	  else { 
+	    if(debug) 
+	      std::cout << " ### WARNING: some gen-particles not identified: v1:" << v1id 
+			<< ", v2:" << v2id << ", l1:" << l1id << ", l2:" << l2id << "###" << std::endl; 
+	  } 
+	} // end "if isMC and is ZZ" 
+
+	// Apply EWK weight! 
+	weight *= ewk_w; 
+
+	// End EWK corrections 
+	////// 
 
         // FIXME need to have a function: loop all leptons, find a Z candidate,
         // can have input, ev.mn, ev.en
@@ -456,7 +660,6 @@ int main(int argc, char* argv[])
         //#########################################################################
         //####################  Generator Level Reweighting  ######################
         //#########################################################################
-
 
         //for Wimps
         if(isMC_WIMP || isMC_ADD || isMC_Unpart) {
@@ -497,7 +700,8 @@ int main(int argc, char* argv[])
         std::vector<PhysicsObjectJetCollection> variedJets;
         LorentzVectorCollection variedMET;
 
-        METUtils::computeVariation(phys.jets, phys.leptons, phys.metNoHF, variedJets, variedMET, &jecUnc);
+        //METUtils::computeVariation(phys.jets, phys.leptons, phys.metNoHF, variedJets, variedMET, &jecUnc);
+        METUtils::computeVariation(phys.jets, phys.leptons, phys.met, variedJets, variedMET, &jecUnc);
 
         LorentzVector metP4=variedMET[0];
         PhysicsObjectJetCollection &corrJets = variedJets[0];
@@ -629,8 +833,11 @@ int main(int argc, char* argv[])
 
         // pielup reweightiing
         mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      weight);
-        if(isMC) weight *= myWIMPweights.get1DWeights(phys.nvtx,"pileup_weights");
+        //if(isMC) weight *= myWIMPweights.get1DWeights(phys.nvtx,"pileup_weights");
 
+	// Temporary pileup reweighting with simple vector (true PU weights) 
+	unsigned int truepubin = int(ev.ngenTruepu + 0.5); 
+	if(isMC) weight *= puWeightsNew[truepubin]; 
 
         mon.fillHisto("eventflow",tags,0,weight);
         mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
@@ -775,7 +982,9 @@ int main(int argc, char* argv[])
         bool passDphiZMETcut(dphiZMET>2.7);
 
         //missing ET
-        bool passMETcut=(metP4.pt()>80);
+        //bool passMETcut=(metP4.pt()>80);
+        //bool passMETcut=(metP4.pt()>60);
+        bool passMETcut=(metP4.pt()>120);
         bool passMETcut120=(metP4.pt()>120);
 
         //missing ET balance
@@ -898,22 +1107,35 @@ int main(int argc, char* argv[])
 
         //Fill histogram for posterior optimization, or for control regions
         for(size_t ivar=0; ivar<nvarsToInclude; ivar++) {
-            float iweight = weight;                                               //nominal
-            if(varNames[ivar]=="_puup")        iweight *=1;//TotalWeight_plus;        //pu up
-            if(varNames[ivar]=="_pudown")      iweight *=1;//TotalWeight_minus;       //pu down
+	  float iweight = weight;                                               //nominal
+	  if(varNames[ivar]=="_puup")        iweight *=1;//TotalWeight_plus;        //pu up
+	  if(varNames[ivar]=="_pudown")      iweight *=1;//TotalWeight_minus;       //pu down
 
-            if(isSignal && (varNames[ivar]=="_pdfup" || varNames[ivar]=="_pdfdown")) {
-                if(mPDFInfo) {
-                    float PDFWeight_plus(1.0), PDFWeight_down(1.0);
-                    std::vector<float> wgts=mPDFInfo->getWeights(iev);
-                    for(size_t ipw=0; ipw<wgts.size(); ipw++) {
-                        PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
-                        PDFWeight_down = TMath::Min(PDFWeight_down,wgts[ipw]);
-                    }
-                    if(varNames[ivar]=="_pdfup")    iweight *= PDFWeight_plus;
-                    if(varNames[ivar]=="_pdfdown")  iweight *= PDFWeight_down;
-                }
-            }
+	  if(isSignal && (varNames[ivar]=="_pdfup" || varNames[ivar]=="_pdfdown")) {
+	    if(mPDFInfo) {
+	      float PDFWeight_plus(1.0), PDFWeight_down(1.0);
+	      std::vector<float> wgts=mPDFInfo->getWeights(iev);
+	      for(size_t ipw=0; ipw<wgts.size(); ipw++) {
+		PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
+		PDFWeight_down = TMath::Min(PDFWeight_down,wgts[ipw]);
+	      }
+	      if(varNames[ivar]=="_pdfup")    iweight *= PDFWeight_plus;
+	      if(varNames[ivar]=="_pdfdown")  iweight *= PDFWeight_down;
+	    }
+	  }
+
+	  if( url.Contains("MC13TeV_ZZTo") ) { 
+	    if(varNames[ivar]=="_ewkup"  ) { iweight /= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk up 
+	    if(varNames[ivar]=="_ewkdown") { iweight *= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk down
+	  }
+
+	  // WZ: assign 100% uncertainty (TEMPORARY) 
+	  if( url.Contains("MC13TeV_WZ") && (!url.Contains("MC13TeV_WZZ")) ) { 
+	    if(varNames[ivar]=="_ewkup"  ) { iweight /= ewk_w; } // Ewk up
+	    if(varNames[ivar]=="_ewkdown") { iweight *= ewk_w; } // Ewk down
+	    //if(varNames[ivar]=="_ewkdown") { iweight /= ewk_w; iweight *=(1-(1-EWK_w)*2);} // Ewk down
+	  }
+
 
             //##############################################
             // recompute MET/MT if JES/JER was varied
