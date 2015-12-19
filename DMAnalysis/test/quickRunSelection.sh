@@ -13,6 +13,7 @@ json="$main/data/sample_13TeV_25ns_ZHinv_plot.json"
 input="/store/group/phys_exotica/monoZ/llvvNtuple_25ns_29Oct2015"
 wimpweights="$main/data/weights/PileupWeights_Sep182015.root"
 queue="2nd"
+mkdir -p /tmp/`whoami`
 #runLocalAnalysisOverSamples.py -g $runlog -e $execute -j $json -o $outfile -d $input -c $templ -p "@runSystematics=False @is2011=False @runOptimization=False @wimpweights=${wimpweights}" -s $queue 
 #runLocalAnalysisOverSamples.py -g $runlog -e $execute -j $json -o $outfile -d $input -c $templ -p "@runSystematics=True @is2011=False @runOptimization=False @wimpweights=${wimpweights}" -s $queue 
 runLocalAnalysisOverSamples.py -g $runlog -e $execute -j $json -o $outfile -d $input -c $templ -p "@runSystematics=False @is2011=False @runOptimization=False @wimpweights=${wimpweights}" -s $queue 
