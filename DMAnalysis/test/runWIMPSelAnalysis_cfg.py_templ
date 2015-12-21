@@ -22,7 +22,8 @@ blinding=False
 
 runProcess = cms.PSet(
     input = cms.string("@input"),
-    outdir = cms.string("@outdir"),
+    outdir = cms.string("."),
+    saveFinalList = cms.untracked.bool(False),
     suffix = cms.string("@suffix"),
     tag = cms.string("@tag"),
     wimpweights = cms.vstring("@wimpweights"),

@@ -68,9 +68,11 @@ int main(int argc, char* argv[])
 
     TString outTxtUrl_final= outUrl + "/" + outFileUrl + "_FinalList.txt";
     FILE* outTxtFile_final = NULL;
-    outTxtFile_final = fopen(outTxtUrl_final.Data(), "w");
-    printf("TextFile URL = %s\n",outTxtUrl_final.Data());
-    fprintf(outTxtFile_final,"run lumi event\n");
+    if ( runProcess.getUntrackedParameter<bool>("saveFinalList", true) ) {
+        outTxtFile_final = fopen(outTxtUrl_final.Data(), "w");
+        printf("TextFile URL = %s\n",outTxtUrl_final.Data());
+        fprintf(outTxtFile_final,"run lumi event\n");
+    }
 
     int fType(0);
     if(url.Contains("DoubleEG")) fType=EE;
@@ -1074,7 +1076,7 @@ int main(int argc, char* argv[])
 
                                     if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
-                                    if(!isMC) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                    if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
 
                                 } //passMETcut
 
@@ -1276,3 +1278,4 @@ int main(int argc, char* argv[])
 
     if(outTxtFile_final)fclose(outTxtFile_final);
 }
+/* vim: set ts=4 sw=4 tw=0 et :*/
