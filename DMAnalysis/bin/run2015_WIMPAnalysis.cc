@@ -724,10 +724,11 @@ int main(int argc, char* argv[])
 
             bool hasTightIdandIso(true);
             if(abs(lepid)==13) { //muon
+                // MIT: medium POG + d0<0.02 + dz<0.1
                 hasTightIdandIso &= phys.leptons[ilep].isTightMu;
                 if(hasTightIdandIso) mon.fillHisto("mu_reliso_raw",   tags, phys.leptons[ilep].m_pfRelIsoDbeta(), weight);
 
-                hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.1 );
+                hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.12 );
             } else if(abs(lepid)==11) { //electron
                 hasTightIdandIso &= phys.leptons[ilep].isElpassMedium;
                 if(hasTightIdandIso) mon.fillHisto("el_reliso_raw",   tags, phys.leptons[ilep].e_pfRelIsoDbeta(), weight);
@@ -925,7 +926,7 @@ int main(int argc, char* argv[])
                 if(dR > minDR) continue;
                 minDR = dR;
             }
-            if(minDR < 0.4) continue;
+            if(minDR < 0.3) continue;
 
 
             GoodIdJets.push_back(corrJets[ijet]);
@@ -981,16 +982,16 @@ int main(int argc, char* argv[])
         }
 
         double dphiZMET=fabs(deltaPhi(zll.phi(),metP4.phi()));
-        bool passDphiZMETcut(dphiZMET>2.7);
+        bool passDphiZMETcut(dphiZMET>2.8);
 
         //missing ET
         //bool passMETcut=(metP4.pt()>80);
         //bool passMETcut=(metP4.pt()>60);
-        bool passMETcut=(metP4.pt()>120);
+        bool passMETcut=(metP4.pt()>100);
         bool passMETcut120=(metP4.pt()>120);
 
         //missing ET balance
-        bool passBalanceCut=(metP4.pt()/zll.pt()>0.80 && metP4.pt()/zll.pt()<1.20);
+        bool passBalanceCut=(metP4.pt()/zll.pt()>0.50 && metP4.pt()/zll.pt()<1.50);
         double balanceDif = fabs(1-metP4.pt()/zll.pt());
 
         //transverse mass
