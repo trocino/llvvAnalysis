@@ -74,6 +74,17 @@ int main(int argc, char* argv[])
         fprintf(outTxtFile_final,"run lumi event\n");
     }
 
+    // Embed final list in root file
+    TTree * eventList = new TTree("eventList", "List of passed events");
+    int eventList_run, eventList_lumi, eventList_evt;
+    float eventList_met, eventList_mt, eventList_llpt;
+    eventList->Branch("run", &eventList_run);
+    eventList->Branch("lumi", &eventList_lumi);
+    eventList->Branch("evt", &eventList_evt);
+    eventList->Branch("met", &eventList_met);
+    eventList->Branch("mt", &eventList_mt);
+    eventList->Branch("llpt", &eventList_llpt);
+
     int fType(0);
     if(url.Contains("DoubleEG")) fType=EE;
     if(url.Contains("DoubleMuon"))  fType=MUMU;
@@ -183,9 +194,10 @@ int main(int argc, char* argv[])
     h->GetXaxis()->SetBinLabel(3,"#it{p}_{T}^{ll}>50");
     h->GetXaxis()->SetBinLabel(4,"3^{rd}-lepton veto");
     h->GetXaxis()->SetBinLabel(5,"b-veto");
-    h->GetXaxis()->SetBinLabel(6,"#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss})>2.7");
-    h->GetXaxis()->SetBinLabel(7,"|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T}<0.2");
-    h->GetXaxis()->SetBinLabel(8,"E_{T}^{miss}>80");
+    h->GetXaxis()->SetBinLabel(6,"#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss})>2.8");
+    h->GetXaxis()->SetBinLabel(7,"#Delta#it{#phi}(#it{l^{+},l^{-}})<#pi/2");
+    h->GetXaxis()->SetBinLabel(8,"|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T}<0.4");
+    h->GetXaxis()->SetBinLabel(9,"E_{T}^{miss}>100");
 
 
     //for MC normalization (to 1/pb)
@@ -776,6 +788,7 @@ int main(int argc, char* argv[])
         LorentzVector zll(lep1+lep2);
         bool passZmass(fabs(zll.mass()-91)<15);
         bool passZpt(zll.pt()>50);
+        bool passDiLepDphi(fabs(deltaPhi(lep1.phi(), lep2.phi()))<M_PI/2);
 
 
         TString tag_cat;
@@ -901,6 +914,18 @@ int main(int argc, char* argv[])
 
         pass3dLeptonVeto=(n3rdLeptons==0);
 
+        //
+        // Also look for soft muons for b veto
+        //
+        int nSoftMuons(0);
+        for(size_t ilep=0; ilep<phys.leptons.size(); ilep++) {
+            LorentzVector lep=phys.leptons[ilep];
+            if ( lep.pt() < 3 ) continue;
+            if ( ! phys.leptons[ilep].isSoftMu ) continue;
+            if ( std::find(allLeptons.begin(), allLeptons.end(), lep) != allLeptons.end() ) continue;
+            
+            nSoftMuons++;
+        }
 
         //
         //JET AND BTAGING ANALYSIS
@@ -912,8 +937,8 @@ int main(int argc, char* argv[])
         double BTagScaleFactor(1.0);
         for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
 
-            if(corrJets[ijet].pt()<20) continue;
-            if(fabs(corrJets[ijet].eta())>2.5) continue;
+            if(corrJets[ijet].pt()<30) continue;
+            if(fabs(corrJets[ijet].eta())>5.) continue;
 
             //jet ID
             if(!corrJets[ijet].isPFLoose) continue;
@@ -930,12 +955,12 @@ int main(int argc, char* argv[])
 
 
             GoodIdJets.push_back(corrJets[ijet]);
-            if(corrJets[ijet].pt()>30) nJetsGood30++;
+            if(corrJets[ijet].pt()>30) nJetsGood30++; // unused currently
 
 
             if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.244);
             if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.679);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.898);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.890); // 0.898 originally
 
 
             bool isCSVLtagged(corrJets[ijet].btag0>0.244 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
@@ -974,7 +999,7 @@ int main(int argc, char* argv[])
 
         }
 
-        passBveto=(nCSVLtags==0);
+        passBveto=(nCSVTtags==0)&&(nSoftMuons==0);
 
         for(size_t ij=0; ij<GoodIdJets.size(); ij++) {
             mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
@@ -991,7 +1016,7 @@ int main(int argc, char* argv[])
         bool passMETcut120=(metP4.pt()>120);
 
         //missing ET balance
-        bool passBalanceCut=(metP4.pt()/zll.pt()>0.50 && metP4.pt()/zll.pt()<1.50);
+        bool passBalanceCut=(metP4.pt()/zll.pt()>0.60 && metP4.pt()/zll.pt()<1.40);
         double balanceDif = fabs(1-metP4.pt()/zll.pt());
 
         //transverse mass
@@ -1066,22 +1091,36 @@ int main(int argc, char* argv[])
                         if(passDphiZMETcut) {
                             mon.fillHisto("eventflow",  tags, 5, weight);
 
-                            if(passBalanceCut) {
-                                mon.fillHisto("eventflow",  tags, 6, weight);
+                            if(passDiLepDphi) {
+                                mon.fillHisto("eventflow", tags, 6, weight);
 
-                                if(passMETcut) {
+                                if(passBalanceCut) {
                                     mon.fillHisto("eventflow",  tags, 7, weight);
-                                    mon.fillHisto("mt_final",   tags, MT_massless, weight);
-                                    mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
-                                    mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
 
-                                    if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
+                                    if(passMETcut) {
+                                        mon.fillHisto("eventflow",  tags, 8, weight);
+                                        mon.fillHisto("mt_final",   tags, MT_massless, weight);
+                                        mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
+                                        mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
 
-                                    if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                        if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
-                                } //passMETcut
+                                        if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                        if(!isMC) {
+                                            eventList_run = ev.run;
+                                            eventList_lumi = ev.lumi;
+                                            eventList_evt = ev.event;
+                                            eventList_met = metP4.pt();
+                                            eventList_mt = MT_massless;
+                                            eventList_llpt = zll.pt();
+                                            eventList->Fill();
+                                        }
 
-                            } //passBalanceCut
+                                    } //passMETcut
+
+                                } //passBalanceCut
+
+                            } //passDiLepDphi
 
                         } //passDphiZMETcut
 
@@ -1274,6 +1313,7 @@ int main(int argc, char* argv[])
     //save all to the file
     TFile *ofile=TFile::Open(outUrl, "recreate");
     mon.Write();
+    eventList->Write();
 
     ofile->Close();
 
