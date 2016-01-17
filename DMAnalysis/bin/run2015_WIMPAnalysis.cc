@@ -745,7 +745,8 @@ int main(int argc, char* argv[])
                 hasTightIdandIso &= phys.leptons[ilep].isElpassMedium;
                 if(hasTightIdandIso) mon.fillHisto("el_reliso_raw",   tags, phys.leptons[ilep].e_pfRelIsoDbeta(), weight);
 
-                hasTightIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.1 );
+                // Electron tight ID from VID already includes isolation
+                // hasTightIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.1 );
             } else continue;
 
 
@@ -902,7 +903,8 @@ int main(int argc, char* argv[])
                 hasLooseIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.2 );
             } else if(abs(lepid)==11) { //electron
                 hasLooseIdandIso &= phys.leptons[ilep].isElpassVeto;
-                hasLooseIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.2 );
+                // Electron ID from VID already includes isolation
+                //hasLooseIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.2 );
             } else continue;
 
 
