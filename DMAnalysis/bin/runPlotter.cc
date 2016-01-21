@@ -1642,3 +1642,4 @@ int main(int argc, char* argv[]){
    printf("\033[31mYou can browse the results using: firefox %sindex.html\033[0m\n",outDir.c_str());
 }
 
+/* vim: set ts=8 sw=2 tw=0 et :*/

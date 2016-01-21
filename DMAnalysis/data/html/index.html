@@ -86,7 +86,7 @@
     baseplotname=baseplotname.replace('all_','');
     var plotname=baseplotname;
     if(theBaseUrl.length>0) plotname = theBaseUrl + '/' + baseplotname;
-    $('#'+iplotval).append('<td><div class="title" align="center"><b>'+title+'</b>: <a href="'+plotname+'.pdf">PDF</a> / <a href="'+plotname+'.png">PNG</a></div><div class="image"><img width="350" src="'+plotname+'.png"/></div></td>');
+    $('#'+iplotval).append('<td><div class="title" align="center"><b>'+title+'</b>: <a href="'+plotname+'.root">ROOT</a> / <a href="'+plotname+'.png">PNG</a></div><div class="image"><img width="350" src="'+plotname+'.png"/></div></td>');
     });
     });
     });
