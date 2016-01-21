@@ -75,15 +75,20 @@ int main(int argc, char* argv[])
     }
 
     // Embed final list in root file
-    TTree * eventList = new TTree("eventList", "List of passed events");
-    int eventList_run, eventList_lumi, eventList_evt;
+    int eventList_run, eventList_lumi, eventList_evt, eventList_nJets;
     float eventList_met, eventList_mt, eventList_llpt;
-    eventList->Branch("run", &eventList_run);
-    eventList->Branch("lumi", &eventList_lumi);
-    eventList->Branch("evt", &eventList_evt);
-    eventList->Branch("met", &eventList_met);
-    eventList->Branch("mt", &eventList_mt);
-    eventList->Branch("llpt", &eventList_llpt);
+    bool saveEventList = !isMC || runProcess.getUntrackedParameter<bool>("saveEventList", false);
+    TTree * eventList{nullptr};
+    if ( saveEventList ) {
+        eventList = new TTree("eventList", "List of passed events");
+        eventList->Branch("run", &eventList_run);
+        eventList->Branch("lumi", &eventList_lumi);
+        eventList->Branch("evt", &eventList_evt);
+        eventList->Branch("nJets", &eventList_nJets);
+        eventList->Branch("met", &eventList_met);
+        eventList->Branch("mt", &eventList_mt);
+        eventList->Branch("llpt", &eventList_llpt);
+    }
 
     int fType(0);
     if(url.Contains("DoubleEG")) fType=EE;
@@ -191,13 +196,16 @@ int main(int argc, char* argv[])
     TH1F *h=(TH1F*) mon.addHistogram( new TH1F ("eventflow", ";;Events", 10,0,10) );
     h->GetXaxis()->SetBinLabel(1,"Trigger && 2 leptons");
     h->GetXaxis()->SetBinLabel(2,"|#it{m}_{ll}-#it{m}_{Z}|<15");
-    h->GetXaxis()->SetBinLabel(3,"#it{p}_{T}^{ll}>50");
+    h->GetXaxis()->SetBinLabel(3,"#it{p}_{T}^{ll}>60");
     h->GetXaxis()->SetBinLabel(4,"3^{rd}-lepton veto");
     h->GetXaxis()->SetBinLabel(5,"b-veto");
     h->GetXaxis()->SetBinLabel(6,"#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss})>2.8");
     h->GetXaxis()->SetBinLabel(7,"#Delta#it{#phi}(#it{l^{+},l^{-}})<#pi/2");
     h->GetXaxis()->SetBinLabel(8,"|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T}<0.4");
     h->GetXaxis()->SetBinLabel(9,"E_{T}^{miss}>100");
+    h->GetXaxis()->SetBinLabel(10,"m_{T} > 200");
+
+    mon.addHistogram((TH1F*) h->Clone("eventflow_unweighted"));
 
 
     //for MC normalization (to 1/pb)
@@ -788,7 +796,7 @@ int main(int argc, char* argv[])
         if(id1*id2==0) continue;
         LorentzVector zll(lep1+lep2);
         bool passZmass(fabs(zll.mass()-91)<15);
-        bool passZpt(zll.pt()>50);
+        bool passZpt(zll.pt()>60);
         bool passDiLepDphi(fabs(deltaPhi(lep1.phi(), lep2.phi()))<M_PI/2);
 
 
@@ -1066,15 +1074,19 @@ int main(int argc, char* argv[])
 
         if(passZmass) {
             mon.fillHisto("eventflow",  tags, 1, weight);
+            mon.fillHisto("eventflow_unweighted",  tags, 1, 1.);
 
             if(passZpt) {
                 mon.fillHisto("eventflow",  tags, 2, weight);
+                mon.fillHisto("eventflow_unweighted",  tags, 2, 1.);
 
                 if(pass3dLeptonVeto) {
                     mon.fillHisto("eventflow",  tags, 3, weight);
+                    mon.fillHisto("eventflow_unweighted",  tags, 3, 1.);
 
                     if(passBveto) {
                         mon.fillHisto("eventflow",  tags, 4, weight);
+                        mon.fillHisto("eventflow_unweighted",  tags, 4, 1.);
 
                         //for MET X-Y shift correction
                         mon.fillHisto("pfmetphi_wocorr_presel",tags, metP4.phi(), weight);
@@ -1092,26 +1104,36 @@ int main(int argc, char* argv[])
 
                         if(passDphiZMETcut) {
                             mon.fillHisto("eventflow",  tags, 5, weight);
+                            mon.fillHisto("eventflow_unweighted",  tags, 5, 1.);
 
                             if(passDiLepDphi) {
                                 mon.fillHisto("eventflow", tags, 6, weight);
+                                mon.fillHisto("eventflow_unweighted", tags, 6, 1.);
 
                                 if(passBalanceCut) {
                                     mon.fillHisto("eventflow",  tags, 7, weight);
+                                    mon.fillHisto("eventflow_unweighted",  tags, 7, 1.);
 
                                     if(passMETcut) {
                                         mon.fillHisto("eventflow",  tags, 8, weight);
+                                        mon.fillHisto("eventflow_unweighted",  tags, 8, 1.);
                                         mon.fillHisto("mt_final",   tags, MT_massless, weight);
                                         mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
                                         mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
 
                                         if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
+                                        if(MT_massless>200) {
+                                            mon.fillHisto("eventflow",  tags, 9, weight);
+                                            mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
+                                        }
+
                                         if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
-                                        if(!isMC) {
+                                        if(saveEventList) {
                                             eventList_run = ev.run;
                                             eventList_lumi = ev.lumi;
                                             eventList_evt = ev.event;
+                                            eventList_nJets = GoodIdJets.size();
                                             eventList_met = metP4.pt();
                                             eventList_mt = MT_massless;
                                             eventList_llpt = zll.pt();
@@ -1315,7 +1337,7 @@ int main(int argc, char* argv[])
     //save all to the file
     TFile *ofile=TFile::Open(outUrl, "recreate");
     mon.Write();
-    eventList->Write();
+    if ( eventList ) eventList->Write();
 
     ofile->Close();
 
