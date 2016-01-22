@@ -104,6 +104,24 @@ int main(int argc, char* argv[])
     // Temporary pileup reweighting with simple vector (true PU weights) 
     double puWeightsNew[100] = {0., 54.0349, 116.125, 40.5246, 16.8051, 3.04448, 1.19776, 1.07217, 1.70808, 2.39848, 2.63249, 2.71243, 2.603, 2.16652, 1.50064, 0.857888, 0.409503, 0.173253, 0.0756125, 0.0399038, 0.0234459, 0.0126852, 0.00577866, 0.0022077, 0.000755718, 0.000269065, 0.000118168, 6.61647e-05, 4.40645e-05, 3.21187e-05, 2.38856e-05, 1.63517e-05, 9.18719e-06, 4.29246e-06, 1.69405e-06, 6.09737e-07, 2.13578e-07, 6.75225e-08, 2.08689e-08, 6.0951e-09, 1.72728e-09, 4.62314e-10, 1.1934e-10, 3.06271e-11, 7.08311e-12, 1.64595e-12, 5.12206e-13, 2.41336e-13, 8.96516e-14, 7.4969e-14, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; 
 
+    for(int i=0; i<100; ++i) {puWeightsNew[i] /= (284.886/313.347);} 
+
+// 313.347  284.886
+// 1364.03  1241.98
+// 1712.07  1558.24
+// 945.921  903.55
+// 3726.47  3374.27
+// 3801.33  3447.72
+// 40791.1  37261
+// 26944.5  25545.9
+// 2.65721e+06  2.40604e+06
+// 67.7048  61.7827
+// 46.9555  42.8672
+// 26.786  24.4586
+// 10.5018  9.64228
+// 2.46057  2.23257
+
+
 
     // EWK corrections (from table or from plot) 
     bool useEwkTable = false; 
@@ -453,12 +471,21 @@ int main(int argc, char* argv[])
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
 
 	float ewk_w = 1.; 
+	/// Also include an extra 10% to account for gg->ZZ contribution. 
+	///  N.B.:  sigma(gg->ZZ) = sigma(qq->ZZ) BEFORE NLO EWK contribution!!! 
+	///  Therefore it's not  sigma(qq->ZZ) * (1 + ewk_corr) * (1 + gg_contr) 
+	///  but rather  
+	///    sigma(qq->ZZ) + ewk_corr*sigma(qq->ZZ) + gg_contr*sigma(qq->ZZ) 
+	///    = sigma(qq->ZZ) * (1 + ewk_corr + gg_contr) 
+	///  where gg_contr = 0.1 
+	float ggZZ_contr = 0.1; 
 
 	/////// 
 	// EWK correction for ZZ and WZ (ewk_w = 1.0 otherwise) 
 	/// 
 	// WZ 
-	if(isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
+	if(false && // turn them off for now (probably negligible) 
+	   isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
 	  TLorentzVector wz_z, wz_w;
 	  TLorentzVector 
 	    nu(0., 0., 0., 0.), l1(0., 0., 0., 0.), 
@@ -523,24 +550,24 @@ int main(int argc, char* argv[])
 	    float wz_min_pt = wz_z.Pt() < wz_w.Pt() ? wz_z.Pt() : wz_w.Pt(); 
 	    if( !useEwkTable ) { 
 	      // Reading by eye from the paper
-	      if(     wz_min_pt<60.)  ewk_w = 1.-(0.9/100.);
-	      else if(wz_min_pt<80.)  ewk_w = 1.-(0.9/100.);
-	      else if(wz_min_pt<100.) ewk_w = 1.-(1.0/100.);
-	      else if(wz_min_pt<120.) ewk_w = 1.-(1.5/100.);
-	      else if(wz_min_pt<140.) ewk_w = 1.-(2.0/100.);
-	      else if(wz_min_pt<160.) ewk_w = 1.-(2.6/100.);
-	      else if(wz_min_pt<180.) ewk_w = 1.-(3.0/100.);
-	      else if(wz_min_pt<200.) ewk_w = 1.-(4.9/100.);
-	      else if(wz_min_pt<220.) ewk_w = 1.-(5.2/100.);
-	      else if(wz_min_pt<240.) ewk_w = 1.-(6.5/100.);
-	      else if(wz_min_pt<260.) ewk_w = 1.-(7.5/100.);
-	      else if(wz_min_pt<280.) ewk_w = 1.-(8.0/100.);
-	      else if(wz_min_pt<300.) ewk_w = 1.-(9.9/100.);
-	      else if(wz_min_pt<320.) ewk_w = 1.-(10.9/100.);
-	      else if(wz_min_pt<340.) ewk_w = 1.-(12.3/100.);
-	      else if(wz_min_pt<360.) ewk_w = 1.-(12.6/100.);
-	      else if(wz_min_pt<380.) ewk_w = 1.-(13.5/100.);
-	      else                    ewk_w = 1.-(14.0/100.);
+	      if(     wz_min_pt<60.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<80.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<100.) ewk_w = 1. - ( 1.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<120.) ewk_w = 1. - ( 1.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<140.) ewk_w = 1. - ( 2.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<160.) ewk_w = 1. - ( 2.6/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<180.) ewk_w = 1. - ( 3.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<200.) ewk_w = 1. - ( 4.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<220.) ewk_w = 1. - ( 5.2/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<240.) ewk_w = 1. - ( 6.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<260.) ewk_w = 1. - ( 7.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<280.) ewk_w = 1. - ( 8.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<300.) ewk_w = 1. - ( 9.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<320.) ewk_w = 1. - (10.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<340.) ewk_w = 1. - (12.3/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<360.) ewk_w = 1. - (12.6/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<380.) ewk_w = 1. - (13.5/100.) + ggZZ_contr; 
+	      else                    ewk_w = 1. - (14.0/100.) + ggZZ_contr; 
 	    } // end "if not useEwkTable" 
 	  } // end "if all gen-particles are identified" 
 	  else { 
