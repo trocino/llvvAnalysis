@@ -475,12 +475,21 @@ int main(int argc, char* argv[])
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
 
 	float ewk_w = 1.; 
+	/// Also include an extra 10% to account for gg->ZZ contribution. 
+	///  N.B.:  sigma(gg->ZZ) = sigma(qq->ZZ) BEFORE NLO EWK contribution!!! 
+	///  Therefore it's not  sigma(qq->ZZ) * (1 + ewk_corr) * (1 + gg_contr) 
+	///  but rather  
+	///    sigma(qq->ZZ) + ewk_corr*sigma(qq->ZZ) + gg_contr*sigma(qq->ZZ) 
+	///    = sigma(qq->ZZ) * (1 + ewk_corr + gg_contr) 
+	///  where gg_contr = 0.1 
+	float ggZZ_contr = 0.1; 
 
 	/////// 
 	// EWK correction for ZZ and WZ (ewk_w = 1.0 otherwise) 
 	/// 
 	// WZ 
-	if(isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
+	if(false && // turn them off for now (probably negligible) 
+	   isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
 	  TLorentzVector wz_z, wz_w;
 	  TLorentzVector 
 	    nu(0., 0., 0., 0.), l1(0., 0., 0., 0.), 
@@ -545,24 +554,24 @@ int main(int argc, char* argv[])
 	    float wz_min_pt = wz_z.Pt() < wz_w.Pt() ? wz_z.Pt() : wz_w.Pt(); 
 	    if( !useEwkTable ) { 
 	      // Reading by eye from the paper
-	      if(     wz_min_pt<60.)  ewk_w = 1.-(0.9/100.);
-	      else if(wz_min_pt<80.)  ewk_w = 1.-(0.9/100.);
-	      else if(wz_min_pt<100.) ewk_w = 1.-(1.0/100.);
-	      else if(wz_min_pt<120.) ewk_w = 1.-(1.5/100.);
-	      else if(wz_min_pt<140.) ewk_w = 1.-(2.0/100.);
-	      else if(wz_min_pt<160.) ewk_w = 1.-(2.6/100.);
-	      else if(wz_min_pt<180.) ewk_w = 1.-(3.0/100.);
-	      else if(wz_min_pt<200.) ewk_w = 1.-(4.9/100.);
-	      else if(wz_min_pt<220.) ewk_w = 1.-(5.2/100.);
-	      else if(wz_min_pt<240.) ewk_w = 1.-(6.5/100.);
-	      else if(wz_min_pt<260.) ewk_w = 1.-(7.5/100.);
-	      else if(wz_min_pt<280.) ewk_w = 1.-(8.0/100.);
-	      else if(wz_min_pt<300.) ewk_w = 1.-(9.9/100.);
-	      else if(wz_min_pt<320.) ewk_w = 1.-(10.9/100.);
-	      else if(wz_min_pt<340.) ewk_w = 1.-(12.3/100.);
-	      else if(wz_min_pt<360.) ewk_w = 1.-(12.6/100.);
-	      else if(wz_min_pt<380.) ewk_w = 1.-(13.5/100.);
-	      else                    ewk_w = 1.-(14.0/100.);
+	      if(     wz_min_pt<60.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<80.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<100.) ewk_w = 1. - ( 1.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<120.) ewk_w = 1. - ( 1.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<140.) ewk_w = 1. - ( 2.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<160.) ewk_w = 1. - ( 2.6/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<180.) ewk_w = 1. - ( 3.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<200.) ewk_w = 1. - ( 4.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<220.) ewk_w = 1. - ( 5.2/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<240.) ewk_w = 1. - ( 6.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<260.) ewk_w = 1. - ( 7.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<280.) ewk_w = 1. - ( 8.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<300.) ewk_w = 1. - ( 9.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<320.) ewk_w = 1. - (10.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<340.) ewk_w = 1. - (12.3/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<360.) ewk_w = 1. - (12.6/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<380.) ewk_w = 1. - (13.5/100.) + ggZZ_contr; 
+	      else                    ewk_w = 1. - (14.0/100.) + ggZZ_contr; 
 	    } // end "if not useEwkTable" 
 	  } // end "if all gen-particles are identified" 
 	  else { 
