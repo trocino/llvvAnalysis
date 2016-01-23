@@ -5,7 +5,7 @@ stamp=`date +%Y%m%d_%H%M`
 templ="$main/test/runWIMPSelAnalysis_cfg.py_templ"
 CWD=`pwd`
 #outfile=$CWD/analysis_ZH125_${stamp}
-outfile=$CWD/analysis_pfmet100_newTruePUweights_byEyeEWKcorr_MITCuts_noSysts_${stamp}
+outfile=$CWD/analysis_pfmet100_nickPUweights_byEyeEWKcorr_MITCuts_noSysts_${stamp}
 runlog=$outfile/LOGFILES
 mkdir -p $runlog
 #json="$main/data/sample_13TeV_25ns_ZHinv.json"

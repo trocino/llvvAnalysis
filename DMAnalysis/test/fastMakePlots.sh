@@ -17,7 +17,7 @@ outfile="$output/plotter.root"
 #onlyplots=" --channel all --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes "
 #onlyplots=" --channel all --channel eelesq1jets  --channel mumulesq1jets --channel emulesq1jets  --only cut1 --only optim_systs --only mt_shapes "
 #onlyplots="--channel all_ --channel ee --channel mumu --channel emu --only raw --only final --only presel --only eventflow --only optim"
-onlyplots="--channel all_ --channel ee --channel mumu --only pfmet --only mt --only zpt --only eventflow "
+onlyplots="--channel all_ --channel ee --channel mumu --only raw --only pfmet --only mt --only zpt --only eventflow "
 #onlyplots="--channel all_ --channel ee --channel mumu --channel emu --only zmass_wwctrl "
 
 ### Remove data, only mt, pfmet 
