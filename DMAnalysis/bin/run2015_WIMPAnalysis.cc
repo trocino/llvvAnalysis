@@ -970,18 +970,18 @@ int main(int argc, char* argv[])
             if(corrJets[ijet].pt()>30) nJetsGood30++; // unused currently
 
 
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.244);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.679);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.890); // 0.898 originally
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.605);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.890);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.970);
 
 
-            bool isCSVLtagged(corrJets[ijet].btag0>0.244 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
+            bool isCSVMtagged(corrJets[ijet].btag0>0.890 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
             if(abs(corrJets[ijet].flavid)==5) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/b_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
             } else if(abs(corrJets[ijet].flavid)==4) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/c_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
             } else {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/udsg_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
             }
 
 
@@ -991,9 +991,9 @@ int main(int argc, char* argv[])
                 for(size_t csvtag=0; csvtag<CSVkey.size(); csvtag++) {
 
                     bool isBTag(false);
-                    if	   (CSVkey[csvtag]=="CSVL" && (corrJets[ijet].btag0>0.244)) isBTag = true;
-                    else if(CSVkey[csvtag]=="CSVM" && (corrJets[ijet].btag0>0.679)) isBTag = true;
-                    else if(CSVkey[csvtag]=="CSVT" && (corrJets[ijet].btag0>0.898)) isBTag = true;
+                    if	   (CSVkey[csvtag]=="CSVL" && (corrJets[ijet].btag0>0.605)) isBTag = true;
+                    else if(CSVkey[csvtag]=="CSVM" && (corrJets[ijet].btag0>0.890)) isBTag = true;
+                    else if(CSVkey[csvtag]=="CSVT" && (corrJets[ijet].btag0>0.970)) isBTag = true;
 
                     if(flavid==5) {
                         mon.fillHisto(TString("beff_Denom_")+CSVkey[csvtag],tags,corrJets[ijet].pt(),weight);
@@ -1011,7 +1011,7 @@ int main(int argc, char* argv[])
 
         }
 
-        passBveto=(nCSVTtags==0)&&(nSoftMuons==0);
+        passBveto=(nCSVMtags==0)&&(nSoftMuons==0);
 
         for(size_t ij=0; ij<GoodIdJets.size(); ij++) {
             mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
