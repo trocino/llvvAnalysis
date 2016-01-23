@@ -8,8 +8,8 @@ CWD=`pwd`
 outfile=$CWD/analysis_pfmet100_nickPUweights_byEyeEWKcorr_MITCuts_noSysts_${stamp}
 runlog=$outfile/LOGFILES
 mkdir -p $runlog
-#json="$main/data/sample_13TeV_25ns_ZHinv.json"
-json="$main/data/sample_13TeV_25ns_ZHinv_plot.json"
+json="$main/data/sample_13TeV_25ns_ZHinv.json"
+#json="$main/data/sample_13TeV_25ns_ZHinv_plot.json"
 input="/store/group/phys_exotica/monoZ/llvvNtuple_25ns_29Oct2015"
 wimpweights="$main/data/weights/PileupWeights_Sep182015.root"
 queue="2nd"

@@ -268,6 +268,7 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
+    mon.addHistogram( new TH1F( "dphiLL_presel",     ";#Delta#it{#phi}(#it{l^{+},l^{-}});Events", 10,0,TMath::Pi()) );
     mon.addHistogram( new TH1F( "balancedif_presel", ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events", 5,0,1.0) );
     mon.addHistogram( new TH1F( "mt_presel",         ";#it{m}_{T} [GeV];Events", 12,0,1200) );
 
@@ -806,7 +807,9 @@ int main(int argc, char* argv[])
         LorentzVector zll(lep1+lep2);
         bool passZmass(fabs(zll.mass()-91)<15);
         bool passZpt(zll.pt()>60);
-        bool passDiLepDphi(fabs(deltaPhi(lep1.phi(), lep2.phi()))<M_PI/2);
+
+        double dphiLL{fabs(deltaPhi(lep1.phi(), lep2.phi()))};
+        bool passDiLepDphi(dphiLL<M_PI/2);
 
 
         TString tag_cat;
@@ -871,26 +874,9 @@ int main(int argc, char* argv[])
 
 	// Temporary pileup reweighting with simple vector (true PU weights) 
 	unsigned int truepubin = int(floor(ev.ngenTruepu));
-    if (truepubin>=52) continue;
-	if(isMC) weight *= puWeightsNew[truepubin]; 
+	if(isMC && truepubin<52) weight *= puWeightsNew[truepubin]; 
 
-        mon.fillHisto("eventflow",tags,0,weight);
-        mon.fillHisto("eventflow_unweighted",tags,0,1.);
-        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      weight);
-
-
-        if(lep1.pt()>lep2.pt()) {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
-        } else {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
-        }
 
 
         //
@@ -1063,11 +1049,27 @@ int main(int argc, char* argv[])
         if(isMC) weight *= BTagScaleFactor;
 
 
+        mon.fillHisto("eventflow",tags,0,weight);
+        mon.fillHisto("eventflow_unweighted",tags,0,1.);
+
+        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
+        if(lep1.pt()>lep2.pt()) {
+            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
+            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
+            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
+            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
+        } else {
+            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
+            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
+            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
+            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
+        }
+
         mon.fillHisto("zpt_raw"                         ,tags, zll.pt(),   weight);
         mon.fillHisto("pfmet_raw"                       ,tags, metP4.pt(), weight);
         mon.fillHisto("zmass_raw"                       ,tags, zll.mass(), weight);
         mon.fillHisto("njets_raw"                       ,tags, nJetsGood30, weight);
-        mon.fillHisto("nbjets_raw"                      ,tags, nCSVLtags, weight);
+        mon.fillHisto("nbjets_raw"                      ,tags, nCSVMtags, weight);
         if(lep1.pt()>lep2.pt()) mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep1.pt(), lep2.pt(), weight);
         else 			mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep2.pt(), lep1.pt(), weight);
 
@@ -1110,6 +1112,7 @@ int main(int argc, char* argv[])
                         mon.fillHisto("pfmet2_presel",tags, metP4.pt(), weight, true);
                         mon.fillHisto("mt_presel",   tags, MT_massless, weight);
                         mon.fillHisto("dphiZMET_presel",tags, dphiZMET, weight);
+                        mon.fillHisto("dphiLL_presel",tags, dphiLL, weight);
                         mon.fillHisto("balancedif_presel",tags, balanceDif, weight);
 
 
@@ -1128,28 +1131,29 @@ int main(int argc, char* argv[])
                                     if(passMETcut) {
                                         mon.fillHisto("eventflow",  tags, 8, weight);
                                         mon.fillHisto("eventflow_unweighted",  tags, 8, 1.);
-                                        mon.fillHisto("mt_final",   tags, MT_massless, weight);
-                                        mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
-                                        mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
-
-                                        if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
                                         if(MT_massless>200) {
                                             mon.fillHisto("eventflow",  tags, 9, weight);
                                             mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
-                                        }
 
-                                        if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
-                                        if(saveEventList) {
-                                            eventList_run = ev.run;
-                                            eventList_lumi = ev.lumi;
-                                            eventList_evt = ev.event;
-                                            eventList_nJets = GoodIdJets.size();
-                                            eventList_met = metP4.pt();
-                                            eventList_mt = MT_massless;
-                                            eventList_llpt = zll.pt();
-                                            eventList->Fill();
-                                        }
+                                            mon.fillHisto("mt_final",   tags, MT_massless, weight);
+                                            mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
+                                            mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
+                                            if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
+
+                                            if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                            if(saveEventList) {
+                                                eventList_run = ev.run;
+                                                eventList_lumi = ev.lumi;
+                                                eventList_evt = ev.event;
+                                                eventList_nJets = GoodIdJets.size();
+                                                eventList_met = metP4.pt();
+                                                eventList_mt = MT_massless;
+                                                eventList_llpt = zll.pt();
+                                                eventList->Fill();
+                                            }
+
+                                        } //pass MT cut
 
                                     } //passMETcut
 
