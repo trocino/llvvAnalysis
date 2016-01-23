@@ -35,9 +35,10 @@ class PhysicsObject_Lepton : public LorentzVector {
 public :
     PhysicsObject_Lepton(LorentzVector vec, Int_t id_):
         LorentzVector(vec), id(id_) { }
-    void setLeptonIDInfo(bool isLooseMu_, bool isTightMu_, bool isSoftMu_, bool isHighPtMu_,
+    void setLeptonIDInfo(bool isLooseMu_, bool isMediumMu_, bool isTightMu_, bool isSoftMu_, bool isHighPtMu_,
                          bool isElpassVeto_, bool isElpassLoose_, bool isElpassMedium_, bool isElpassTight_) {
         isLooseMu = isLooseMu_;
+        isMediumMu = isMediumMu_;
         isTightMu = isTightMu_;
         isSoftMu = isSoftMu_;
         isHighPtMu = isHighPtMu_;
@@ -62,6 +63,11 @@ public :
         en_neutralHadIso = en_neutralHadIso_;
     }
 
+    void setLeptonD0DZInfo(float d0_, float dz_) {
+        d0 = d0_;
+        dz = dz_;
+    }
+
     float e_pfRelIsoDbeta() {
         return (en_chargedIso + TMath::Max(0., en_neutralHadIso + en_photonIso - 0.5 * en_pileupIso) )/pt();
     }
@@ -71,10 +77,11 @@ public :
     }
 
     Int_t id;
-    bool isLooseMu, isTightMu, isSoftMu, isHighPtMu;
+    bool isLooseMu, isMediumMu, isTightMu, isSoftMu, isHighPtMu;
     bool isElpassVeto, isElpassLoose, isElpassMedium, isElpassTight;
     float mn_pileupIso, mn_chargedIso, mn_photonIso, mn_neutralHadIso;
     float en_pileupIso, en_chargedIso, en_photonIso, en_neutralHadIso;
+    float d0, dz;
 };
 
 

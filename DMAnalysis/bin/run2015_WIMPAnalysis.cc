@@ -744,8 +744,8 @@ int main(int argc, char* argv[])
 
             bool hasTightIdandIso(true);
             if(abs(lepid)==13) { //muon
-                // MIT: medium POG + d0<0.02 + dz<0.1
-                hasTightIdandIso &= phys.leptons[ilep].isTightMu;
+                hasTightIdandIso &= phys.leptons[ilep].isMediumMu;
+                hasTightIdandIso &= fabs(phys.leptons[ilep].d0)<0.02 && fabs(phys.leptons[ilep].dz)<0.1;
                 if(hasTightIdandIso) mon.fillHisto("mu_reliso_raw",   tags, phys.leptons[ilep].m_pfRelIsoDbeta(), weight);
 
                 hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.12 );

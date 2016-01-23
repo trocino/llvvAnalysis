@@ -509,7 +509,7 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
     event.getByToken(muonTag_, muons);
     ev.mn=0;
     for(const pat::Muon &mu : *muons) {
-        if(mu.pt() < 5) continue;
+        if(mu.pt() < 3) continue;
         ev.mn_px[ev.mn] = mu.px();
         ev.mn_py[ev.mn] = mu.py();
         ev.mn_pz[ev.mn] = mu.pz();
@@ -522,6 +522,7 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
         ev.mn_ip3dsig[ev.mn] = mu.dB(pat::Muon::PV3D)/mu.edB(pat::Muon::PV3D);
 
         ev.mn_IsLoose[ev.mn] = mu.isLooseMuon();
+        ev.mn_IsMedium[ev.mn] = mu.isMediumMuon();
         ev.mn_IsTight[ev.mn] = mu.isTightMuon(PV);
         ev.mn_IsSoft[ev.mn] = mu.isSoftMuon(PV);
         ev.mn_IsHighPt[ev.mn] = mu.isHighPtMuon(PV);
