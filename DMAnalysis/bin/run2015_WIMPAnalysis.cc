@@ -336,8 +336,8 @@ int main(int argc, char* argv[])
     if(runOptimization) {
         // for optimization
         cout << "Optimization will be performed for this analysis" << endl;
-        for(double met=60; met<=150; met+=10) {
-            for(double balance=0.2; balance<=0.2; balance+=0.05) {
+        for(double met=80; met<=120; met+=10) {
+            for(double balance=0.2; balance<=0.4; balance+=0.1) {
                 for(double dphi=2.7; dphi<2.8; dphi+=0.1) {
                     optim_Cuts1_MET     .push_back(met);
                     optim_Cuts1_Balance .push_back(balance);
@@ -1240,8 +1240,8 @@ int main(int argc, char* argv[])
             bool passLocalBveto(true);
             for(size_t ijet=0; ijet<vJets.size(); ijet++) {
 
-                if(vJets[ijet].pt()<20) continue;
-                if(fabs(vJets[ijet].eta())>2.5) continue;
+                if(vJets[ijet].pt()<30) continue;
+                if(fabs(vJets[ijet].eta())>5.) continue;
 
                 //jet ID
                 if(!vJets[ijet].isPFLoose) continue;
@@ -1254,22 +1254,22 @@ int main(int argc, char* argv[])
                     if(dR > minDR) continue;
                     minDR = dR;
                 }
-                if(minDR < 0.4) continue;
+                if(minDR < 0.3) continue;
 
 
-                if(vJets[ijet].pt()>20 && fabs(vJets[ijet].eta())<2.4) {
-                    passLocalBveto &= (vJets[ijet].btag0<0.244);
-                    bool isLocalCSVLtagged(vJets[ijet].btag0>0.244);
+                if(vJets[ijet].pt()>30 && fabs(vJets[ijet].eta())<2.4) {
+                    passLocalBveto &= (vJets[ijet].btag0<0.890);
+                    bool isLocalCSVMtagged(vJets[ijet].btag0>0.890);
                     double val=1., valerr=0.;
                     if(abs(vJets[ijet].flavid)==5) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/b_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/b_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
+                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").second;
                     } else if(abs(vJets[ijet].flavid)==4) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/c_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/c_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
+                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").second;
                     } else {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/udsg_eff").first;
-                        valerr= myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/udsg_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
+                        valerr= myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").second;
                     }
                     double BTagWeights_Up = (val+valerr)/val;
                     double BTagWeights_Down = (val-valerr)/val;
@@ -1279,7 +1279,7 @@ int main(int argc, char* argv[])
 
             }
 
-            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto);
+            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi );
 
             double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt
             double LocalDphiZMET=fabs(deltaPhi(zll.phi(),vMET.phi()));
