@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
     WIMPReweighting myWIMPweights(runProcess);
 
     // Temporary pileup reweighting with simple vector (true PU weights) 
-    double puWeightsNew[52] = {116.22760977497512, 154.24128356275705, 115.7428184377684, 33.922638481138904, 19.769939956571026, 3.816256045235799, 2.2012560585517473, 2.7186896444772475, 3.3703204102411926, 3.1217434777182698, 2.8926459469403336, 2.6996048045981538, 2.2230717352275553, 1.5309771152459934, 0.8739488923136435, 0.4159157916222633, 0.1746591040067042, 0.07468767799149771, 0.03815666774403656, 0.02165601932906971, 0.011338665281367686, 0.005007105569201648, 0.0018577565005812916, 0.0006187833089101414, 0.00021474611528485784, 9.187658706243804e-05, 5.020115943379001e-05, 3.267087208425476e-05, 2.3672323606843003e-05, 1.7828276388156806e-05, 1.2685759053931129e-05, 7.66768293802047e-06, 3.7487452487155273e-06, 1.5383775786645468e-06, 5.634737803954267e-07, 1.9161619717128312e-07, 6.159956565761226e-08, 1.8862670922462243e-08, 5.520902032641459e-09, 1.5473602173928852e-09, 4.158246349604017e-10, 1.0725321657041846e-10, 2.65730856521026e-11, 6.328634892908405e-12, 1.4497934624661496e-12, 3.1960540400815945e-13, 1.6782792109644e-13, 4.980088793517763e-14, 4.5402219999950395e-14, 0.0, 0.0, 0.0}; 
+    double puWeightsNew[53] = {58.11380488748758, 93.26129672050942, 98.61620819958856, 28.710453450943625, 15.461738110343367, 2.7153649566833766, 1.4508190200934896, 1.7113554670643525, 2.3002683150588688, 2.478890795620616, 2.5634937261651434, 2.6060767979433512, 2.3623139729022284, 1.8314456720575751, 1.1939779550674, 0.6482593490607179, 0.300031985790039, 0.12726522751437955, 0.05787696855272272, 0.03129373468199889, 0.01794696563017523, 0.009367718902615849, 0.0041699518626305354, 0.0015958000976093603, 0.0005656542628421905, 0.00021590065740351115, 0.00010288912302544099, 6.186019389368631e-05, 4.3333625189295766e-05, 3.243049824295563e-05, 2.3379666897118117e-05, 1.4505386313365704e-05, 7.33633419348492e-06, 3.1279422520951384e-06, 1.193153164297415e-06, 4.2312807646063326e-07, 1.4197671020470987e-07, 4.5407636106872174e-08, 1.3888762286858452e-08, 4.0699760679295675e-09, 1.1440982214123114e-09, 3.088245290326575e-10, 8.010883780396007e-11, 1.9983352338057993e-11, 4.796698583685166e-12, 1.1085609692219938e-12, 6.101823054238068e-13, 1.9272836506402889e-13, 1.4720333566859804e-13, 4.5402219999950414e-14, 0.0, 0.0, 0.0}; 
 
 
     // EWK corrections (from table or from plot) 
@@ -268,6 +268,7 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
+    mon.addHistogram( new TH1F( "dphiLL_presel",     ";#Delta#it{#phi}(#it{l^{+},l^{-}});Events", 10,0,TMath::Pi()) );
     mon.addHistogram( new TH1F( "balancedif_presel", ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events", 5,0,1.0) );
     mon.addHistogram( new TH1F( "mt_presel",         ";#it{m}_{T} [GeV];Events", 12,0,1200) );
 
@@ -335,9 +336,9 @@ int main(int argc, char* argv[])
     if(runOptimization) {
         // for optimization
         cout << "Optimization will be performed for this analysis" << endl;
-        for(double met=60; met<=150; met+=10) {
-            for(double balance=0.2; balance<=0.2; balance+=0.05) {
-                for(double dphi=2.7; dphi<2.8; dphi+=0.1) {
+        for(double met=80; met<=120; met+=10) {
+            for(double balance=0.2; balance<=0.4; balance+=0.1) {
+                for(double dphi=2.7; dphi<=2.8; dphi+=0.1) {
                     optim_Cuts1_MET     .push_back(met);
                     optim_Cuts1_Balance .push_back(balance);
                     optim_Cuts1_DphiZMET.push_back(dphi);
@@ -475,12 +476,21 @@ int main(int argc, char* argv[])
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
 
 	float ewk_w = 1.; 
+	/// Also include an extra 10% to account for gg->ZZ contribution. 
+	///  N.B.:  sigma(gg->ZZ) = sigma(qq->ZZ) BEFORE NLO EWK contribution!!! 
+	///  Therefore it's not  sigma(qq->ZZ) * (1 + ewk_corr) * (1 + gg_contr) 
+	///  but rather  
+	///    sigma(qq->ZZ) + ewk_corr*sigma(qq->ZZ) + gg_contr*sigma(qq->ZZ) 
+	///    = sigma(qq->ZZ) * (1 + ewk_corr + gg_contr) 
+	///  where gg_contr = 0.1 
+	float ggZZ_contr = 0.1; 
 
 	/////// 
 	// EWK correction for ZZ and WZ (ewk_w = 1.0 otherwise) 
 	/// 
 	// WZ 
-	if(isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
+	if(false && // turn them off for now (probably negligible) 
+	   isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
 	  TLorentzVector wz_z, wz_w;
 	  TLorentzVector 
 	    nu(0., 0., 0., 0.), l1(0., 0., 0., 0.), 
@@ -545,24 +555,24 @@ int main(int argc, char* argv[])
 	    float wz_min_pt = wz_z.Pt() < wz_w.Pt() ? wz_z.Pt() : wz_w.Pt(); 
 	    if( !useEwkTable ) { 
 	      // Reading by eye from the paper
-	      if(     wz_min_pt<60.)  ewk_w = 1.-(0.9/100.);
-	      else if(wz_min_pt<80.)  ewk_w = 1.-(0.9/100.);
-	      else if(wz_min_pt<100.) ewk_w = 1.-(1.0/100.);
-	      else if(wz_min_pt<120.) ewk_w = 1.-(1.5/100.);
-	      else if(wz_min_pt<140.) ewk_w = 1.-(2.0/100.);
-	      else if(wz_min_pt<160.) ewk_w = 1.-(2.6/100.);
-	      else if(wz_min_pt<180.) ewk_w = 1.-(3.0/100.);
-	      else if(wz_min_pt<200.) ewk_w = 1.-(4.9/100.);
-	      else if(wz_min_pt<220.) ewk_w = 1.-(5.2/100.);
-	      else if(wz_min_pt<240.) ewk_w = 1.-(6.5/100.);
-	      else if(wz_min_pt<260.) ewk_w = 1.-(7.5/100.);
-	      else if(wz_min_pt<280.) ewk_w = 1.-(8.0/100.);
-	      else if(wz_min_pt<300.) ewk_w = 1.-(9.9/100.);
-	      else if(wz_min_pt<320.) ewk_w = 1.-(10.9/100.);
-	      else if(wz_min_pt<340.) ewk_w = 1.-(12.3/100.);
-	      else if(wz_min_pt<360.) ewk_w = 1.-(12.6/100.);
-	      else if(wz_min_pt<380.) ewk_w = 1.-(13.5/100.);
-	      else                    ewk_w = 1.-(14.0/100.);
+	      if(     wz_min_pt<60.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<80.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<100.) ewk_w = 1. - ( 1.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<120.) ewk_w = 1. - ( 1.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<140.) ewk_w = 1. - ( 2.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<160.) ewk_w = 1. - ( 2.6/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<180.) ewk_w = 1. - ( 3.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<200.) ewk_w = 1. - ( 4.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<220.) ewk_w = 1. - ( 5.2/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<240.) ewk_w = 1. - ( 6.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<260.) ewk_w = 1. - ( 7.5/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<280.) ewk_w = 1. - ( 8.0/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<300.) ewk_w = 1. - ( 9.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<320.) ewk_w = 1. - (10.9/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<340.) ewk_w = 1. - (12.3/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<360.) ewk_w = 1. - (12.6/100.) + ggZZ_contr; 
+	      else if(wz_min_pt<380.) ewk_w = 1. - (13.5/100.) + ggZZ_contr; 
+	      else                    ewk_w = 1. - (14.0/100.) + ggZZ_contr; 
 	    } // end "if not useEwkTable" 
 	  } // end "if all gen-particles are identified" 
 	  else { 
@@ -797,7 +807,9 @@ int main(int argc, char* argv[])
         LorentzVector zll(lep1+lep2);
         bool passZmass(fabs(zll.mass()-91)<15);
         bool passZpt(zll.pt()>60);
-        bool passDiLepDphi(fabs(deltaPhi(lep1.phi(), lep2.phi()))<M_PI/2);
+
+        double dphiLL{fabs(deltaPhi(lep1.phi(), lep2.phi()))};
+        bool passDiLepDphi(dphiLL<M_PI/2);
 
 
         TString tag_cat;
@@ -861,27 +873,10 @@ int main(int argc, char* argv[])
         //if(isMC) weight *= myWIMPweights.get1DWeights(phys.nvtx,"pileup_weights");
 
 	// Temporary pileup reweighting with simple vector (true PU weights) 
-	unsigned int truepubin = int(floor(ev.ngenTruepu));
-    if (truepubin>=52) continue;
-	if(isMC) weight *= puWeightsNew[truepubin]; 
+	unsigned int truepubin = ev.ngenTruepu;
+	if(isMC && truepubin<53) weight *= puWeightsNew[truepubin]; 
 
-        mon.fillHisto("eventflow",tags,0,weight);
-        mon.fillHisto("eventflow_unweighted",tags,0,1.);
-        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      weight);
-
-
-        if(lep1.pt()>lep2.pt()) {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
-        } else {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
-        }
 
 
         //
@@ -970,18 +965,18 @@ int main(int argc, char* argv[])
             if(corrJets[ijet].pt()>30) nJetsGood30++; // unused currently
 
 
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.244);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.679);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.890); // 0.898 originally
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.605);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.890);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.970);
 
 
-            bool isCSVLtagged(corrJets[ijet].btag0>0.244 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
+            bool isCSVMtagged(corrJets[ijet].btag0>0.890 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
             if(abs(corrJets[ijet].flavid)==5) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/b_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
             } else if(abs(corrJets[ijet].flavid)==4) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/c_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
             } else {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/udsg_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
             }
 
 
@@ -991,9 +986,9 @@ int main(int argc, char* argv[])
                 for(size_t csvtag=0; csvtag<CSVkey.size(); csvtag++) {
 
                     bool isBTag(false);
-                    if	   (CSVkey[csvtag]=="CSVL" && (corrJets[ijet].btag0>0.244)) isBTag = true;
-                    else if(CSVkey[csvtag]=="CSVM" && (corrJets[ijet].btag0>0.679)) isBTag = true;
-                    else if(CSVkey[csvtag]=="CSVT" && (corrJets[ijet].btag0>0.898)) isBTag = true;
+                    if	   (CSVkey[csvtag]=="CSVL" && (corrJets[ijet].btag0>0.605)) isBTag = true;
+                    else if(CSVkey[csvtag]=="CSVM" && (corrJets[ijet].btag0>0.890)) isBTag = true;
+                    else if(CSVkey[csvtag]=="CSVT" && (corrJets[ijet].btag0>0.970)) isBTag = true;
 
                     if(flavid==5) {
                         mon.fillHisto(TString("beff_Denom_")+CSVkey[csvtag],tags,corrJets[ijet].pt(),weight);
@@ -1011,7 +1006,7 @@ int main(int argc, char* argv[])
 
         }
 
-        passBveto=(nCSVTtags==0)&&(nSoftMuons==0);
+        passBveto=(nCSVMtags==0)&&(nSoftMuons==0);
 
         for(size_t ij=0; ij<GoodIdJets.size(); ij++) {
             mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
@@ -1054,11 +1049,27 @@ int main(int argc, char* argv[])
         if(isMC) weight *= BTagScaleFactor;
 
 
+        mon.fillHisto("eventflow",tags,0,weight);
+        mon.fillHisto("eventflow_unweighted",tags,0,1.);
+
+        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
+        if(lep1.pt()>lep2.pt()) {
+            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
+            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
+            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
+            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
+        } else {
+            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
+            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
+            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
+            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
+        }
+
         mon.fillHisto("zpt_raw"                         ,tags, zll.pt(),   weight);
         mon.fillHisto("pfmet_raw"                       ,tags, metP4.pt(), weight);
         mon.fillHisto("zmass_raw"                       ,tags, zll.mass(), weight);
         mon.fillHisto("njets_raw"                       ,tags, nJetsGood30, weight);
-        mon.fillHisto("nbjets_raw"                      ,tags, nCSVLtags, weight);
+        mon.fillHisto("nbjets_raw"                      ,tags, nCSVMtags, weight);
         if(lep1.pt()>lep2.pt()) mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep1.pt(), lep2.pt(), weight);
         else 			mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep2.pt(), lep1.pt(), weight);
 
@@ -1101,6 +1112,7 @@ int main(int argc, char* argv[])
                         mon.fillHisto("pfmet2_presel",tags, metP4.pt(), weight, true);
                         mon.fillHisto("mt_presel",   tags, MT_massless, weight);
                         mon.fillHisto("dphiZMET_presel",tags, dphiZMET, weight);
+                        mon.fillHisto("dphiLL_presel",tags, dphiLL, weight);
                         mon.fillHisto("balancedif_presel",tags, balanceDif, weight);
 
 
@@ -1119,28 +1131,29 @@ int main(int argc, char* argv[])
                                     if(passMETcut) {
                                         mon.fillHisto("eventflow",  tags, 8, weight);
                                         mon.fillHisto("eventflow_unweighted",  tags, 8, 1.);
-                                        mon.fillHisto("mt_final",   tags, MT_massless, weight);
-                                        mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
-                                        mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
-
-                                        if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
                                         if(MT_massless>200) {
                                             mon.fillHisto("eventflow",  tags, 9, weight);
                                             mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
-                                        }
 
-                                        if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
-                                        if(saveEventList) {
-                                            eventList_run = ev.run;
-                                            eventList_lumi = ev.lumi;
-                                            eventList_evt = ev.event;
-                                            eventList_nJets = GoodIdJets.size();
-                                            eventList_met = metP4.pt();
-                                            eventList_mt = MT_massless;
-                                            eventList_llpt = zll.pt();
-                                            eventList->Fill();
-                                        }
+                                            mon.fillHisto("mt_final",   tags, MT_massless, weight);
+                                            mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
+                                            mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
+                                            if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
+
+                                            if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                            if(saveEventList) {
+                                                eventList_run = ev.run;
+                                                eventList_lumi = ev.lumi;
+                                                eventList_evt = ev.event;
+                                                eventList_nJets = GoodIdJets.size();
+                                                eventList_met = metP4.pt();
+                                                eventList_mt = MT_massless;
+                                                eventList_llpt = zll.pt();
+                                                eventList->Fill();
+                                            }
+
+                                        } //pass MT cut
 
                                     } //passMETcut
 
@@ -1227,8 +1240,8 @@ int main(int argc, char* argv[])
             bool passLocalBveto(true);
             for(size_t ijet=0; ijet<vJets.size(); ijet++) {
 
-                if(vJets[ijet].pt()<20) continue;
-                if(fabs(vJets[ijet].eta())>2.5) continue;
+                if(vJets[ijet].pt()<30) continue;
+                if(fabs(vJets[ijet].eta())>5.) continue;
 
                 //jet ID
                 if(!vJets[ijet].isPFLoose) continue;
@@ -1241,22 +1254,22 @@ int main(int argc, char* argv[])
                     if(dR > minDR) continue;
                     minDR = dR;
                 }
-                if(minDR < 0.4) continue;
+                if(minDR < 0.3) continue;
 
 
-                if(vJets[ijet].pt()>20 && fabs(vJets[ijet].eta())<2.4) {
-                    passLocalBveto &= (vJets[ijet].btag0<0.244);
-                    bool isLocalCSVLtagged(vJets[ijet].btag0>0.244);
+                if(vJets[ijet].pt()>30 && fabs(vJets[ijet].eta())<2.4) {
+                    passLocalBveto &= (vJets[ijet].btag0<0.890);
+                    bool isLocalCSVMtagged(vJets[ijet].btag0>0.890);
                     double val=1., valerr=0.;
                     if(abs(vJets[ijet].flavid)==5) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/b_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/b_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
+                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").second;
                     } else if(abs(vJets[ijet].flavid)==4) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/c_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/c_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
+                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").second;
                     } else {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/udsg_eff").first;
-                        valerr= myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/udsg_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
+                        valerr= myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").second;
                     }
                     double BTagWeights_Up = (val+valerr)/val;
                     double BTagWeights_Down = (val-valerr)/val;
@@ -1266,7 +1279,7 @@ int main(int argc, char* argv[])
 
             }
 
-            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto);
+            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi );
 
             double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt
             double LocalDphiZMET=fabs(deltaPhi(zll.phi(),vMET.phi()));
