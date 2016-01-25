@@ -19,9 +19,10 @@ onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll
 ### Remove data final plots
 #onlyplots=" --channel all_ --channel ee --channel mumu --only final --isDataBlind "
 
+### Limits
+#onlyplots=" --channel all_ --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes "
+
 Ecm="13"
 Lumi="2110.246"
-#Lumi="5000.000"
-#Lumi="10000.000"
 runPlotter --json $json --inDir $input --outDir $output --outFile $outfile $onlyplots --iEcm $Ecm --iLumi $Lumi   
 exit

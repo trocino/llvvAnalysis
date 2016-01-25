@@ -338,7 +338,7 @@ int main(int argc, char* argv[])
         cout << "Optimization will be performed for this analysis" << endl;
         for(double met=80; met<=120; met+=10) {
             for(double balance=0.2; balance<=0.4; balance+=0.1) {
-                for(double dphi=2.7; dphi<2.8; dphi+=0.1) {
+                for(double dphi=2.7; dphi<=2.8; dphi+=0.1) {
                     optim_Cuts1_MET     .push_back(met);
                     optim_Cuts1_Balance .push_back(balance);
                     optim_Cuts1_DphiZMET.push_back(dphi);
