@@ -104,7 +104,8 @@ process.mainAnalyzer = cms.EDAnalyzer('MainAnalyzer',
                     "HLT_IsoMu27_v"),
 
     	SingleEleTrigs = cms.vstring(
-					"HLT_Ele23_WPLoose_Gsf_v"
+					"HLT_Ele23_WPLoose_Gsf_v",
+					"HLT_Ele22_eta2p1_WP75_Gsf_v"
 					),
 
    	MuEGTrigs = cms.vstring("HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",
