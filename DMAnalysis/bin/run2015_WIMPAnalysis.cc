@@ -927,7 +927,7 @@ int main(int argc, char* argv[])
         int nSoftMuons(0);
         for(size_t ilep=0; ilep<phys.leptons.size(); ilep++) {
             LorentzVector lep=phys.leptons[ilep];
-            if ( lep.pt() < 3 ) continue;
+            if ( lep.pt() < 3 || abs(phys.leptons[ilep].id) != 13 ) continue;
             if ( ! phys.leptons[ilep].isSoftMu ) continue;
             if ( std::find(allLeptons.begin(), allLeptons.end(), lep) != allLeptons.end() ) continue;
             
