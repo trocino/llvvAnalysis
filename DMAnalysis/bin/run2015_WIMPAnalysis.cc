@@ -793,6 +793,7 @@ int main(int argc, char* argv[])
                 LorentzVector dilepton=lep1_+lep2_;
                 double massdif = fabs(dilepton.mass()-91.);
                 if(massdif < _MASSDIF_) {
+                    _MASSDIF_ = massdif;
                     lep1.SetPxPyPzE(lep1_.px(),lep1_.py(),lep1_.pz(),lep1_.energy());
                     lep2.SetPxPyPzE(lep2_.px(),lep2_.py(),lep2_.pz(),lep2_.energy());
                     id1 = id1_;
