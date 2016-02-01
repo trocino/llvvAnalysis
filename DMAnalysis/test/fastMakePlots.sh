@@ -11,7 +11,7 @@ fi
 output="$2" 
 #output="$input/results" 
 main="${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis"
-json="$main/data/sample_13TeV_25ns_ZHinv_plot.json"
+json="$main/data/sample_13TeV_25ns_ZHinv_plot_31Jan2016.json"
 #json="$main/data/sample_13TeV_25ns_ZHinv_noData_plot.json"
 outfile="$output/plotter.root" 
 onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll --only raw --only presel --only final --only eventflow "
@@ -23,6 +23,6 @@ onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll
 #onlyplots=" --channel all_ --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes "
 
 Ecm="13"
-Lumi="2110.246"
+Lumi="2263.55"
 runPlotter --json $json --inDir $input --outDir $output --outFile $outfile $onlyplots --iEcm $Ecm --iLumi $Lumi   
 exit
