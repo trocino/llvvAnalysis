@@ -157,7 +157,7 @@ for proc in procList :
 
                 #if(eventsFile.find('/store/')==0)  : eventsFile = commands.getstatusoutput('/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select find ' + eventsFile)[1]
 		#if(eventsFile.find('?')>=0)  : eventsFile = eventsFile[:eventsFile.find('?')]
-		eventsFile = 'root://eoscms.cern.ch/'+eventsFile
+		eventsFile = 'root://cmsxrootd.hep.wisc.edu/'+eventsFile
 
             	sedcmd = 'sed \"s%@input%' + eventsFile +'%;s%@outdir%' + outdir +'%;s%@isMC%' + str(not isdata) + '%;s%@mctruthmode%'+str(mctruthmode)+'%;s%@xsec%'+str(xsec)+'%;'
                 sedcmd += 's%@cprime%'+str(getByLabel(d,'cprime',-1))+'%;'
