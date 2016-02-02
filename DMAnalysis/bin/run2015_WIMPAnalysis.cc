@@ -412,7 +412,7 @@ int main(int argc, char* argv[])
         //if(cutflowH) cnorm=cutflowH->GetBinContent(1);
         TH1F* posH = (TH1F *) file->Get("mainAnalyzer/llvv/n_posevents");
         TH1F* negH = (TH1F *) file->Get("mainAnalyzer/llvv/n_negevents");
-        if(posH && negH) cnorm = posH->GetBinContent(1) + negH->GetBinContent(1);
+        if(posH && negH) cnorm = posH->GetBinContent(1) - negH->GetBinContent(1);
         if(rescaleFactor>0) cnorm /= rescaleFactor;
         printf("cnorm = %f\n",cnorm);
     }
