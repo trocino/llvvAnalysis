@@ -634,6 +634,96 @@
                 }
             ], 
             "fill": 0
+        },
+        {
+            "isdata": false, 
+            "color": "28", 
+            "issignal": true, 
+            "lcolor": "28", 
+            "spimpose": true, 
+            "tag": "ZH400", 
+            "lstyle": 3, 
+            "lwidth": 2, 
+            "marker": 28, 
+            "data": [
+                {
+                    "dtag": "MC13TeV_ZH_ZToEE_HToInv_M400", 
+                    "xsec": 0.03796, 
+                    "split": 1, 
+                    "br": [
+                        0.033658
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_ZH_ZToMM_HToInv_M400", 
+                    "xsec": 0.03796, 
+                    "split": 1, 
+                    "br": [
+                        0.033658
+                    ]
+                }
+            ], 
+            "fill": 0
+        },
+        {
+            "isdata": false, 
+            "color": "28", 
+            "issignal": true, 
+            "lcolor": "28", 
+            "spimpose": true, 
+            "tag": "ZH500", 
+            "lstyle": 3, 
+            "lwidth": 2, 
+            "marker": 28, 
+            "data": [
+                {
+                    "dtag": "MC13TeV_ZH_ZToEE_HToInv_M500", 
+                    "xsec": 0.03796, 
+                    "split": 1, 
+                    "br": [
+                        0.033658
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_ZH_ZToMM_HToInv_M500", 
+                    "xsec": 0.03796, 
+                    "split": 1, 
+                    "br": [
+                        0.033658
+                    ]
+                }
+            ], 
+            "fill": 0
+        },
+        {
+            "isdata": false, 
+            "color": "28", 
+            "issignal": true, 
+            "lcolor": "28", 
+            "spimpose": true, 
+            "tag": "ZH600", 
+            "lstyle": 3, 
+            "lwidth": 2, 
+            "marker": 28, 
+            "data": [
+                {
+                    "dtag": "MC13TeV_ZH_ZToEE_HToInv_M600", 
+                    "xsec": 0.03796, 
+                    "split": 1, 
+                    "br": [
+                        0.033658
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_ZH_ZToMM_HToInv_M600", 
+                    "xsec": 0.03796, 
+                    "split": 1, 
+                    "br": [
+                        0.033658
+                    ]
+                }
+            ], 
+            "fill": 0
         }
     ]
 }
