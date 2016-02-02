@@ -498,7 +498,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M110", 
-                    "xsec": 1.4291, 
+                    "xsec": 1.2825, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -506,7 +506,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M110", 
-                    "xsec": 1.4291, 
+                    "xsec": 1.2825, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -528,7 +528,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M125", 
-                    "xsec": 0.969, 
+                    "xsec": 0.8696, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -536,7 +536,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M125", 
-                    "xsec": 0.969, 
+                    "xsec": 0.8696, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -558,7 +558,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M150", 
-                    "xsec": 0.5385, 
+                    "xsec": 0.4833, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -566,7 +566,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M150", 
-                    "xsec": 0.5385, 
+                    "xsec": 0.4833, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -588,7 +588,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M200", 
-                    "xsec": 0.1981, 
+                    "xsec": 0.17779, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -596,7 +596,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M200", 
-                    "xsec": 0.1981, 
+                    "xsec": 0.17779, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -618,7 +618,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M300", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.03407, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -626,7 +626,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M300", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.03407, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -637,18 +637,18 @@
         },
         {
             "isdata": false, 
-            "color": "28", 
+            "color": "46", 
             "issignal": true, 
-            "lcolor": "28", 
+            "lcolor": "46", 
             "spimpose": true, 
             "tag": "ZH400", 
-            "lstyle": 3, 
+            "lstyle": 4, 
             "lwidth": 2, 
-            "marker": 28, 
+            "marker": 46, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M400", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.009565, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -656,7 +656,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M400", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.009565, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -667,18 +667,18 @@
         },
         {
             "isdata": false, 
-            "color": "28", 
+            "color": "43", 
             "issignal": true, 
-            "lcolor": "28", 
+            "lcolor": "43", 
             "spimpose": true, 
             "tag": "ZH500", 
-            "lstyle": 3, 
+            "lstyle": 5, 
             "lwidth": 2, 
-            "marker": 28, 
+            "marker": 43, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M500", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.009565, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -686,7 +686,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M500", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.009565, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -697,18 +697,18 @@
         },
         {
             "isdata": false, 
-            "color": "28", 
+            "color": "41", 
             "issignal": true, 
-            "lcolor": "28", 
+            "lcolor": "41", 
             "spimpose": true, 
             "tag": "ZH600", 
-            "lstyle": 3, 
+            "lstyle": 6, 
             "lwidth": 2, 
-            "marker": 28, 
+            "marker": 41, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M600", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.009565, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -716,7 +716,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M600", 
-                    "xsec": 0.03796, 
+                    "xsec": 0.009565, 
                     "split": 1, 
                     "br": [
                         0.033658
