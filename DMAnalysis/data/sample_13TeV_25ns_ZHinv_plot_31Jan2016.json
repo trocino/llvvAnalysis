@@ -10,7 +10,7 @@
                 {
                     "dtag": "MC13TeV_ZZTo2L2Nu", 
                     "xsec": 0.564, 
-                    "split": 14, 
+                    "split": 12, 
                     "br": [
                         1
                     ]
@@ -27,7 +27,7 @@
                 {
                     "dtag": "MC13TeV_WZpowheg", 
                     "xsec": 4.102, 
-                    "split": 4, 
+                    "split": 2, 
                     "br": [
                         1
                     ]
@@ -68,7 +68,7 @@
                 {
                     "dtag": "MC13TeV_ZZTo4L", 
                     "xsec": 1.212, 
-                    "split": 18, 
+                    "split": 9, 
                     "br": [
                         1
                     ]
@@ -76,7 +76,7 @@
                 {
                     "dtag": "MC13TeV_ZZTo2L2Q", 
                     "xsec": 3.22, 
-                    "split": 30, 
+                    "split": 20, 
                     "br": [
                         1
                     ]
@@ -93,7 +93,7 @@
                 {
                     "dtag": "MC13TeV_WJetsmadgraphMLM", 
                     "xsec": 61526.7, 
-                    "split": 108, 
+                    "split": 47, 
                     "br": [
                         1
                     ]
@@ -110,7 +110,7 @@
                 {
                     "dtag": "MC13TeV_WW", 
                     "xsec": 10.481, 
-                    "split": 4, 
+                    "split": 3, 
                     "br": [
                         1
                     ]
@@ -127,17 +127,17 @@
                 {
                     "dtag": "MC13TeV_ST_tW_top_5f", 
                     "xsec": 35.6, 
-                    "split": 2
+                    "split": 1
                 }, 
                 {
                     "dtag": "MC13TeV_ST_tW_antitop_5f", 
                     "xsec": 35.6, 
-                    "split": 2
+                    "split": 1
                 }, 
                 {
                     "dtag": "MC13TeV_ST_t-channel_4f", 
                     "xsec": 70.69, 
-                    "split": 34
+                    "split": 18
                 }
             ]
         }, 
@@ -151,7 +151,7 @@
                 {
                     "dtag": "MC13TeV_TTJetsamcatnloFXFX", 
                     "xsec": 831.76, 
-                    "split": 62, 
+                    "split": 31, 
                     "br": [
                         1
                     ]
@@ -184,7 +184,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_15to20", 
                     "xsec": 1279000000, 
-                    "split": 4, 
+                    "split": 2, 
                     "br": [
                         0.0018
                     ]
@@ -200,7 +200,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_30to50", 
                     "xsec": 136000000, 
-                    "split": 7, 
+                    "split": 8, 
                     "br": [
                         0.073
                     ]
@@ -216,7 +216,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_80to120", 
                     "xsec": 2800000, 
-                    "split": 15, 
+                    "split": 8, 
                     "br": [
                         0.125
                     ]
@@ -224,7 +224,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_120to170", 
                     "xsec": 477000, 
-                    "split": 12, 
+                    "split": 7, 
                     "br": [
                         0.132
                     ]
@@ -232,7 +232,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_170to300", 
                     "xsec": 114000, 
-                    "split": 9, 
+                    "split": 5, 
                     "br": [
                         0.165
                     ]
@@ -296,7 +296,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_15to20", 
                     "xsec": 1273190000, 
-                    "split": 4, 
+                    "split": 2, 
                     "br": [
                         0.003
                     ]
@@ -312,7 +312,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_30to50", 
                     "xsec": 139803000, 
-                    "split": 8, 
+                    "split": 4, 
                     "br": [
                         0.01182
                     ]
@@ -320,7 +320,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_50to80", 
                     "xsec": 19222500, 
-                    "split": 8, 
+                    "split": 4, 
                     "br": [
                         0.02276
                     ]
@@ -328,7 +328,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_80to120", 
                     "xsec": 2758420, 
-                    "split": 6, 
+                    "split": 3, 
                     "br": [
                         0.03844
                     ]
@@ -336,7 +336,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_120to170", 
                     "xsec": 469797, 
-                    "split": 2, 
+                    "split": 5, 
                     "br": [
                         0.05362
                     ]
@@ -376,7 +376,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_800to1000", 
                     "xsec": 32.3486, 
-                    "split": 3, 
+                    "split": 2, 
                     "br": [
                         0.14552
                     ]
@@ -409,7 +409,7 @@
                 {
                     "dtag": "MC13TeV_DYJetsToLL_50toInf", 
                     "xsec": 6025, 
-                    "split": 46, 
+                    "split": 23, 
                     "br": [
                         1
                     ]
@@ -444,43 +444,43 @@
                 }, 
                 {
                     "dtag": "Data13TeV_DoubleEG2015D_05Oct2015", 
-                    "split": 59
+                    "split": 54
                 }, 
                 {
                     "dtag": "Data13TeV_DoubleMuon2015D_05Oct2015", 
-                    "split": 31
+                    "split": 19
                 }, 
                 {
                     "dtag": "Data13TeV_MuonEG2015D_05Oct2015", 
-                    "split": 8
+                    "split": 3
                 }, 
                 {
                     "dtag": "Data13TeV_SingleElectron2015D_05Oct2015", 
-                    "split": 75
+                    "split": 35
                 }, 
                 {
                     "dtag": "Data13TeV_SingleMuon2015D_05Oct2015", 
-                    "split": 49
+                    "split": 22
                 }, 
                 {
                     "dtag": "Data13TeV_DoubleEG2015D_PromptRecov4", 
-                    "split": 52
+                    "split": 21
                 }, 
                 {
                     "dtag": "Data13TeV_DoubleMuon2015D_PromptRecov4", 
-                    "split": 27
+                    "split": 10
                 }, 
                 {
                     "dtag": "Data13TeV_MuonEG2015D_PromptRecov4", 
-                    "split": 11
+                    "split": 6
                 }, 
                 {
                     "dtag": "Data13TeV_SingleElectron2015D_PromptRecov4", 
-                    "split": 66
+                    "split": 62
                 }, 
                 {
                     "dtag": "Data13TeV_SingleMuon2015D_PromptRecov4", 
-                    "split": 47
+                    "split": 37
                 }
             ], 
             "fill": 0

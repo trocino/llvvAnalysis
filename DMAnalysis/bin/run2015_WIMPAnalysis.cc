@@ -265,6 +265,9 @@ int main(int argc, char* argv[])
     double METBins2[]= {0,10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,500,1000};
     const int nBinsMET2 = sizeof(METBins2)/sizeof(double) - 1;
 
+    double MTBins[]= {200,300,400,600,800,1200};
+    const int nBinsMT = sizeof(MTBins)/sizeof(double) - 1;
+
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
@@ -302,8 +305,8 @@ int main(int argc, char* argv[])
     }
 
 
-    mon.addHistogram( new TH1F( "mt_final",             ";#it{m}_{T} [GeV];Events", 12,0,1200) );
-    mon.addHistogram( new TH1F( "mt_final120",             ";#it{m}_{T} [GeV];Events", 12,0,1200) );
+    mon.addHistogram( new TH1F( "mt_final",             ";#it{m}_{T} [GeV];Events / 1 GeV", nBinsMT, MTBins) );
+    mon.addHistogram( new TH1F( "mt_final120",             ";#it{m}_{T} [GeV];Events / 1 GeV", nBinsMT, MTBins) );
     mon.addHistogram( new TH1F( "pfmet_final",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
 
@@ -369,7 +372,7 @@ int main(int argc, char* argv[])
         Hoptim_systs->GetXaxis()->SetBinLabel(ivar+1, varNames[ivar]);
 
         //1D shapes for limit setting
-        mon.addHistogram( new TH2F (TString("mt_shapes")+varNames[ivar],";cut index; #it{m}_{T} [GeV];#Events (/100GeV)",nOptims,0,nOptims,12,0,1200) );
+        mon.addHistogram( new TH2F (TString("mt_shapes")+varNames[ivar],";cut index; #it{m}_{T} [GeV];#Events (/100GeV)",nOptims,0,nOptims,nBinsMT,MTBins) );
         //mon.addHistogram( new TH2F (TString("pfmet_shapes")+varNames[ivar],";cut index; E_{T}^{miss} [GeV];#Events",nOptims,0,nOptims,nBinPFMET,xbinsPFMET) );
 
         //2D shapes for limit setting
