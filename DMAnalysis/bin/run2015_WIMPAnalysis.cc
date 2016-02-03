@@ -311,6 +311,13 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
 
 
+    TH1F *hfinalWeights=(TH1F*) mon.addHistogram( new TH1F ("weights_final", ";;Events", 6,0,6) );
+    hfinalWeights->GetXaxis()->SetBinLabel(1,"Raw");
+    hfinalWeights->GetXaxis()->SetBinLabel(2,"*(gen sign)");
+    hfinalWeights->GetXaxis()->SetBinLabel(3,"*(ewk)");
+    hfinalWeights->GetXaxis()->SetBinLabel(4,"*(PU)");
+    hfinalWeights->GetXaxis()->SetBinLabel(5,"*(btagSF)");
+    hfinalWeights->GetXaxis()->SetBinLabel(6,"*(lepSF)");
 
 
     //#################################################
@@ -876,9 +883,12 @@ int main(int argc, char* argv[])
         mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      weight);
         //if(isMC) weight *= myWIMPweights.get1DWeights(phys.nvtx,"pileup_weights");
 
-	// Temporary pileup reweighting with simple vector (true PU weights) 
-	unsigned int truepubin = ev.ngenTruepu;
-	if(isMC && truepubin<53) weight *= puWeightsNew[truepubin]; 
+        // Temporary pileup reweighting with simple vector (true PU weights)
+        unsigned int truepubin = ev.ngenTruepu;
+        double pileupWeight = 1.;
+        if(isMC && truepubin<53) pileupWeight = puWeightsNew[truepubin];
+        if(isMC && truepubin>=53) pileupWeight = 0.;
+        weight *= pileupWeight;
 
         mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      weight);
 
@@ -1156,6 +1166,13 @@ int main(int argc, char* argv[])
                                                 eventList_llpt = zll.pt();
                                                 eventList->Fill();
                                             }
+
+                                            mon.fillHisto("weights_final", tags, 0., 1.);
+                                            mon.fillHisto("weights_final", tags, 1., 1.*genWeight);
+                                            mon.fillHisto("weights_final", tags, 2., 1.*genWeight*ewk_w);
+                                            mon.fillHisto("weights_final", tags, 3., 1.*genWeight*ewk_w*pileupWeight);
+                                            mon.fillHisto("weights_final", tags, 4., 1.*genWeight*ewk_w*pileupWeight*BTagScaleFactor);
+                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*pileupWeight*BTagScaleFactor*1.); // lepton sf
 
                                         } //pass MT cut
 
