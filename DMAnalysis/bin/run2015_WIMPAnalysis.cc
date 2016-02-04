@@ -15,6 +15,7 @@
 
 #include "CondFormats/JetMETObjects/interface/JetResolution.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
 #include "TSystem.h"
 #include "TFile.h"
@@ -29,6 +30,12 @@
 
 
 #include "llvvAnalysis/DMAnalysis/interface/PDFInfo.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibrationReader.h"
+
+//https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration
+#include "llvvAnalysis/DMAnalysis/interface/BTagCalibrationStandalone.h"
+
 
 using namespace std;
 
@@ -117,15 +124,20 @@ int main(int argc, char* argv[])
 
     BTagUtils myBtagUtils(runProcess);
 
+    // https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration
+    // setup calibration readers
+    TString BtagSF = runProcess.getParameter<std::string>("BtagSF");
+    gSystem->ExpandPathName(BtagSF);
+    cout << "Loading btag sacle factor: " << BtagSF << endl;
+    BTagCalibration btagcalib("csvv2", BtagSF.Data());
+    BTagCalibrationReader btag_reader(&btagcalib, BTagEntry::OP_MEDIUM, "mujets", "central");
+    BTagCalibrationReader btag_reader_up(&btagcalib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
+    BTagCalibrationReader btag_reader_down(&btagcalib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down
+
     WIMPReweighting myWIMPweights(runProcess);
-
-    // Temporary pileup reweighting with simple vector (true PU weights) 
-    double puWeightsNew[53] = {58.11380488748758, 93.26129672050942, 98.61620819958856, 28.710453450943625, 15.461738110343367, 2.7153649566833766, 1.4508190200934896, 1.7113554670643525, 2.3002683150588688, 2.478890795620616, 2.5634937261651434, 2.6060767979433512, 2.3623139729022284, 1.8314456720575751, 1.1939779550674, 0.6482593490607179, 0.300031985790039, 0.12726522751437955, 0.05787696855272272, 0.03129373468199889, 0.01794696563017523, 0.009367718902615849, 0.0041699518626305354, 0.0015958000976093603, 0.0005656542628421905, 0.00021590065740351115, 0.00010288912302544099, 6.186019389368631e-05, 4.3333625189295766e-05, 3.243049824295563e-05, 2.3379666897118117e-05, 1.4505386313365704e-05, 7.33633419348492e-06, 3.1279422520951384e-06, 1.193153164297415e-06, 4.2312807646063326e-07, 1.4197671020470987e-07, 4.5407636106872174e-08, 1.3888762286858452e-08, 4.0699760679295675e-09, 1.1440982214123114e-09, 3.088245290326575e-10, 8.010883780396007e-11, 1.9983352338057993e-11, 4.796698583685166e-12, 1.1085609692219938e-12, 6.101823054238068e-13, 1.9272836506402889e-13, 1.4720333566859804e-13, 4.5402219999950414e-14, 0.0, 0.0, 0.0}; 
-
 
     // EWK corrections (from table or from plot) 
     bool useEwkTable = false; 
-
 
     // Systematics
     bool runSystematics                        = runProcess.getParameter<bool>("runSystematics");
@@ -425,6 +437,24 @@ int main(int argc, char* argv[])
     }
     Hcutflow->SetBinContent(1,cnorm);
 
+    //pileup weighting
+    TString PU_Central = runProcess.getParameter<std::string>("PU_Central");
+    gSystem->ExpandPathName(PU_Central);
+    cout << "Loading PU weights Central: " << PU_Central << endl;
+    TFile *PU_Central_File = TFile::Open(PU_Central);
+    TH1F* weight_pileup_Central = (TH1F *) PU_Central_File->Get("pileup");
+
+    TString PU_Up = runProcess.getParameter<std::string>("PU_Up");
+    gSystem->ExpandPathName(PU_Up);
+    cout << "Loading PU weights Up: " << PU_Up << endl;
+    TFile *PU_Up_File = TFile::Open(PU_Up);
+    TH1F* weight_pileup_Up = (TH1F *) PU_Up_File->Get("pileup");
+
+    TString PU_Down = runProcess.getParameter<std::string>("PU_Down");
+    gSystem->ExpandPathName(PU_Down);
+    cout << "Loading PU weights Down: " << PU_Down << endl;
+    TFile *PU_Down_File = TFile::Open(PU_Down);
+    TH1F* weight_pileup_Down = (TH1F *) PU_Down_File->Get("pileup");
 
     // event categorizer
     EventCategory eventCategoryInst(1);   //jet(0,1,>=2) binning
@@ -465,22 +495,34 @@ int main(int argc, char* argv[])
         float genWeight = 1.0;
         if(isMC && ev.genWeight<0) genWeight = -1.0;
 
-        //pileup weight
+        // total event weight, accrued over time
         float weight = 1.0;
         if(isMC) weight *= genWeight;
-        double TotalWeight_plus = 1.0;
-        double TotalWeight_minus = 1.0;
-	// if(isMC) {
-	// weight            = LumiWeights->weight(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
-	// TotalWeight_plus  = PuShifters[PUUP]->Eval(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
-	// TotalWeight_minus = PuShifters[PUDOWN]->Eval(useObservedPU ? ev.ngenITpu : ev.ngenTruepu);
-	// } 
 
-        Hcutflow->Fill(1,1);
-        Hcutflow->Fill(2,weight);
-        Hcutflow->Fill(3,weight*TotalWeight_minus);
-        Hcutflow->Fill(4,weight*TotalWeight_plus);
+        double puWeight = 1.;
+        double puWeight_plus = 1.;
+        double puWeight_minus = 1.;
 
+        if(isMC) {
+            mon.fillHisto("pileup", "all", ev.ngenTruepu, 1.0);
+            float xval = ev.ngenTruepu;
+            int xbins = weight_pileup_Central->GetXaxis()->GetNbins();
+            if     (xval > weight_pileup_Central->GetXaxis()->GetBinUpEdge(xbins)    ) xval = weight_pileup_Central->GetXaxis()->GetBinUpEdge(xbins);
+            else if(xval < weight_pileup_Central->GetXaxis()->GetBinLowEdge(1)       ) xval = weight_pileup_Central->GetXaxis()->GetBinLowEdge(1);
+
+            int binx = weight_pileup_Central->GetXaxis()->FindBin(xval);
+
+            puWeight       *= weight_pileup_Central->GetBinContent(binx);
+            puWeight_plus  *= weight_pileup_Up->GetBinContent(binx);
+            puWeight_minus *= weight_pileup_Down->GetBinContent(binx);
+        }
+
+        Hcutflow->Fill(1,weight);
+        Hcutflow->Fill(2,weight*puWeight);
+        Hcutflow->Fill(3,weight*puWeight_minus);
+        Hcutflow->Fill(4,weight*puWeight_plus);
+
+        weight *= puWeight;
 
         // add PhysicsEvent_t class, get all tree to physics objects
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
@@ -880,16 +922,7 @@ int main(int argc, char* argv[])
 
 
         // pielup reweightiing
-        mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      weight);
-        //if(isMC) weight *= myWIMPweights.get1DWeights(phys.nvtx,"pileup_weights");
-
-        // Temporary pileup reweighting with simple vector (true PU weights)
-        unsigned int truepubin = ev.ngenTruepu;
-        double pileupWeight = 1.;
-        if(isMC && truepubin<53) pileupWeight = puWeightsNew[truepubin];
-        if(isMC && truepubin>=53) pileupWeight = 0.;
-        weight *= pileupWeight;
-
+        mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      genWeight);
         mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      weight);
 
 
@@ -979,20 +1012,23 @@ int main(int argc, char* argv[])
             if(corrJets[ijet].pt()>30) nJetsGood30++; // unused currently
 
 
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.605);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.890);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.970);
-
-
-            bool isCSVMtagged(corrJets[ijet].btag0>0.890 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
-            if(abs(corrJets[ijet].flavid)==5) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
-            } else if(abs(corrJets[ijet].flavid)==4) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
-            } else {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
+            if ( fabs(corrJets[ijet].eta())<2.4 ) {
+                nCSVLtags += (corrJets[ijet].btag0>0.605);
+                nCSVMtags += (corrJets[ijet].btag0>0.890);
+                nCSVTtags += (corrJets[ijet].btag0>0.970);
             }
 
+
+            if(!isMC) continue;
+            bool isCSVMtagged(corrJets[ijet].btag0>0.890 && fabs(corrJets[ijet].eta())<2.4);
+            if(abs(corrJets[ijet].flavid)==5) {
+                if(isCSVMtagged) BTagScaleFactor *= btag_reader.eval( BTagEntry::FLAV_B, corrJets[ijet].eta(), (corrJets[ijet].pt()<670. ? corrJets[ijet].pt() : 670.) );
+            } else if(abs(corrJets[ijet].flavid)==4) {
+                if(isCSVMtagged) BTagScaleFactor *= btag_reader.eval( BTagEntry::FLAV_C, corrJets[ijet].eta(), (corrJets[ijet].pt()<670. ? corrJets[ijet].pt() : 670.) );
+            } else {
+                //no SF available yet for light flavor jet (CSVv2.csv)
+                //BTagScaleFactor *= btag_reader.eval( BTagEntry::FLAV_UDSG, corrJets[ijet].eta(), (corrJets[ijet].pt()<670. ? corrJets[ijet].pt() : 670.) );
+            }
 
             // for Btag efficiency
             if((isMC_ttbar||isMC_stop) && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4) {
@@ -1026,6 +1062,8 @@ int main(int argc, char* argv[])
             mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
             mon.fillHisto("jet_eta_raw",  tags, GoodIdJets[ij].eta(),weight);
         }
+
+        LorentzVector metP4_XYCorr = METUtils::applyMETXYCorr(metP4,isMC,phys.nvtx);
 
         double dphiZMET=fabs(deltaPhi(zll.phi(),metP4.phi()));
         bool passDphiZMETcut(dphiZMET>2.8);
@@ -1119,11 +1157,11 @@ int main(int argc, char* argv[])
                         mon.fillHisto("pfmetphi_wocorr_presel",tags, metP4.phi(), weight);
                         mon.fillHisto("pfmetx_vs_nvtx_presel",tags,phys.nvtx,metP4.px(), weight);
                         mon.fillHisto("pfmety_vs_nvtx_presel",tags,phys.nvtx,metP4.py(), weight);
-                        mon.fillHisto("pfmetphi_wicorr_presel",tags, metP4.phi(), weight);
+                        mon.fillHisto("pfmetphi_wicorr_presel",tags, metP4_XYCorr.phi(), weight);
 
                         //preselection plots
                         mon.fillHisto("pfmet_presel",tags, metP4.pt(), weight, true);
-                        mon.fillHisto("pfmet2_presel",tags, metP4.pt(), weight, true);
+                        mon.fillHisto("pfmet2_presel",tags, metP4_XYCorr.pt(), weight, true);
                         mon.fillHisto("mt_presel",   tags, MT_massless, weight);
                         mon.fillHisto("dphiZMET_presel",tags, dphiZMET, weight);
                         mon.fillHisto("dphiLL_presel",tags, dphiLL, weight);
@@ -1152,7 +1190,7 @@ int main(int argc, char* argv[])
 
                                             mon.fillHisto("mt_final",   tags, MT_massless, weight);
                                             mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
-                                            mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
+                                            mon.fillHisto("pfmet2_final",tags, metP4_XYCorr.pt(), weight);
                                             if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
                                             if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
@@ -1170,9 +1208,9 @@ int main(int argc, char* argv[])
                                             mon.fillHisto("weights_final", tags, 0., 1.);
                                             mon.fillHisto("weights_final", tags, 1., 1.*genWeight);
                                             mon.fillHisto("weights_final", tags, 2., 1.*genWeight*ewk_w);
-                                            mon.fillHisto("weights_final", tags, 3., 1.*genWeight*ewk_w*pileupWeight);
-                                            mon.fillHisto("weights_final", tags, 4., 1.*genWeight*ewk_w*pileupWeight*BTagScaleFactor);
-                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*pileupWeight*BTagScaleFactor*1.); // lepton sf
+                                            mon.fillHisto("weights_final", tags, 3., 1.*genWeight*ewk_w*puWeight);
+                                            mon.fillHisto("weights_final", tags, 4., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor);
+                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor*1.); // TODO: lepton sf
 
                                         } //pass MT cut
 
@@ -1209,9 +1247,9 @@ int main(int argc, char* argv[])
 
         //Fill histogram for posterior optimization, or for control regions
         for(size_t ivar=0; ivar<nvarsToInclude; ivar++) {
-	  float iweight = weight;                                               //nominal
-	  if(varNames[ivar]=="_puup")        iweight *=1;//TotalWeight_plus;        //pu up
-	  if(varNames[ivar]=="_pudown")      iweight *=1;//TotalWeight_minus;       //pu down
+	  float iweight = weight;                                                //nominal
+	  if(varNames[ivar]=="_puup")        iweight *=puWeight_plus/puWeight;   //pu up
+	  if(varNames[ivar]=="_pudown")      iweight *=puWeight_minus/puWeight;  //pu down
 
 	  if(isSignal && (varNames[ivar]=="_pdfup" || varNames[ivar]=="_pdfdown")) {
 	    if(mPDFInfo) {
@@ -1281,19 +1319,16 @@ int main(int argc, char* argv[])
                 if(vJets[ijet].pt()>30 && fabs(vJets[ijet].eta())<2.4) {
                     passLocalBveto &= (vJets[ijet].btag0<0.890);
                     bool isLocalCSVMtagged(vJets[ijet].btag0>0.890);
-                    double val=1., valerr=0.;
+                    double BTagWeights_Up=1., BTagWeights_Down=1.;
                     if(abs(vJets[ijet].flavid)==5) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").second;
+                        if(isLocalCSVMtagged) BTagWeights_Up *= btag_reader_up.eval( BTagEntry::FLAV_B, vJets[ijet].eta(), (vJets[ijet].pt()<670. ? vJets[ijet].pt() : 670.) );
+                        if(isLocalCSVMtagged) BTagWeights_Down *= btag_reader_down.eval( BTagEntry::FLAV_B, vJets[ijet].eta(), (vJets[ijet].pt()<670. ? vJets[ijet].pt() : 670.) );
                     } else if(abs(vJets[ijet].flavid)==4) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").second;
+                        if(isLocalCSVMtagged) BTagWeights_Up *= btag_reader_up.eval( BTagEntry::FLAV_C, vJets[ijet].eta(), (vJets[ijet].pt()<670. ? vJets[ijet].pt() : 670.) );
+                        if(isLocalCSVMtagged) BTagWeights_Down *= btag_reader_down.eval( BTagEntry::FLAV_C, vJets[ijet].eta(), (vJets[ijet].pt()<670. ? vJets[ijet].pt() : 670.) );
                     } else {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
-                        valerr= myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").second;
+                        // No udsg weights available
                     }
-                    double BTagWeights_Up = (val+valerr)/val;
-                    double BTagWeights_Down = (val-valerr)/val;
                     if(varNames[ivar]=="_btagup") iweight *= BTagWeights_Up;
                     if(varNames[ivar]=="_btagdown")	iweight *= BTagWeights_Down;
                 }
@@ -1376,6 +1411,10 @@ int main(int argc, char* argv[])
     if ( eventList ) eventList->Write();
 
     ofile->Close();
+
+    PU_Central_File->Close();
+    PU_Up_File->Close();
+    PU_Down_File->Close();
 
     if(outTxtFile_final)fclose(outTxtFile_final);
 }
