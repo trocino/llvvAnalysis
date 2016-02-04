@@ -14,7 +14,6 @@
 
 #include "CondFormats/JetMETObjects/interface/JetResolution.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
 #include "TSystem.h"
 #include "TFile.h"
