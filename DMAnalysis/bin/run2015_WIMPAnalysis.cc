@@ -120,8 +120,6 @@ int main(int argc, char* argv[])
     bool isSignal = (isMC_WIMP || isMC_ADD || isMC_Unpart);
 
 
-    BTagUtils myBtagUtils(runProcess);
-
     // https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration
     // setup calibration readers
     TString BtagSF = runProcess.getParameter<std::string>("BtagSF");
