@@ -10,7 +10,6 @@
 #include "llvvAnalysis/DMAnalysis/interface/SmartSelectionMonitor.h"
 #include "llvvAnalysis/DMAnalysis/interface/METUtils.h"
 #include "llvvAnalysis/DMAnalysis/interface/BTagUtils.h"
-#include "llvvAnalysis/DMAnalysis/interface/WIMPReweighting.h"
 #include "llvvAnalysis/DMAnalysis/interface/EventCategory.h"
 
 #include "CondFormats/JetMETObjects/interface/JetResolution.h"
@@ -133,8 +132,6 @@ int main(int argc, char* argv[])
     BTagCalibrationReader btag_reader(&btagcalib, BTagEntry::OP_MEDIUM, "mujets", "central");
     BTagCalibrationReader btag_reader_up(&btagcalib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
     BTagCalibrationReader btag_reader_down(&btagcalib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down
-
-    WIMPReweighting myWIMPweights(runProcess);
 
     // EWK corrections (from table or from plot) 
     bool useEwkTable = false; 
@@ -744,32 +741,6 @@ int main(int argc, char* argv[])
         //#########################################################################
         //####################  Generator Level Reweighting  ######################
         //#########################################################################
-
-        //for Wimps
-        if(isMC_WIMP || isMC_ADD || isMC_Unpart) {
-            if(phys.genleptons.size()!=2) continue;
-            if(phys.genGravitons.size()!=1 && phys.genWIMPs.size()!=2) continue;
-
-            LorentzVector genmet(0,0,0,0);
-            if(phys.genWIMPs.size()==2) 	  genmet = phys.genWIMPs[0]+phys.genWIMPs[1];
-            else if(phys.genGravitons.size()==1)  genmet = phys.genGravitons[0];
-
-            LorentzVector dilep = phys.genleptons[0]+phys.genleptons[1];
-            double dphizmet = fabs(deltaPhi(dilep.phi(),genmet.phi()));
-
-            //reweighting
-            //weight *= myWIMPweights.get1DWeights(genmet.pt(),"wimps_pt");
-            weight *= myWIMPweights.get2DWeights(genmet.pt(),dphizmet,"dphi_vs_met");
-
-            mon.fillHisto("met_Gen", tags, genmet.pt(), weight);
-            mon.fillHisto("zpt_Gen", tags, dilep.pt(), weight);
-            mon.fillHisto("dphi_Gen", tags, dphizmet, weight);
-            mon.fillHisto("zmass_Gen", tags, dilep.mass(), weight);
-            if(phys.genleptons[0].pt() > phys.genleptons[1].pt()) mon.fillHisto("ptlep1vs2_Gen", tags, phys.genleptons[0].pt(), phys.genleptons[1].pt(), weight);
-            else mon.fillHisto("ptlep1vs2_Gen", tags, phys.genleptons[1].pt(), phys.genleptons[0].pt(), weight);
-        }
-
-
 
 
 
