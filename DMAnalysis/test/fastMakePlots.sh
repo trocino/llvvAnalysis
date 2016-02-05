@@ -11,7 +11,7 @@ fi
 output="$2" 
 #output="$input/results" 
 main="${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis"
-json="$main/data/sample_13TeV_25ns_ZHinv_plot_31Jan2016.json"
+json="$main/data/sample_13TeV_25ns_ZHinv_plot_04Feb2016.json"
 #json="$main/data/sample_13TeV_25ns_ZHinv_noData_plot.json"
 outfile="$output/plotter.root" 
 onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll --only raw --only presel --only final --only eventflow "
