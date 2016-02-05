@@ -12,6 +12,7 @@
 #include "llvvAnalysis/DMAnalysis/interface/BTagUtils.h"
 #include "llvvAnalysis/DMAnalysis/interface/WIMPReweighting.h"
 #include "llvvAnalysis/DMAnalysis/interface/EventCategory.h"
+#include "llvvAnalysis/DMAnalysis/interface/LeptonEfficiencySF.h"
 
 #include "CondFormats/JetMETObjects/interface/JetResolution.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -68,9 +69,27 @@ int main(int argc, char* argv[])
 
     TString outTxtUrl_final= outUrl + "/" + outFileUrl + "_FinalList.txt";
     FILE* outTxtFile_final = NULL;
-    outTxtFile_final = fopen(outTxtUrl_final.Data(), "w");
-    printf("TextFile URL = %s\n",outTxtUrl_final.Data());
-    fprintf(outTxtFile_final,"run lumi event\n");
+    if ( runProcess.getUntrackedParameter<bool>("saveFinalList", true) ) {
+        outTxtFile_final = fopen(outTxtUrl_final.Data(), "w");
+        printf("TextFile URL = %s\n",outTxtUrl_final.Data());
+        fprintf(outTxtFile_final,"run lumi event\n");
+    }
+
+    // Embed final list in root file
+    int eventList_run, eventList_lumi, eventList_evt, eventList_nJets;
+    float eventList_met, eventList_mt, eventList_llpt;
+    bool saveEventList = !isMC || runProcess.getUntrackedParameter<bool>("saveEventList", false);
+    TTree * eventList{nullptr};
+    if ( saveEventList ) {
+        eventList = new TTree("eventList", "List of passed events");
+        eventList->Branch("run", &eventList_run);
+        eventList->Branch("lumi", &eventList_lumi);
+        eventList->Branch("evt", &eventList_evt);
+        eventList->Branch("nJets", &eventList_nJets);
+        eventList->Branch("met", &eventList_met);
+        eventList->Branch("mt", &eventList_mt);
+        eventList->Branch("llpt", &eventList_llpt);
+    }
 
     int fType(0);
     if(url.Contains("DoubleEG")) fType=EE;
@@ -102,25 +121,7 @@ int main(int argc, char* argv[])
     WIMPReweighting myWIMPweights(runProcess);
 
     // Temporary pileup reweighting with simple vector (true PU weights) 
-    double puWeightsNew[100] = {0., 54.0349, 116.125, 40.5246, 16.8051, 3.04448, 1.19776, 1.07217, 1.70808, 2.39848, 2.63249, 2.71243, 2.603, 2.16652, 1.50064, 0.857888, 0.409503, 0.173253, 0.0756125, 0.0399038, 0.0234459, 0.0126852, 0.00577866, 0.0022077, 0.000755718, 0.000269065, 0.000118168, 6.61647e-05, 4.40645e-05, 3.21187e-05, 2.38856e-05, 1.63517e-05, 9.18719e-06, 4.29246e-06, 1.69405e-06, 6.09737e-07, 2.13578e-07, 6.75225e-08, 2.08689e-08, 6.0951e-09, 1.72728e-09, 4.62314e-10, 1.1934e-10, 3.06271e-11, 7.08311e-12, 1.64595e-12, 5.12206e-13, 2.41336e-13, 8.96516e-14, 7.4969e-14, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; 
-
-    for(int i=0; i<100; ++i) {puWeightsNew[i] /= (284.886/313.347);} 
-
-// 313.347  284.886
-// 1364.03  1241.98
-// 1712.07  1558.24
-// 945.921  903.55
-// 3726.47  3374.27
-// 3801.33  3447.72
-// 40791.1  37261
-// 26944.5  25545.9
-// 2.65721e+06  2.40604e+06
-// 67.7048  61.7827
-// 46.9555  42.8672
-// 26.786  24.4586
-// 10.5018  9.64228
-// 2.46057  2.23257
-
+    double puWeightsNew[53] = {58.11380488748758, 93.26129672050942, 98.61620819958856, 28.710453450943625, 15.461738110343367, 2.7153649566833766, 1.4508190200934896, 1.7113554670643525, 2.3002683150588688, 2.478890795620616, 2.5634937261651434, 2.6060767979433512, 2.3623139729022284, 1.8314456720575751, 1.1939779550674, 0.6482593490607179, 0.300031985790039, 0.12726522751437955, 0.05787696855272272, 0.03129373468199889, 0.01794696563017523, 0.009367718902615849, 0.0041699518626305354, 0.0015958000976093603, 0.0005656542628421905, 0.00021590065740351115, 0.00010288912302544099, 6.186019389368631e-05, 4.3333625189295766e-05, 3.243049824295563e-05, 2.3379666897118117e-05, 1.4505386313365704e-05, 7.33633419348492e-06, 3.1279422520951384e-06, 1.193153164297415e-06, 4.2312807646063326e-07, 1.4197671020470987e-07, 4.5407636106872174e-08, 1.3888762286858452e-08, 4.0699760679295675e-09, 1.1440982214123114e-09, 3.088245290326575e-10, 8.010883780396007e-11, 1.9983352338057993e-11, 4.796698583685166e-12, 1.1085609692219938e-12, 6.101823054238068e-13, 1.9272836506402889e-13, 1.4720333566859804e-13, 4.5402219999950414e-14, 0.0, 0.0, 0.0}; 
 
 
     // EWK corrections (from table or from plot) 
@@ -196,12 +197,16 @@ int main(int argc, char* argv[])
     TH1F *h=(TH1F*) mon.addHistogram( new TH1F ("eventflow", ";;Events", 10,0,10) );
     h->GetXaxis()->SetBinLabel(1,"Trigger && 2 leptons");
     h->GetXaxis()->SetBinLabel(2,"|#it{m}_{ll}-#it{m}_{Z}|<15");
-    h->GetXaxis()->SetBinLabel(3,"#it{p}_{T}^{ll}>50");
+    h->GetXaxis()->SetBinLabel(3,"#it{p}_{T}^{ll}>60");
     h->GetXaxis()->SetBinLabel(4,"3^{rd}-lepton veto");
     h->GetXaxis()->SetBinLabel(5,"b-veto");
-    h->GetXaxis()->SetBinLabel(6,"#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss})>2.7");
-    h->GetXaxis()->SetBinLabel(7,"|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T}<0.2");
-    h->GetXaxis()->SetBinLabel(8,"E_{T}^{miss}>80");
+    h->GetXaxis()->SetBinLabel(6,"#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss})>2.8");
+    h->GetXaxis()->SetBinLabel(7,"#Delta#it{#phi}(#it{l^{+},l^{-}})<#pi/2");
+    h->GetXaxis()->SetBinLabel(8,"|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T}<0.4");
+    h->GetXaxis()->SetBinLabel(9,"E_{T}^{miss}>100");
+    h->GetXaxis()->SetBinLabel(10,"m_{T} > 200");
+
+    mon.addHistogram((TH1F*) h->Clone("eventflow_unweighted"));
 
 
     //for MC normalization (to 1/pb)
@@ -264,6 +269,7 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
+    mon.addHistogram( new TH1F( "dphiLL_presel",     ";#Delta#it{#phi}(#it{l^{+},l^{-}});Events", 10,0,TMath::Pi()) );
     mon.addHistogram( new TH1F( "balancedif_presel", ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events", 5,0,1.0) );
     mon.addHistogram( new TH1F( "mt_presel",         ";#it{m}_{T} [GeV];Events", 12,0,1200) );
 
@@ -331,9 +337,9 @@ int main(int argc, char* argv[])
     if(runOptimization) {
         // for optimization
         cout << "Optimization will be performed for this analysis" << endl;
-        for(double met=60; met<=150; met+=10) {
-            for(double balance=0.2; balance<=0.2; balance+=0.05) {
-                for(double dphi=2.7; dphi<2.8; dphi+=0.1) {
+        for(double met=80; met<=120; met+=10) {
+            for(double balance=0.2; balance<=0.4; balance+=0.1) {
+                for(double dphi=2.7; dphi<2.9; dphi+=0.1) {
                     optim_Cuts1_MET     .push_back(met);
                     optim_Cuts1_Balance .push_back(balance);
                     optim_Cuts1_DphiZMET.push_back(dphi);
@@ -414,6 +420,8 @@ int main(int argc, char* argv[])
     // event categorizer
     EventCategory eventCategoryInst(1);   //jet(0,1,>=2) binning
 
+    // Lepton scale factors 
+    LeptonEfficiencySF lsf(2015); 
 
     //####################################################################################################################
     //###########################################           EVENT LOOP         ###########################################
@@ -749,15 +757,17 @@ int main(int argc, char* argv[])
 
             bool hasTightIdandIso(true);
             if(abs(lepid)==13) { //muon
-                hasTightIdandIso &= phys.leptons[ilep].isTightMu;
+                hasTightIdandIso &= phys.leptons[ilep].isMediumMu;
+                hasTightIdandIso &= fabs(phys.leptons[ilep].d0)<0.02 && fabs(phys.leptons[ilep].dz)<0.1;
                 if(hasTightIdandIso) mon.fillHisto("mu_reliso_raw",   tags, phys.leptons[ilep].m_pfRelIsoDbeta(), weight);
 
-                hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.1 );
+                hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.12 );
             } else if(abs(lepid)==11) { //electron
                 hasTightIdandIso &= phys.leptons[ilep].isElpassMedium;
                 if(hasTightIdandIso) mon.fillHisto("el_reliso_raw",   tags, phys.leptons[ilep].e_pfRelIsoDbeta(), weight);
 
-                hasTightIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.1 );
+                // Electron tight ID from VID already includes isolation
+                // hasTightIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.1 );
             } else continue;
 
 
@@ -786,6 +796,7 @@ int main(int argc, char* argv[])
                 LorentzVector dilepton=lep1_+lep2_;
                 double massdif = fabs(dilepton.mass()-91.);
                 if(massdif < _MASSDIF_) {
+                    _MASSDIF_ = massdif;
                     lep1.SetPxPyPzE(lep1_.px(),lep1_.py(),lep1_.pz(),lep1_.energy());
                     lep2.SetPxPyPzE(lep2_.px(),lep2_.py(),lep2_.pz(),lep2_.energy());
                     id1 = id1_;
@@ -794,12 +805,25 @@ int main(int argc, char* argv[])
             }
         }
 
-
+	// ID + ISO scale factors (only muons for the time being) 
+	// Need to implement variations for errors (unused for now) 
+	float llScaleFactor = 1.0; 
+	llScaleFactor *= lsf.getLeptonEfficiency( lep1.pt(), lep1.eta(), abs(id1) ).first; 
+	llScaleFactor *= lsf.getLeptonEfficiency( lep2.pt(), lep2.eta(), abs(id2) ).first; 
+	if(llScaleFactor>0) weight *= llScaleFactor; 
+	else 
+	  std::cout << " *** WARNING: ll scale factor = " << llScaleFactor 
+		    << ", l1(" << lep1.pt() << ", " << lep1.eta() << ", " << id1 << ")" 
+		    << ", l2(" << lep2.pt() << ", " << lep2.eta() << ", " << id2 << ")" 
+		    << std::endl; 
 
         if(id1*id2==0) continue;
         LorentzVector zll(lep1+lep2);
         bool passZmass(fabs(zll.mass()-91)<15);
-        bool passZpt(zll.pt()>50);
+        bool passZpt(zll.pt()>60);
+
+        double dphiLL{fabs(deltaPhi(lep1.phi(), lep2.phi()))};
+        bool passDiLepDphi(dphiLL<M_PI/2);
 
 
         TString tag_cat;
@@ -863,25 +887,10 @@ int main(int argc, char* argv[])
         //if(isMC) weight *= myWIMPweights.get1DWeights(phys.nvtx,"pileup_weights");
 
 	// Temporary pileup reweighting with simple vector (true PU weights) 
-	unsigned int truepubin = int(ev.ngenTruepu + 0.5); 
-	if(isMC) weight *= puWeightsNew[truepubin]; 
+	unsigned int truepubin = ev.ngenTruepu;
+	if(isMC && truepubin<53) weight *= puWeightsNew[truepubin]; 
 
-        mon.fillHisto("eventflow",tags,0,weight);
-        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      weight);
-
-
-        if(lep1.pt()>lep2.pt()) {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
-        } else {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
-        }
 
 
         //
@@ -913,7 +922,8 @@ int main(int argc, char* argv[])
                 hasLooseIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.2 );
             } else if(abs(lepid)==11) { //electron
                 hasLooseIdandIso &= phys.leptons[ilep].isElpassVeto;
-                hasLooseIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.2 );
+                // Electron ID from VID already includes isolation
+                //hasLooseIdandIso &= ( phys.leptons[ilep].e_pfRelIsoDbeta() < 0.2 );
             } else continue;
 
 
@@ -925,6 +935,18 @@ int main(int argc, char* argv[])
 
         pass3dLeptonVeto=(n3rdLeptons==0);
 
+        //
+        // Also look for soft muons for b veto
+        //
+        int nSoftMuons(0);
+        for(size_t ilep=0; ilep<phys.leptons.size(); ilep++) {
+            LorentzVector lep=phys.leptons[ilep];
+            if ( lep.pt() < 3 || abs(phys.leptons[ilep].id) != 13 ) continue;
+            if ( ! phys.leptons[ilep].isSoftMu ) continue;
+            if ( std::find(allLeptons.begin(), allLeptons.end(), lep) != allLeptons.end() ) continue;
+            
+            nSoftMuons++;
+        }
 
         //
         //JET AND BTAGING ANALYSIS
@@ -936,8 +958,8 @@ int main(int argc, char* argv[])
         double BTagScaleFactor(1.0);
         for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
 
-            if(corrJets[ijet].pt()<20) continue;
-            if(fabs(corrJets[ijet].eta())>2.5) continue;
+            if(corrJets[ijet].pt()<30) continue;
+            if(fabs(corrJets[ijet].eta())>5.) continue;
 
             //jet ID
             if(!corrJets[ijet].isPFLoose) continue;
@@ -950,25 +972,25 @@ int main(int argc, char* argv[])
                 if(dR > minDR) continue;
                 minDR = dR;
             }
-            if(minDR < 0.4) continue;
+            if(minDR < 0.3) continue;
 
 
             GoodIdJets.push_back(corrJets[ijet]);
-            if(corrJets[ijet].pt()>30) nJetsGood30++;
+            if(corrJets[ijet].pt()>30) nJetsGood30++; // unused currently
 
 
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.244);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.679);
-            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.898);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVLtags += (corrJets[ijet].btag0>0.605);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVMtags += (corrJets[ijet].btag0>0.890);
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  nCSVTtags += (corrJets[ijet].btag0>0.970);
 
 
-            bool isCSVLtagged(corrJets[ijet].btag0>0.244 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
+            bool isCSVMtagged(corrJets[ijet].btag0>0.890 && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4);
             if(abs(corrJets[ijet].flavid)==5) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/b_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
             } else if(abs(corrJets[ijet].flavid)==4) {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/c_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
             } else {
-                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVLtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVL","CSVL/udsg_eff").first;
+                BTagScaleFactor *= myBtagUtils.getBTagWeight(isCSVMtagged,corrJets[ijet].pt(),corrJets[ijet].eta(),abs(corrJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
             }
 
 
@@ -978,9 +1000,9 @@ int main(int argc, char* argv[])
                 for(size_t csvtag=0; csvtag<CSVkey.size(); csvtag++) {
 
                     bool isBTag(false);
-                    if	   (CSVkey[csvtag]=="CSVL" && (corrJets[ijet].btag0>0.244)) isBTag = true;
-                    else if(CSVkey[csvtag]=="CSVM" && (corrJets[ijet].btag0>0.679)) isBTag = true;
-                    else if(CSVkey[csvtag]=="CSVT" && (corrJets[ijet].btag0>0.898)) isBTag = true;
+                    if	   (CSVkey[csvtag]=="CSVL" && (corrJets[ijet].btag0>0.605)) isBTag = true;
+                    else if(CSVkey[csvtag]=="CSVM" && (corrJets[ijet].btag0>0.890)) isBTag = true;
+                    else if(CSVkey[csvtag]=="CSVT" && (corrJets[ijet].btag0>0.970)) isBTag = true;
 
                     if(flavid==5) {
                         mon.fillHisto(TString("beff_Denom_")+CSVkey[csvtag],tags,corrJets[ijet].pt(),weight);
@@ -998,7 +1020,7 @@ int main(int argc, char* argv[])
 
         }
 
-        passBveto=(nCSVLtags==0);
+        passBveto=(nCSVMtags==0)&&(nSoftMuons==0);
 
         for(size_t ij=0; ij<GoodIdJets.size(); ij++) {
             mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
@@ -1006,16 +1028,16 @@ int main(int argc, char* argv[])
         }
 
         double dphiZMET=fabs(deltaPhi(zll.phi(),metP4.phi()));
-        bool passDphiZMETcut(dphiZMET>2.7);
+        bool passDphiZMETcut(dphiZMET>2.8);
 
         //missing ET
         //bool passMETcut=(metP4.pt()>80);
         //bool passMETcut=(metP4.pt()>60);
-        bool passMETcut=(metP4.pt()>120);
+        bool passMETcut=(metP4.pt()>100);
         bool passMETcut120=(metP4.pt()>120);
 
         //missing ET balance
-        bool passBalanceCut=(metP4.pt()/zll.pt()>0.80 && metP4.pt()/zll.pt()<1.20);
+        bool passBalanceCut=(metP4.pt()/zll.pt()>0.60 && metP4.pt()/zll.pt()<1.40);
         double balanceDif = fabs(1-metP4.pt()/zll.pt());
 
         //transverse mass
@@ -1041,11 +1063,27 @@ int main(int argc, char* argv[])
         if(isMC) weight *= BTagScaleFactor;
 
 
+        mon.fillHisto("eventflow",tags,0,weight);
+        mon.fillHisto("eventflow_unweighted",tags,0,1.);
+
+        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
+        if(lep1.pt()>lep2.pt()) {
+            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
+            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
+            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
+            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
+        } else {
+            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
+            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
+            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
+            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
+        }
+
         mon.fillHisto("zpt_raw"                         ,tags, zll.pt(),   weight);
         mon.fillHisto("pfmet_raw"                       ,tags, metP4.pt(), weight);
         mon.fillHisto("zmass_raw"                       ,tags, zll.mass(), weight);
         mon.fillHisto("njets_raw"                       ,tags, nJetsGood30, weight);
-        mon.fillHisto("nbjets_raw"                      ,tags, nCSVLtags, weight);
+        mon.fillHisto("nbjets_raw"                      ,tags, nCSVMtags, weight);
         if(lep1.pt()>lep2.pt()) mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep1.pt(), lep2.pt(), weight);
         else 			mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep2.pt(), lep1.pt(), weight);
 
@@ -1063,15 +1101,19 @@ int main(int argc, char* argv[])
 
         if(passZmass) {
             mon.fillHisto("eventflow",  tags, 1, weight);
+            mon.fillHisto("eventflow_unweighted",  tags, 1, 1.);
 
             if(passZpt) {
                 mon.fillHisto("eventflow",  tags, 2, weight);
+                mon.fillHisto("eventflow_unweighted",  tags, 2, 1.);
 
                 if(pass3dLeptonVeto) {
                     mon.fillHisto("eventflow",  tags, 3, weight);
+                    mon.fillHisto("eventflow_unweighted",  tags, 3, 1.);
 
                     if(passBveto) {
                         mon.fillHisto("eventflow",  tags, 4, weight);
+                        mon.fillHisto("eventflow_unweighted",  tags, 4, 1.);
 
                         //for MET X-Y shift correction
                         mon.fillHisto("pfmetphi_wocorr_presel",tags, metP4.phi(), weight);
@@ -1084,28 +1126,54 @@ int main(int argc, char* argv[])
                         mon.fillHisto("pfmet2_presel",tags, metP4.pt(), weight, true);
                         mon.fillHisto("mt_presel",   tags, MT_massless, weight);
                         mon.fillHisto("dphiZMET_presel",tags, dphiZMET, weight);
+                        mon.fillHisto("dphiLL_presel",tags, dphiLL, weight);
                         mon.fillHisto("balancedif_presel",tags, balanceDif, weight);
 
 
                         if(passDphiZMETcut) {
                             mon.fillHisto("eventflow",  tags, 5, weight);
+                            mon.fillHisto("eventflow_unweighted",  tags, 5, 1.);
 
-                            if(passBalanceCut) {
-                                mon.fillHisto("eventflow",  tags, 6, weight);
+                            if(passDiLepDphi) {
+                                mon.fillHisto("eventflow", tags, 6, weight);
+                                mon.fillHisto("eventflow_unweighted", tags, 6, 1.);
 
-                                if(passMETcut) {
+                                if(passBalanceCut) {
                                     mon.fillHisto("eventflow",  tags, 7, weight);
-                                    mon.fillHisto("mt_final",   tags, MT_massless, weight);
-                                    mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
-                                    mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
+                                    mon.fillHisto("eventflow_unweighted",  tags, 7, 1.);
 
-                                    if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
+                                    if(passMETcut) {
+                                        mon.fillHisto("eventflow",  tags, 8, weight);
+                                        mon.fillHisto("eventflow_unweighted",  tags, 8, 1.);
 
-                                    if(!isMC) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                        if(MT_massless>200) {
+                                            mon.fillHisto("eventflow",  tags, 9, weight);
+                                            mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
 
-                                } //passMETcut
+                                            mon.fillHisto("mt_final",   tags, MT_massless, weight);
+                                            mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
+                                            mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight);
+                                            if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
-                            } //passBalanceCut
+                                            if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                            if(saveEventList) {
+                                                eventList_run = ev.run;
+                                                eventList_lumi = ev.lumi;
+                                                eventList_evt = ev.event;
+                                                eventList_nJets = GoodIdJets.size();
+                                                eventList_met = metP4.pt();
+                                                eventList_mt = MT_massless;
+                                                eventList_llpt = zll.pt();
+                                                eventList->Fill();
+                                            }
+
+                                        } //pass MT cut
+
+                                    } //passMETcut
+
+                                } //passBalanceCut
+
+                            } //passDiLepDphi
 
                         } //passDphiZMETcut
 
@@ -1186,8 +1254,8 @@ int main(int argc, char* argv[])
             bool passLocalBveto(true);
             for(size_t ijet=0; ijet<vJets.size(); ijet++) {
 
-                if(vJets[ijet].pt()<20) continue;
-                if(fabs(vJets[ijet].eta())>2.5) continue;
+                if(vJets[ijet].pt()<30) continue;
+                if(fabs(vJets[ijet].eta())>5.) continue;
 
                 //jet ID
                 if(!vJets[ijet].isPFLoose) continue;
@@ -1200,22 +1268,22 @@ int main(int argc, char* argv[])
                     if(dR > minDR) continue;
                     minDR = dR;
                 }
-                if(minDR < 0.4) continue;
+                if(minDR < 0.3) continue;
 
 
-                if(vJets[ijet].pt()>20 && fabs(vJets[ijet].eta())<2.4) {
-                    passLocalBveto &= (vJets[ijet].btag0<0.244);
-                    bool isLocalCSVLtagged(vJets[ijet].btag0>0.244);
+                if(vJets[ijet].pt()>30 && fabs(vJets[ijet].eta())<2.4) {
+                    passLocalBveto &= (vJets[ijet].btag0<0.890);
+                    bool isLocalCSVMtagged(vJets[ijet].btag0>0.890);
                     double val=1., valerr=0.;
                     if(abs(vJets[ijet].flavid)==5) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/b_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/b_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").first;
+                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/b_eff").second;
                     } else if(abs(vJets[ijet].flavid)==4) {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/c_eff").first;
-                        valerr = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/c_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").first;
+                        valerr = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/c_eff").second;
                     } else {
-                        val = myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/udsg_eff").first;
-                        valerr= myBtagUtils.getBTagWeight(isLocalCSVLtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVL","CSVL/udsg_eff").second;
+                        val = myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").first;
+                        valerr= myBtagUtils.getBTagWeight(isLocalCSVMtagged,vJets[ijet].pt(),vJets[ijet].eta(),abs(vJets[ijet].flavid),"CSVM","CSVM/udsg_eff").second;
                     }
                     double BTagWeights_Up = (val+valerr)/val;
                     double BTagWeights_Down = (val-valerr)/val;
@@ -1225,7 +1293,7 @@ int main(int argc, char* argv[])
 
             }
 
-            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto);
+            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi );
 
             double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt
             double LocalDphiZMET=fabs(deltaPhi(zll.phi(),vMET.phi()));
@@ -1298,8 +1366,10 @@ int main(int argc, char* argv[])
     //save all to the file
     TFile *ofile=TFile::Open(outUrl, "recreate");
     mon.Write();
+    if ( eventList ) eventList->Write();
 
     ofile->Close();
 
     if(outTxtFile_final)fclose(outTxtFile_final);
 }
+/* vim: set ts=4 sw=4 tw=0 et :*/
