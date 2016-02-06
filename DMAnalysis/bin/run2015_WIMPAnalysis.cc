@@ -11,6 +11,7 @@
 #include "llvvAnalysis/DMAnalysis/interface/METUtils.h"
 #include "llvvAnalysis/DMAnalysis/interface/BTagUtils.h"
 #include "llvvAnalysis/DMAnalysis/interface/EventCategory.h"
+#include "llvvAnalysis/DMAnalysis/interface/LeptonEfficiencySF.h"
 
 #include "CondFormats/JetMETObjects/interface/JetResolution.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -453,6 +454,9 @@ int main(int argc, char* argv[])
     // event categorizer
     EventCategory eventCategoryInst(1);   //jet(0,1,>=2) binning
 
+    // Lepton scale factors 
+    LeptonEfficiencySF lsf(2015);
+
 
     //####################################################################################################################
     //###########################################           EVENT LOOP         ###########################################
@@ -498,7 +502,6 @@ int main(int argc, char* argv[])
         double puWeight_minus = 1.;
 
         if(isMC) {
-            mon.fillHisto("pileup", "all", ev.ngenTruepu, 1.0);
             float xval = ev.ngenTruepu;
             int xbins = weight_pileup_Central->GetXaxis()->GetNbins();
             if     (xval > weight_pileup_Central->GetXaxis()->GetBinUpEdge(xbins)    ) xval = weight_pileup_Central->GetXaxis()->GetBinUpEdge(xbins);
@@ -823,6 +826,18 @@ int main(int argc, char* argv[])
         }
 
 
+        // ID + ISO scale factors (only muons for the time being) 
+        // Need to implement variations for errors (unused for now) 
+        float llScaleFactor = 1.0; 
+        llScaleFactor *= lsf.getLeptonEfficiency( lep1.pt(), lep1.eta(), abs(id1) ).first; 
+        llScaleFactor *= lsf.getLeptonEfficiency( lep2.pt(), lep2.eta(), abs(id2) ).first; 
+        if(llScaleFactor>0)
+            weight *= llScaleFactor; 
+        else 
+            std::cout << " *** WARNING: ll scale factor = " << llScaleFactor 
+                << ", l1(" << lep1.pt() << ", " << lep1.eta() << ", " << id1 << ")" 
+                << ", l2(" << lep2.pt() << ", " << lep2.eta() << ", " << id2 << ")" 
+                << std::endl; 
 
         if(id1*id2==0) continue;
         LorentzVector zll(lep1+lep2);
@@ -1178,7 +1193,7 @@ int main(int argc, char* argv[])
                                             mon.fillHisto("weights_final", tags, 2., 1.*genWeight*ewk_w);
                                             mon.fillHisto("weights_final", tags, 3., 1.*genWeight*ewk_w*puWeight);
                                             mon.fillHisto("weights_final", tags, 4., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor);
-                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor*1.); // TODO: lepton sf
+                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor*llScaleFactor);
 
                                         } //pass MT cut
 
