@@ -82,6 +82,7 @@ for p in inFile.readlines():
 categories=list(set(categories))
 subcategories=list(set(subcategories))
 finalplots=list(set(finalplots))
+finalplots.sort()
 
 #write in json format
 fileObj = open(output,'w')
