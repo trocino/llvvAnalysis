@@ -15,7 +15,7 @@ json="$main/data/sample_13TeV_25ns_ZHinv_plot_04Feb2016.json"
 Ecm="13"
 Lumi="2263.55"
 
-onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll --only raw --only presel --only final --only eventflow "
+onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll --only raw --only presel --only final --only flow "
 runPlotter --json $json --inDir $input --outDir $output --outFile $output/plotter.root $onlyplots --iEcm $Ecm --iLumi $Lumi   
 
 ### Remove data final plots

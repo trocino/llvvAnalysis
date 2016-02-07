@@ -222,6 +222,9 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "nvtxwgt_raw",	";Vertices;Events",50,0,50) );
     mon.addHistogram( new TH1F( "zpt_raw",      ";#it{p}_{T}^{ll} [GeV];Events", 50,0,500) );
     mon.addHistogram( new TH1F( "pfmet_raw",    ";E_{T}^{miss} [GeV];Events", 50,0,500) );
+    mon.addHistogram( new TH1F( "pfmet_wocorr_raw",    ";E_{T}^{miss} [GeV];Events", 50,0,500) );
+    mon.addHistogram( new TH1F( "pfmet_noHF_raw",    ";E_{T}^{miss} [GeV];Events", 50,0,500) );
+    mon.addHistogram( new TH1F( "pfmet_puppi_raw",    ";E_{T}^{miss} [GeV];Events", 50,0,500) );
     mon.addHistogram( new TH1F( "zmass_raw",    ";#it{m}_{ll} [GeV];Events", 100,40,250) );
 
     mon.addHistogram( new TH2F( "ptlep1vs2_raw",";#it{p}_{T}^{l1} [GeV];#it{p}_{T}^{l2} [GeV];Events",250,0,500, 250,0,500) );
@@ -285,6 +288,10 @@ int main(int argc, char* argv[])
 
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
+    mon.addHistogram( new TH1F( "pfmetCtrl_presel",     ";E_{T}^{miss} [GeV];Events / 5 GeV", 20, 0, 100));
+    mon.addHistogram( new TH1F( "pfmetCtrl_wocorr_presel",     ";E_{T}^{miss} [GeV];Events / 5 GeV", 20, 0, 100));
+    mon.addHistogram( new TH1F( "pfmetCtrl_noHF_presel",     ";E_{T}^{miss} [GeV];Events / 5 GeV", 20, 0, 100));
+    mon.addHistogram( new TH1F( "pfmetCtrl_puppi_presel",     ";E_{T}^{miss} [GeV];Events / 5 GeV", 20, 0, 100));
     mon.addHistogram( new TH1F( "pfmetParallelZ_presel",     ";E_{T}^{miss} Parallel Z [GeV];Events / 10 GeV", 40, -200, 200));
     mon.addHistogram( new TH1F( "pfmetPerpZ_presel",         ";E_{T}^{miss} Perp. Z [GeV];Events / 5 GeV", 40, -100, 100));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
@@ -338,6 +345,7 @@ int main(int argc, char* argv[])
     hfinalWeights->GetXaxis()->SetBinLabel(5,"*(btagSF)");
     hfinalWeights->GetXaxis()->SetBinLabel(6,"*(lepSF)");
 
+    mon.addHistogram( (TH1F*) hfinalWeights->Clone("weights_presel") );
 
     //#################################################
     //############# CONTROL PLOTS #####################
@@ -537,10 +545,6 @@ int main(int argc, char* argv[])
 
         // add PhysicsEvent_t class, get all tree to physics objects
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
-
-        mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      genWeight);
-        mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      genWeight*puWeight);
-
 
         float ewk_w = 1.; 
         /// Also include an extra 10% to account for gg->ZZ contribution. 
@@ -799,7 +803,7 @@ int main(int argc, char* argv[])
                 hasTightIdandIso &= fabs(phys.leptons[ilep].d0)<0.02 && fabs(phys.leptons[ilep].dz)<0.1;
                 if(hasTightIdandIso) mon.fillHisto("mu_reliso_raw",   tags, phys.leptons[ilep].m_pfRelIsoDbeta(), weight);
 
-                hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.12 );
+                hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.12 ); // MIT moved to 0.15
             } else if(abs(lepid)==11) { //electron
                 hasTightIdandIso &= phys.leptons[ilep].isElpassMedium;
                 if(hasTightIdandIso) mon.fillHisto("el_reliso_raw",   tags, phys.leptons[ilep].e_pfRelIsoDbeta(), weight);
@@ -818,6 +822,11 @@ int main(int argc, char* argv[])
         }
 
         if(nGoodLeptons<2) continue; // 2 tight leptons
+        
+        // Now we can look at nvtx distribution (not enough QCD MC to allow data comparison before this)
+        mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      genWeight);
+        mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      genWeight*puWeight);
+
 
         float _MASSDIF_(999.);
         int id1(0),id2(0);
@@ -1116,6 +1125,9 @@ int main(int argc, char* argv[])
 
         mon.fillHisto("zpt_raw"                         ,tags, zll.pt(),   weight);
         mon.fillHisto("pfmet_raw"                       ,tags, metP4_XYCorr.pt(), weight);
+        mon.fillHisto("pfmet_wocorr_raw"                ,tags, metP4.pt(), weight);
+        mon.fillHisto("pfmet_noHF_raw"                  ,tags, phys.metNoHF.pt(), weight);
+        mon.fillHisto("pfmet_puppi_raw"                 ,tags, phys.metPUPPI.pt(), weight);
         mon.fillHisto("zmass_raw"                       ,tags, zll.mass(), weight);
         mon.fillHisto("njets_raw"                       ,tags, nJetsGood30, weight);
         mon.fillHisto("nbjets_raw"                      ,tags, nCSVMtags, weight);
@@ -1163,10 +1175,22 @@ int main(int argc, char* argv[])
                         //preselection plots
                         mon.fillHisto("pfmet_presel", tags, metP4_XYCorr.pt(), weight, true);
                         mon.fillHisto("pfmet2_presel",tags, metP4_XYCorr.pt(), weight, true);
+                        mon.fillHisto("pfmetCtrl_presel", tags, metP4_XYCorr.pt(), weight);
+                        mon.fillHisto("pfmetCtrl_wocorr_presel", tags, metP4.pt(), weight);
+                        mon.fillHisto("pfmetCtrl_noHF_presel", tags, phys.metNoHF.pt(), weight);
+                        mon.fillHisto("pfmetCtrl_puppi_presel", tags, phys.metPUPPI.pt(), weight);
                         mon.fillHisto("mt_presel",   tags, MT_massless, weight);
                         mon.fillHisto("dphiZMET_presel",tags, dphiZMET, weight);
                         mon.fillHisto("dphiLL_presel",tags, dphiLL, weight);
                         mon.fillHisto("balancedif_presel",tags, balanceDif, weight);
+
+                        //check weights
+                        mon.fillHisto("weights_presel", tags, 0., 1.);
+                        mon.fillHisto("weights_presel", tags, 1., 1.*genWeight);
+                        mon.fillHisto("weights_presel", tags, 2., 1.*genWeight*ewk_w);
+                        mon.fillHisto("weights_presel", tags, 3., 1.*genWeight*ewk_w*puWeight);
+                        mon.fillHisto("weights_presel", tags, 4., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor);
+                        mon.fillHisto("weights_presel", tags, 5., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor*llScaleFactor);
 
 
                         if(passDphiZMETcut) {
