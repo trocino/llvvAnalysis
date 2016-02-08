@@ -923,13 +923,13 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
           }
         mctotalUnc->SetDirectory(0);
 
-        TGraphErrors *mcgr=new TGraphErrors;
+        TGraphErrors *mcgr=new TGraphErrors("mcStatErrGraph", "mcstaterrors");
         for(int ibin=1; ibin<=mctotalUnc->GetXaxis()->GetNbins(); ibin++)
           {
         	mcgr->SetPoint(ibin-1,mctotalUnc->GetXaxis()->GetBinCenter(ibin),mctotalUnc->GetBinContent(ibin));
                 mcgr->SetPointError(ibin-1,mctotalUnc->GetXaxis()->GetBinWidth(ibin)/2,mctotalUnc->GetBinError(ibin));
           }
-       	mcgr->SetFillStyle(3254);
+       	mcgr->SetFillStyle(3004);
        	mcgr->SetFillColor(1);
         mcgr->SetMarkerStyle(1);
        	mcgr->Draw("2 same");
@@ -1088,7 +1088,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
        } //RJ
 
        denRelUnc->SetLineColor(1);
-       denRelUnc->SetFillStyle(3254);
+       denRelUnc->SetFillStyle(3004);
        denRelUnc->SetFillColor(kRed);
        denRelUnc->SetMarkerColor(1);
        denRelUnc->SetMarkerStyle(1);

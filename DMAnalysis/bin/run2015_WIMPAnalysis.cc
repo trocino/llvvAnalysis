@@ -823,10 +823,6 @@ int main(int argc, char* argv[])
 
         if(nGoodLeptons<2) continue; // 2 tight leptons
         
-        // Now we can look at nvtx distribution (not enough QCD MC to allow data comparison before this)
-        mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      genWeight);
-        mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      genWeight*puWeight);
-
 
         float _MASSDIF_(999.);
         int id1(0),id2(0);
@@ -932,6 +928,10 @@ int main(int argc, char* argv[])
 
         tags.push_back(tag_cat); //add ee, mumu, emu category
 
+
+        // Now we can look at nvtx distribution (not enough QCD MC to allow data comparison before this)
+        mon.fillHisto("nvtx_raw",   tags, phys.nvtx,      genWeight);
+        mon.fillHisto("nvtxwgt_raw",   tags, phys.nvtx,      genWeight*puWeight);
 
 
         //
