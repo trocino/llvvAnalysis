@@ -1006,10 +1006,10 @@ int main(int argc, char* argv[])
             if(!corrJets[ijet].isPFLoose) continue;
             //if(corrJets[ijet].pumva<0.5) continue;
 
-            //check overlaps with selected leptons
+            //check overlaps with good leptons
             double minDR(999.);
-            for(vector<LorentzVector>::iterator lIt = allLeptons.begin(); lIt != allLeptons.end(); lIt++) {
-                double dR = deltaR( corrJets[ijet], *lIt );
+            for( auto& goodLep : goodLeptons ) {
+                double dR = deltaR( corrJets[ijet], goodLep.second );
                 if(dR > minDR) continue;
                 minDR = dR;
             }
