@@ -865,7 +865,8 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
 	 if(tSaveName.Contains("Eta_raw")) maximumFound*= 40;
 	 if(tSaveName.Contains("wmt_raw")) maximumFound*= 20;
 	 if(tSaveName.Contains("pfmet_raw")) maximumFound*= 100;
-	 if(tSaveName.Contains("DPhiZMET_dataDY")) maximumFound*= 20;
+	 if(tSaveName.Contains("dphiZMET")) maximumFound*= 100;
+	 if(tSaveName.Contains("balance")) maximumFound*= 100;
 	 if(tSaveName.Contains("eleLooseFakePt")) maximumFound*= 20;
 	 if(tSaveName.Contains("eleTightFakePt")) maximumFound*= 20;
 	 if(tSaveName.Contains("FakeEta")) maximumFound*= 40;
