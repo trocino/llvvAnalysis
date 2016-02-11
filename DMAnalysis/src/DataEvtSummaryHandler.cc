@@ -51,6 +51,15 @@ bool DataEvtSummaryHandler::initTree(TTree *t)
     t_->Branch("id1",        	&evSummary_.id1,            "id1/I");
     t_->Branch("id2",        	&evSummary_.id2,            "id2/I");
     t_->Branch("lheSumPartonHT", &evSummary_.lheSumPartonHT, "lheSumPartonHT/F");
+    t_->Branch("weight_QCDscale_muR1_muF1",     &evSummary_.weight_QCDscale_muR1_muF1,      "weight_QCDscale_muR1_muF1/F");
+    t_->Branch("weight_QCDscale_muR1_muF2",     &evSummary_.weight_QCDscale_muR1_muF2,      "weight_QCDscale_muR1_muF2/F");
+    t_->Branch("weight_QCDscale_muR1_muF0p5",     &evSummary_.weight_QCDscale_muR1_muF0p5,      "weight_QCDscale_muR1_muF0p5/F");
+    t_->Branch("weight_QCDscale_muR2_muF1",     &evSummary_.weight_QCDscale_muR2_muF1,      "weight_QCDscale_muR2_muF1/F");
+    t_->Branch("weight_QCDscale_muR2_muF2",     &evSummary_.weight_QCDscale_muR2_muF2,      "weight_QCDscale_muR2_muF2/F");
+    t_->Branch("weight_QCDscale_muR2_muF0p5",     &evSummary_.weight_QCDscale_muR2_muF0p5,      "weight_QCDscale_muR2_muF0p5/F");
+    t_->Branch("weight_QCDscale_muR0p5_muF1",     &evSummary_.weight_QCDscale_muR0p5_muF1,      "weight_QCDscale_muR0p5_muF1/F");
+    t_->Branch("weight_QCDscale_muR0p5_muF2",     &evSummary_.weight_QCDscale_muR0p5_muF2,      "weight_QCDscale_muR0p5_muF2/F");
+    t_->Branch("weight_QCDscale_muR0p5_muF0p5",     &evSummary_.weight_QCDscale_muR0p5_muF0p5,      "weight_QCDscale_muR0p5_muF0p5/F");
 
 
     //mc truth
@@ -308,6 +317,15 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
     t_->SetBranchAddress("id1",             &evSummary_.id1);
     t_->SetBranchAddress("id2",             &evSummary_.id2);
     t_->SetBranchAddress("lheSumPartonHT",  &evSummary_.lheSumPartonHT);
+    t_->SetBranchAddress("weight_QCDscale_muR1_muF1",       &evSummary_.weight_QCDscale_muR1_muF1);
+    t_->SetBranchAddress("weight_QCDscale_muR1_muF2",       &evSummary_.weight_QCDscale_muR1_muF2);
+    t_->SetBranchAddress("weight_QCDscale_muR1_muF0p5",       &evSummary_.weight_QCDscale_muR1_muF0p5);
+    t_->SetBranchAddress("weight_QCDscale_muR2_muF1",       &evSummary_.weight_QCDscale_muR2_muF1);
+    t_->SetBranchAddress("weight_QCDscale_muR2_muF2",       &evSummary_.weight_QCDscale_muR2_muF2);
+    t_->SetBranchAddress("weight_QCDscale_muR2_muF0p5",       &evSummary_.weight_QCDscale_muR2_muF0p5);
+    t_->SetBranchAddress("weight_QCDscale_muR0p5_muF1",       &evSummary_.weight_QCDscale_muR0p5_muF1);
+    t_->SetBranchAddress("weight_QCDscale_muR0p5_muF2",       &evSummary_.weight_QCDscale_muR0p5_muF2);
+    t_->SetBranchAddress("weight_QCDscale_muR0p5_muF0p5",       &evSummary_.weight_QCDscale_muR0p5_muF0p5);
 
 
     //mc truth

@@ -1055,6 +1055,8 @@ MainAnalyzer::getMCtruth(const edm::Event& event, const edm::EventSetup& iSetup)
     if(ev.genWeight<0) controlHistos_.fillHisto("n_negevents","all",0); //increment negative event count
     if(ev.genWeight>0) controlHistos_.fillHisto("n_posevents","all",0); //increment positive event count
 
+
+
     //
     // gen particles
     //
@@ -1204,19 +1206,32 @@ MainAnalyzer::getMCtruth(const edm::Event& event, const edm::EventSetup& iSetup)
     Handle<LHEEventProduct> lheProduct;
     event.getByToken(lheEventProductToken_, lheProduct);
 
-    const lhef::HEPEUP& lheeventinfo = lheProduct->hepeup();
+    if ( lheProduct.isValid() ) {
+        if(lheProduct->weights().size()>=9) {
+            ev.weight_QCDscale_muR1_muF1     = lheProduct->weights()[0].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR1_muF2     = lheProduct->weights()[1].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR1_muF0p5   = lheProduct->weights()[2].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR2_muF1     = lheProduct->weights()[3].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR2_muF2     = lheProduct->weights()[4].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR2_muF0p5   = lheProduct->weights()[5].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR0p5_muF1   = lheProduct->weights()[6].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR0p5_muF2   = lheProduct->weights()[7].wgt/lheProduct->originalXWGTUP();
+            ev.weight_QCDscale_muR0p5_muF0p5 = lheProduct->weights()[8].wgt/lheProduct->originalXWGTUP();
+        }
 
-    float sumPartonHT=0.;
-    for (int i = 0; i < lheeventinfo.NUP ; ++i) {
-        // final partons, quarks (except top) and gluon
-        if (lheeventinfo.ISTUP[i] !=1 ||((abs(lheeventinfo.IDUP[i])>5&&lheeventinfo.IDUP[i]!=21) ))  continue;
-        double px=lheeventinfo.PUP.at(i)[0];
-        double py=lheeventinfo.PUP.at(i)[1];
-        double pt=sqrt(px*px+py*py);
-        sumPartonHT+=pt;
+        const lhef::HEPEUP& lheeventinfo = lheProduct->hepeup();
+        float sumPartonHT=0.;
+        for (int i = 0; i < lheeventinfo.NUP ; ++i) {
+            // final partons, quarks (except top) and gluon
+            if (lheeventinfo.ISTUP[i] !=1 ||((abs(lheeventinfo.IDUP[i])>5&&lheeventinfo.IDUP[i]!=21) ))  continue;
+            double px=lheeventinfo.PUP.at(i)[0];
+            double py=lheeventinfo.PUP.at(i)[1];
+            double pt=sqrt(px*px+py*py);
+            sumPartonHT+=pt;
+        }
+
+        ev.lheSumPartonHT = sumPartonHT;
     }
-
-    ev.lheSumPartonHT = sumPartonHT;
 }
 
 
