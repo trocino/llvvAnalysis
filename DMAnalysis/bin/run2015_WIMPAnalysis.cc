@@ -1114,7 +1114,7 @@ int main(int argc, char* argv[])
             mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
             mon.fillHisto("jet_eta_raw",  tags, GoodIdJets[ij].eta(),weight);
         }
-        mon.fillHisto("leadingjet_pt_raw", tags, GoodIdJets[iLeadingJet].pt(), weight);
+        if ( GoodIdJets.size() > 0 ) mon.fillHisto("leadingjet_pt_raw", tags, GoodIdJets[iLeadingJet].pt(), weight);
 
         mon.fillHisto("nGoodleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nleptons_raw",tags, allLeptons.size(), weight);
