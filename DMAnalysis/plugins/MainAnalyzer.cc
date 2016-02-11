@@ -126,6 +126,7 @@ private:
     edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenTag_;
     edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenTag_;
     edm::EDGetTokenT<edm::View<reco::GenJet> > genjetTag_;
+    edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;
 
 
 
@@ -237,6 +238,7 @@ MainAnalyzer::MainAnalyzer(const edm::ParameterSet& iConfig):
     prunedGenTag_(	consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("prunedTag"))	),
     packedGenTag_(	consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("packedTag"))	),
     genjetTag_(		consumes<edm::View<reco::GenJet> >(iConfig.getParameter<edm::InputTag>("genJetsTag"))		),
+    lheEventProductToken_(consumes<LHEEventProduct>(iConfig.getUntrackedParameter<edm::InputTag>("lheEventProduct", edm::InputTag("externalLHEProducer")))),
     triggerBits_(	consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("bits"))			),
     triggerObjects_(	consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("objects"))),
     triggerPrescales_(	consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))		),
@@ -1198,7 +1200,23 @@ MainAnalyzer::getMCtruth(const edm::Event& event, const edm::EventSetup& iSetup)
         ev.nmcparticles++;
     }
 
+    // Get some matrix element info.
+    Handle<LHEEventProduct> lheProduct;
+    event.getByToken(lheEventProductToken_, lheProduct);
 
+    const lhef::HEPEUP& lheeventinfo = lheProduct->hepeup();
+
+    float sumPartonHT=0.;
+    for (int i = 0; i < lheeventinfo.NUP ; ++i) {
+        // final partons, quarks (except top) and gluon
+        if (lheeventinfo.ISTUP[i] !=1 ||((abs(lheeventinfo.IDUP[i])>5&&lheeventinfo.IDUP[i]!=21) ))  continue;
+        double px=lheeventinfo.PUP.at(i)[0];
+        double py=lheeventinfo.PUP.at(i)[1];
+        double pt=sqrt(px*px+py*py);
+        sumPartonHT+=pt;
+    }
+
+    ev.lheSumPartonHT = sumPartonHT;
 }
 
 

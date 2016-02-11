@@ -83,8 +83,3 @@ process.p = cms.Path( process.HBHENoiseFilterResultProducer * #produces HBHE bas
                         process.egmGsfElectronIDSequence * process.mainAnalyzer
 )
 
-if 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' in options.inputFiles[0] :
-    print 'LO DY sample -> removing HT>100'
-    process.genHTFilter = cms.EDFilter("GenHTFilter", htMin=cms.double(0), htMax=cms.double(100))
-    process.p.replace(process.mainAnalyzer, cms.Sequence(process.genHTFilter*process.mainAnalyzer))
-

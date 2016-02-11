@@ -40,6 +40,7 @@ struct DataEvtSummary_t {
     Int_t ngenITpu,ngenOOTpu,ngenOOTpum1, ngenTruepu;
     Float_t puWeight, hptWeights[5];
     Float_t pthat,genWeight, qscale, x1,x2;
+    Float_t lheSumPartonHT;
     Int_t id1,id2;
 
     //gen level event
