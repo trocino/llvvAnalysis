@@ -283,7 +283,7 @@ int main(int argc, char* argv[])
     double METBins2[]= {0,10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,500,1000};
     const int nBinsMET2 = sizeof(METBins2)/sizeof(double) - 1;
 
-    double MTBins[]= {200,300,400,600,800,1200};
+    double MTBins[]= {200,250, 300,400,600,800,1000};
     const int nBinsMT = sizeof(MTBins)/sizeof(double) - 1;
 
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
