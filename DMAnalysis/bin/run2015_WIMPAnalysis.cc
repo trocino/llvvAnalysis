@@ -237,6 +237,7 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "el_reliso_raw",  ";Electron pfRelIsoDbeta;Events",50,0,0.5) );
     mon.addHistogram( new TH1F( "mu_reliso_raw",  ";Muon pfRelIsoDbeta;Events",50,0,2) );
 
+    mon.addHistogram( new TH1F( "leadingjet_pt_raw", ";Leading jet #it{p}_{T}^{j};Events", 50,0,500) );
     mon.addHistogram( new TH1F( "jet_pt_raw", ";all jet #it{p}_{T}^{j};Events", 50,0,500) );
     mon.addHistogram( new TH1F( "jet_eta_raw",";all jet #eta^{j};Events", 50,-2.6,2.6) );
 
@@ -286,6 +287,8 @@ int main(int argc, char* argv[])
     double MTBins[]= {200,250, 300,400,600,800,1000};
     const int nBinsMT = sizeof(MTBins)/sizeof(double) - 1;
 
+    mon.addHistogram( new TH1F( "zmass_presel",    ";#it{m}_{ll} [GeV];Events", 50,91-15,91+15) );
+    mon.addHistogram( new TH1F( "zpt_presel",    ";#it{p}_{T}^{ll} [GeV];Events / 10 GeV", 45,50,500) );
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
     mon.addHistogram( new TH1F( "pfmetCtrl_presel",     ";E_{T}^{miss} [GeV];Events / 5 GeV", 20, 0, 100));
@@ -1068,11 +1071,6 @@ int main(int argc, char* argv[])
         // apply BTag weights
         if(isMC) weight *= BTagScaleFactor;
 
-        for(size_t ij=0; ij<GoodIdJets.size(); ij++) {
-            mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
-            mon.fillHisto("jet_eta_raw",  tags, GoodIdJets[ij].eta(),weight);
-        }
-
         LorentzVector metP4_XYCorr = METUtils::applyMETXYCorr(metP4,isMC,phys.nvtx);
         TVector2 met2D(metP4_XYCorr.px(), metP4_XYCorr.py());
         TVector2 zPt2D(zll.px(), zll.py());
@@ -1108,6 +1106,15 @@ int main(int argc, char* argv[])
 
         mon.fillHisto("eventflow",tags,0,weight);
         mon.fillHisto("eventflow_unweighted",tags,0,1.);
+
+        size_t iLeadingJet=0;
+        for(size_t ij=0; ij<GoodIdJets.size(); ij++) {
+            if ( GoodIdJets[ij].pt() > GoodIdJets[iLeadingJet].pt() )
+                iLeadingJet = ij;
+            mon.fillHisto("jet_pt_raw",   tags, GoodIdJets[ij].pt(),weight);
+            mon.fillHisto("jet_eta_raw",  tags, GoodIdJets[ij].eta(),weight);
+        }
+        mon.fillHisto("leadingjet_pt_raw", tags, GoodIdJets[iLeadingJet].pt(), weight);
 
         mon.fillHisto("nGoodleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nleptons_raw",tags, allLeptons.size(), weight);
@@ -1173,6 +1180,8 @@ int main(int argc, char* argv[])
                         mon.fillHisto("pfmetPerpZ_vs_nvtx_presel",    tags,phys.nvtx, metPerpZ, weight);
 
                         //preselection plots
+                        mon.fillHisto("zmass_presel", tags, zll.mass(), weight);
+                        mon.fillHisto("zpt_presel", tags, zll.pt(), weight);
                         mon.fillHisto("pfmet_presel", tags, metP4_XYCorr.pt(), weight, true);
                         mon.fillHisto("pfmet2_presel",tags, metP4_XYCorr.pt(), weight, true);
                         mon.fillHisto("pfmetCtrl_presel", tags, metP4_XYCorr.pt(), weight);
