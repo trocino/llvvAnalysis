@@ -27,12 +27,13 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
         LorentzVector P4(ev.mn_px[i],ev.mn_py[i],ev.mn_pz[i],ev.mn_en[i]);
         if(P4.pt()>0) {
             phys.leptons.push_back(PhysicsObject_Lepton(P4, ev.mn_id[i]));
-            phys.leptons[nlep].setLeptonIDInfo(ev.mn_IsLoose[i], ev.mn_IsTight[i],ev.mn_IsSoft[i],ev.mn_IsHighPt[i],
+            phys.leptons[nlep].setLeptonIDInfo(ev.mn_IsLoose[i], ev.mn_IsMedium[i], ev.mn_IsTight[i],ev.mn_IsSoft[i],ev.mn_IsHighPt[i],
                                                ev.en_passVeto[i], ev.en_passLoose[i], ev.en_passMedium[i], ev.en_passTight[i]
                                               );
             phys.leptons[nlep].setLeptonIsoInfo(ev.mn_pileupIsoR03[i],ev.mn_chargedIsoR03[i],ev.mn_photonIsoR03[i],ev.mn_neutralHadIsoR03[i],
                                                 ev.en_pileupIso[i],ev.en_chargedIso[i],ev.en_photonIso[i],ev.en_neutralHadIso[i]
                                                );
+            phys.leptons[nlep].setLeptonD0DZInfo(ev.mn_d0[i], ev.mn_dZ[i]);
 
             nlep++;
         }
@@ -42,12 +43,13 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
         LorentzVector P4(ev.en_px[i],ev.en_py[i],ev.en_pz[i],ev.en_en[i]);
         if(P4.pt()>0) {
             phys.leptons.push_back(PhysicsObject_Lepton(P4, ev.en_id[i]));
-            phys.leptons[nlep].setLeptonIDInfo(ev.mn_IsLoose[i], ev.mn_IsTight[i],ev.mn_IsSoft[i],ev.mn_IsHighPt[i],
+            phys.leptons[nlep].setLeptonIDInfo(ev.mn_IsLoose[i], ev.mn_IsMedium[i], ev.mn_IsTight[i],ev.mn_IsSoft[i],ev.mn_IsHighPt[i],
                                                ev.en_passVeto[i], ev.en_passLoose[i], ev.en_passMedium[i], ev.en_passTight[i]
                                               );
             phys.leptons[nlep].setLeptonIsoInfo(ev.mn_pileupIsoR03[i],ev.mn_chargedIsoR03[i],ev.mn_photonIsoR03[i],ev.mn_neutralHadIsoR03[i],
                                                 ev.en_pileupIso[i],ev.en_chargedIso[i],ev.en_photonIso[i],ev.en_neutralHadIso[i]
                                                );
+            phys.leptons[nlep].setLeptonD0DZInfo(ev.en_d0[i], ev.en_dZ[i]);
 
 
             nlep++;
