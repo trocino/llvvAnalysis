@@ -40,7 +40,17 @@ struct DataEvtSummary_t {
     Int_t ngenITpu,ngenOOTpu,ngenOOTpum1, ngenTruepu;
     Float_t puWeight, hptWeights[5];
     Float_t pthat,genWeight, qscale, x1,x2;
+    Float_t lheSumPartonHT;
     Int_t id1,id2;
+    Float_t weight_QCDscale_muR1_muF1;
+    Float_t weight_QCDscale_muR1_muF2;
+    Float_t weight_QCDscale_muR1_muF0p5;
+    Float_t weight_QCDscale_muR2_muF1;
+    Float_t weight_QCDscale_muR2_muF2;
+    Float_t weight_QCDscale_muR2_muF0p5;
+    Float_t weight_QCDscale_muR0p5_muF1;
+    Float_t weight_QCDscale_muR0p5_muF2;
+    Float_t weight_QCDscale_muR0p5_muF0p5;
 
     //gen level event
     Int_t nmcparticles;

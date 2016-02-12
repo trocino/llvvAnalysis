@@ -1,6 +1,10 @@
 import FWCore.ParameterSet.Config as cms
+from FWCore.ParameterSet.VarParsing import VarParsing
 
 from llvvAnalysis.DMAnalysis.mainAnalyzer_cfi import *
+
+options = VarParsing('analysis')
+options.parseArguments()
 
 process.mainAnalyzer.isMC = cms.bool(False)
 
@@ -64,12 +68,16 @@ for idmod in my_id_modules:
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
+        options.inputFiles
     )
 )
 
+import FWCore.PythonUtilities.LumiList as LumiList
+process.source.lumisToProcess = LumiList.LumiList(filename = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_v2.txt').getVLuminosityBlockRange()
+
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("analysis.root")
+                                   fileName = cms.string(options.outputFile)
                                   )
 
 

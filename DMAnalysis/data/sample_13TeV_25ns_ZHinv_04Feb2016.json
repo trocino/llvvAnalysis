@@ -2,23 +2,6 @@
     "proc": [
         {
             "isdata": false, 
-            "color": "842", 
-            "lcolor": "1", 
-            "tag": "ZZ#rightarrow 2l2#nu", 
-            "marker": 842, 
-            "data": [
-                {
-                    "dtag": "MC13TeV_ZZTo2L2Nu", 
-                    "xsec": 0.564, 
-                    "split": 12, 
-                    "br": [
-                        1
-                    ]
-                }
-            ]
-        }, 
-        {
-            "isdata": false, 
             "color": "856", 
             "lcolor": "1", 
             "tag": "WZ#rightarrow 3l#nu", 
@@ -27,6 +10,56 @@
                 {
                     "dtag": "MC13TeV_WZpowheg", 
                     "xsec": 4.102, 
+                    "split": 2, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_WZamcatnloFXFX", 
+                    "xsec": 5.29, 
+                    "split": 8, 
+                    "br": [
+                        1
+                    ]
+                }
+            ]
+        }, 
+        {
+            "isdata": false, 
+            "color": "798", 
+            "lcolor": "1", 
+            "tag": "WW#rightarrow l#nul#nu", 
+            "marker": 798, 
+            "data": [
+                {
+                    "dtag": "MC13TeV_WW", 
+                    "xsec": 10.481, 
+                    "split": 2, 
+                    "br": [
+                        1
+                    ]
+                }
+            ]
+        }, 
+        {
+            "isdata": false, 
+            "color": "842", 
+            "lcolor": "1", 
+            "tag": "ZZ#rightarrow 2l2#nu", 
+            "marker": 842, 
+            "data": [
+                {
+                    "dtag": "MC13TeV_ZZTo2L2Nu", 
+                    "xsec": 0.564, 
+                    "split": 8, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_ZZinclusive", 
+                    "xsec": 16.523, 
                     "split": 2, 
                     "br": [
                         1
@@ -68,7 +101,7 @@
                 {
                     "dtag": "MC13TeV_ZZTo4L", 
                     "xsec": 1.212, 
-                    "split": 9, 
+                    "split": 6, 
                     "br": [
                         1
                     ]
@@ -76,7 +109,7 @@
                 {
                     "dtag": "MC13TeV_ZZTo2L2Q", 
                     "xsec": 3.22, 
-                    "split": 20, 
+                    "split": 15, 
                     "br": [
                         1
                     ]
@@ -91,9 +124,17 @@
             "marker": 400, 
             "data": [
                 {
+                    "dtag": "MC13TeV_WJetsamcatnloFXFX", 
+                    "xsec": 61526.7, 
+                    "split": 9, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
                     "dtag": "MC13TeV_WJetsmadgraphMLM", 
                     "xsec": 61526.7, 
-                    "split": 47, 
+                    "split": 32, 
                     "br": [
                         1
                     ]
@@ -102,15 +143,47 @@
         }, 
         {
             "isdata": false, 
-            "color": "798", 
+            "color": "885", 
             "lcolor": "1", 
-            "tag": "WW#rightarrow l#nul#nu", 
-            "marker": 798, 
+            "tag": "t#bar{t}", 
+            "marker": 885, 
             "data": [
                 {
-                    "dtag": "MC13TeV_WW", 
-                    "xsec": 10.481, 
-                    "split": 3, 
+                    "dtag": "MC13TeV_TTpowheg", 
+                    "xsec": 831.76, 
+                    "split": 11, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_TTJetsamcatnloFXFX", 
+                    "xsec": 831.76, 
+                    "split": 31, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_TTTo2L2Nupowheg", 
+                    "xsec": 87.31, 
+                    "split": 7, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_TTWJets", 
+                    "xsec": 0.2043, 
+                    "split": 1, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_TTZJets", 
+                    "xsec": 0.2529, 
+                    "split": 1, 
                     "br": [
                         1
                     ]
@@ -137,37 +210,29 @@
                 {
                     "dtag": "MC13TeV_ST_t-channel_4f", 
                     "xsec": 70.69, 
-                    "split": 18
+                    "split": 12
                 }
             ]
         }, 
         {
             "isdata": false, 
-            "color": "885", 
+            "color": "901", 
             "lcolor": "1", 
-            "tag": "t#bar{t}", 
-            "marker": 885, 
+            "tag": "Z+jets", 
+            "marker": 901, 
             "data": [
                 {
-                    "dtag": "MC13TeV_TTJetsamcatnloFXFX", 
-                    "xsec": 831.76, 
-                    "split": 31, 
+                    "dtag": "MC13TeV_DYJetsToLL_10to50", 
+                    "xsec": 18610, 
+                    "split": 49, 
                     "br": [
                         1
                     ]
                 }, 
                 {
-                    "dtag": "MC13TeV_TTWJets", 
-                    "xsec": 0.2043, 
-                    "split": 1, 
-                    "br": [
-                        1
-                    ]
-                }, 
-                {
-                    "dtag": "MC13TeV_TTZJets", 
-                    "xsec": 0.2529, 
-                    "split": 1, 
+                    "dtag": "MC13TeV_DYJetsToLL_50toInf", 
+                    "xsec": 6025, 
+                    "split": 16, 
                     "br": [
                         1
                     ]
@@ -192,7 +257,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_20to30", 
                     "xsec": 557600000, 
-                    "split": 1, 
+                    "split": 0, 
                     "br": [
                         0.0096
                     ]
@@ -200,7 +265,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_30to50", 
                     "xsec": 136000000, 
-                    "split": 8, 
+                    "split": 1, 
                     "br": [
                         0.073
                     ]
@@ -208,7 +273,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_50to80", 
                     "xsec": 19800000, 
-                    "split": 5, 
+                    "split": 0, 
                     "br": [
                         0.146
                     ]
@@ -216,7 +281,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_80to120", 
                     "xsec": 2800000, 
-                    "split": 8, 
+                    "split": 5, 
                     "br": [
                         0.125
                     ]
@@ -224,7 +289,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_120to170", 
                     "xsec": 477000, 
-                    "split": 7, 
+                    "split": 4, 
                     "br": [
                         0.132
                     ]
@@ -240,7 +305,7 @@
                 {
                     "dtag": "MC13TeV_QCD_EMEnriched_300toInf", 
                     "xsec": 9000, 
-                    "split": 1, 
+                    "split": 0, 
                     "br": [
                         0.15
                     ]
@@ -248,7 +313,7 @@
                 {
                     "dtag": "MC13TeV_QCD_bcToE_15to20", 
                     "xsec": 1272980000, 
-                    "split": 1, 
+                    "split": 0, 
                     "br": [
                         0.0002
                     ]
@@ -264,7 +329,7 @@
                 {
                     "dtag": "MC13TeV_QCD_bcToE_30to80", 
                     "xsec": 159068000, 
-                    "split": 1, 
+                    "split": 3, 
                     "br": [
                         0.00255
                     ]
@@ -272,7 +337,7 @@
                 {
                     "dtag": "MC13TeV_QCD_bcToE_80to170", 
                     "xsec": 3221000, 
-                    "split": 1, 
+                    "split": 2, 
                     "br": [
                         0.01183
                     ]
@@ -280,7 +345,7 @@
                 {
                     "dtag": "MC13TeV_QCD_bcToE_170to250", 
                     "xsec": 105771, 
-                    "split": 5, 
+                    "split": 3, 
                     "br": [
                         0.02492
                     ]
@@ -288,7 +353,7 @@
                 {
                     "dtag": "MC13TeV_QCD_bcToE_250toInf", 
                     "xsec": 21094.1, 
-                    "split": 5, 
+                    "split": 3, 
                     "br": [
                         0.03375
                     ]
@@ -296,7 +361,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_15to20", 
                     "xsec": 1273190000, 
-                    "split": 2, 
+                    "split": 1, 
                     "br": [
                         0.003
                     ]
@@ -304,7 +369,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_20to30", 
                     "xsec": 558528000, 
-                    "split": 1, 
+                    "split": 0, 
                     "br": [
                         0.0053
                     ]
@@ -312,7 +377,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_30to50", 
                     "xsec": 139803000, 
-                    "split": 4, 
+                    "split": 2, 
                     "br": [
                         0.01182
                     ]
@@ -320,7 +385,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_50to80", 
                     "xsec": 19222500, 
-                    "split": 4, 
+                    "split": 3, 
                     "br": [
                         0.02276
                     ]
@@ -336,7 +401,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_120to170", 
                     "xsec": 469797, 
-                    "split": 5, 
+                    "split": 2, 
                     "br": [
                         0.05362
                     ]
@@ -344,7 +409,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_170to300", 
                     "xsec": 117989, 
-                    "split": 1, 
+                    "split": 0, 
                     "br": [
                         0.07335
                     ]
@@ -368,7 +433,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_600to800", 
                     "xsec": 187.109, 
-                    "split": 1, 
+                    "split": 0, 
                     "br": [
                         0.13412
                     ]
@@ -376,7 +441,7 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_800to1000", 
                     "xsec": 32.3486, 
-                    "split": 2, 
+                    "split": 1, 
                     "br": [
                         0.14552
                     ]
@@ -384,34 +449,9 @@
                 {
                     "dtag": "MC13TeV_QCD_MuEnriched_1000toInf", 
                     "xsec": 10.4305, 
-                    "split": 2, 
+                    "split": 1, 
                     "br": [
                         0.15544
-                    ]
-                }
-            ]
-        }, 
-        {
-            "isdata": false, 
-            "color": "901", 
-            "lcolor": "1", 
-            "tag": "Z+jets", 
-            "marker": 901, 
-            "data": [
-                {
-                    "dtag": "MC13TeV_DYJetsToLL_10to50", 
-                    "xsec": 18610, 
-                    "split": 49, 
-                    "br": [
-                        1
-                    ]
-                }, 
-                {
-                    "dtag": "MC13TeV_DYJetsToLL_50toInf", 
-                    "xsec": 6025, 
-                    "split": 23, 
-                    "br": [
-                        1
                     ]
                 }
             ]
@@ -424,11 +464,11 @@
             "data": [
                 {
                     "dtag": "Data13TeV_DoubleEG2015C_05Oct2015", 
-                    "split": 3
+                    "split": 2
                 }, 
                 {
                     "dtag": "Data13TeV_DoubleMuon2015C_05Oct2015", 
-                    "split": 2
+                    "split": 1
                 }, 
                 {
                     "dtag": "Data13TeV_MuonEG2015C_05Oct2015", 
@@ -436,7 +476,7 @@
                 }, 
                 {
                     "dtag": "Data13TeV_SingleElectron2015C_05Oct2015", 
-                    "split": 2
+                    "split": 1
                 }, 
                 {
                     "dtag": "Data13TeV_SingleMuon2015C_05Oct2015", 
@@ -444,43 +484,43 @@
                 }, 
                 {
                     "dtag": "Data13TeV_DoubleEG2015D_05Oct2015", 
-                    "split": 54
-                }, 
-                {
-                    "dtag": "Data13TeV_DoubleMuon2015D_05Oct2015", 
-                    "split": 19
-                }, 
-                {
-                    "dtag": "Data13TeV_MuonEG2015D_05Oct2015", 
-                    "split": 3
-                }, 
-                {
-                    "dtag": "Data13TeV_SingleElectron2015D_05Oct2015", 
-                    "split": 35
-                }, 
-                {
-                    "dtag": "Data13TeV_SingleMuon2015D_05Oct2015", 
-                    "split": 22
-                }, 
-                {
-                    "dtag": "Data13TeV_DoubleEG2015D_PromptRecov4", 
                     "split": 21
                 }, 
                 {
-                    "dtag": "Data13TeV_DoubleMuon2015D_PromptRecov4", 
-                    "split": 10
-                }, 
-                {
-                    "dtag": "Data13TeV_MuonEG2015D_PromptRecov4", 
+                    "dtag": "Data13TeV_DoubleMuon2015D_05Oct2015", 
                     "split": 6
                 }, 
                 {
+                    "dtag": "Data13TeV_MuonEG2015D_05Oct2015", 
+                    "split": 2
+                }, 
+                {
+                    "dtag": "Data13TeV_SingleElectron2015D_05Oct2015", 
+                    "split": 23
+                }, 
+                {
+                    "dtag": "Data13TeV_SingleMuon2015D_05Oct2015", 
+                    "split": 12
+                }, 
+                {
+                    "dtag": "Data13TeV_DoubleEG2015D_PromptRecov4", 
+                    "split": 13
+                }, 
+                {
+                    "dtag": "Data13TeV_DoubleMuon2015D_PromptRecov4", 
+                    "split": 6
+                }, 
+                {
+                    "dtag": "Data13TeV_MuonEG2015D_PromptRecov4", 
+                    "split": 5
+                }, 
+                {
                     "dtag": "Data13TeV_SingleElectron2015D_PromptRecov4", 
-                    "split": 62
+                    "split": 42
                 }, 
                 {
                     "dtag": "Data13TeV_SingleMuon2015D_PromptRecov4", 
-                    "split": 37
+                    "split": 24
                 }
             ], 
             "fill": 0
@@ -498,7 +538,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M110", 
-                    "xsec": 1.2825, 
+                    "xsec": 1.4291, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -506,7 +546,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M110", 
-                    "xsec": 1.2825, 
+                    "xsec": 1.4291, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -528,7 +568,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M125", 
-                    "xsec": 0.8696, 
+                    "xsec": 0.969, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -536,7 +576,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M125", 
-                    "xsec": 0.8696, 
+                    "xsec": 0.969, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -558,7 +598,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M150", 
-                    "xsec": 0.4833, 
+                    "xsec": 0.5385, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -566,7 +606,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M150", 
-                    "xsec": 0.4833, 
+                    "xsec": 0.5385, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -588,7 +628,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M200", 
-                    "xsec": 0.17779, 
+                    "xsec": 0.1981, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -596,7 +636,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M200", 
-                    "xsec": 0.17779, 
+                    "xsec": 0.1981, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -618,7 +658,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M300", 
-                    "xsec": 0.03407, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -626,7 +666,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M300", 
-                    "xsec": 0.03407, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -634,21 +674,21 @@
                 }
             ], 
             "fill": 0
-        },
+        }, 
         {
             "isdata": false, 
-            "color": "46", 
+            "color": "28", 
             "issignal": true, 
-            "lcolor": "46", 
+            "lcolor": "28", 
             "spimpose": true, 
             "tag": "ZH400", 
-            "lstyle": 4, 
+            "lstyle": 3, 
             "lwidth": 2, 
-            "marker": 46, 
+            "marker": 28, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M400", 
-                    "xsec": 0.009565, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -656,7 +696,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M400", 
-                    "xsec": 0.009565, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -664,21 +704,21 @@
                 }
             ], 
             "fill": 0
-        },
+        }, 
         {
             "isdata": false, 
-            "color": "43", 
+            "color": "28", 
             "issignal": true, 
-            "lcolor": "43", 
+            "lcolor": "28", 
             "spimpose": true, 
             "tag": "ZH500", 
-            "lstyle": 5, 
+            "lstyle": 3, 
             "lwidth": 2, 
-            "marker": 43, 
+            "marker": 28, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M500", 
-                    "xsec": 0.009565, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -686,7 +726,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M500", 
-                    "xsec": 0.009565, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -694,21 +734,21 @@
                 }
             ], 
             "fill": 0
-        },
+        }, 
         {
             "isdata": false, 
-            "color": "41", 
+            "color": "28", 
             "issignal": true, 
-            "lcolor": "41", 
+            "lcolor": "28", 
             "spimpose": true, 
             "tag": "ZH600", 
-            "lstyle": 6, 
+            "lstyle": 3, 
             "lwidth": 2, 
-            "marker": 41, 
+            "marker": 28, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZH_ZToEE_HToInv_M600", 
-                    "xsec": 0.009565, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658
@@ -716,7 +756,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZH_ZToMM_HToInv_M600", 
-                    "xsec": 0.009565, 
+                    "xsec": 0.03796, 
                     "split": 1, 
                     "br": [
                         0.033658

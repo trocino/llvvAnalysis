@@ -1,6 +1,10 @@
 import FWCore.ParameterSet.Config as cms
+from FWCore.ParameterSet.VarParsing import VarParsing
 
 from llvvAnalysis.DMAnalysis.mainAnalyzer_cfi import *
+
+options = VarParsing('analysis')
+options.parseArguments()
 
 process.mainAnalyzer.isMC = cms.bool(True)
 
@@ -60,12 +64,13 @@ for idmod in my_id_modules:
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
+        options.inputFiles
     )
 )
 
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("analysis.root")
+                                   fileName = cms.string(options.outputFile)
                                   )
 
 
@@ -73,7 +78,8 @@ process.TFileService = cms.Service("TFileService",
 
 
 process.p = cms.Path( process.HBHENoiseFilterResultProducer * #produces HBHE baseline bools
-                        process.ApplyBaselineHBHENoiseFilter *  #reject events based
-                        process.ApplyBaselineHBHEIsoNoiseFilter *   #reject events based  < 10e-3 mistake rate
+                        #process.ApplyBaselineHBHENoiseFilter *  #reject events based
+                        #process.ApplyBaselineHBHEIsoNoiseFilter *   #reject events based  < 10e-3 mistake rate
                         process.egmGsfElectronIDSequence * process.mainAnalyzer
 )
+

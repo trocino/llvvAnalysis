@@ -865,7 +865,8 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
 	 if(tSaveName.Contains("Eta_raw")) maximumFound*= 40;
 	 if(tSaveName.Contains("wmt_raw")) maximumFound*= 20;
 	 if(tSaveName.Contains("pfmet_raw")) maximumFound*= 100;
-	 if(tSaveName.Contains("DPhiZMET_dataDY")) maximumFound*= 20;
+	 if(tSaveName.Contains("dphiZMET")) maximumFound*= 100;
+	 if(tSaveName.Contains("balance")) maximumFound*= 100;
 	 if(tSaveName.Contains("eleLooseFakePt")) maximumFound*= 20;
 	 if(tSaveName.Contains("eleTightFakePt")) maximumFound*= 20;
 	 if(tSaveName.Contains("FakeEta")) maximumFound*= 40;
@@ -923,13 +924,13 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
           }
         mctotalUnc->SetDirectory(0);
 
-        TGraphErrors *mcgr=new TGraphErrors;
+        TGraphErrors *mcgr=new TGraphErrors("mcStatErrGraph", "mcstaterrors");
         for(int ibin=1; ibin<=mctotalUnc->GetXaxis()->GetNbins(); ibin++)
           {
         	mcgr->SetPoint(ibin-1,mctotalUnc->GetXaxis()->GetBinCenter(ibin),mctotalUnc->GetBinContent(ibin));
                 mcgr->SetPointError(ibin-1,mctotalUnc->GetXaxis()->GetBinWidth(ibin)/2,mctotalUnc->GetBinError(ibin));
           }
-       	mcgr->SetFillStyle(3254);
+       	mcgr->SetFillStyle(3004);
        	mcgr->SetFillColor(1);
         mcgr->SetMarkerStyle(1);
        	mcgr->Draw("2 same");
@@ -1088,7 +1089,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
        } //RJ
 
        denRelUnc->SetLineColor(1);
-       denRelUnc->SetFillStyle(3254);
+       denRelUnc->SetFillStyle(3004);
        denRelUnc->SetFillColor(kRed);
        denRelUnc->SetMarkerColor(1);
        denRelUnc->SetMarkerStyle(1);
@@ -1642,3 +1643,4 @@ int main(int argc, char* argv[]){
    printf("\033[31mYou can browse the results using: firefox %sindex.html\033[0m\n",outDir.c_str());
 }
 
+/* vim: set ts=8 sw=2 tw=0 et :*/
