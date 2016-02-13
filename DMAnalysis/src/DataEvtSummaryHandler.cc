@@ -60,6 +60,9 @@ bool DataEvtSummaryHandler::initTree(TTree *t)
     t_->Branch("weight_QCDscale_muR0p5_muF1",     &evSummary_.weight_QCDscale_muR0p5_muF1,      "weight_QCDscale_muR0p5_muF1/F");
     t_->Branch("weight_QCDscale_muR0p5_muF2",     &evSummary_.weight_QCDscale_muR0p5_muF2,      "weight_QCDscale_muR0p5_muF2/F");
     t_->Branch("weight_QCDscale_muR0p5_muF0p5",     &evSummary_.weight_QCDscale_muR0p5_muF0p5,      "weight_QCDscale_muR0p5_muF0p5/F");
+    t_->Branch("nlheWeights", &evSummary_.nlheWeights, "nlheWeights/I");
+    t_->Branch("lheWeights", evSummary_.lheWeights, "lheWeights[nlheWeights]/F");
+    t_->Branch("lheOriginalWeight", &evSummary_.lheOriginalWeight, "lheOriginalWeight/F");
 
 
     //mc truth
@@ -326,6 +329,9 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
     t_->SetBranchAddress("weight_QCDscale_muR0p5_muF1",       &evSummary_.weight_QCDscale_muR0p5_muF1);
     t_->SetBranchAddress("weight_QCDscale_muR0p5_muF2",       &evSummary_.weight_QCDscale_muR0p5_muF2);
     t_->SetBranchAddress("weight_QCDscale_muR0p5_muF0p5",       &evSummary_.weight_QCDscale_muR0p5_muF0p5);
+    t_->SetBranchAddress("nlheWeights", &evSummary_.nlheWeights);
+    t_->SetBranchAddress("lheWeights", evSummary_.lheWeights);
+    t_->SetBranchAddress("lheOriginalWeight", &evSummary_.lheOriginalWeight);
 
 
     //mc truth
@@ -547,6 +553,7 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
 void DataEvtSummaryHandler::resetStruct()
 {
     evSummary_.nmcparticles=0;
+    evSummary_.nlheWeights=0;
     evSummary_.run=0;
     evSummary_.lumi=0;
     evSummary_.event=0;
