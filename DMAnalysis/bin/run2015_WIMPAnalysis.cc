@@ -81,8 +81,8 @@ int main(int argc, char* argv[])
     }
 
     // Embed final list in root file
-    int eventList_run, eventList_lumi, eventList_evt, eventList_nJets;
-    float eventList_met, eventList_mt, eventList_llpt;
+    int eventList_run, eventList_lumi, eventList_evt, eventList_nJets, eventList_category;
+    float eventList_met, eventList_mt, eventList_llpt, eventList_mll;
     bool saveEventList = !isMC || runProcess.getUntrackedParameter<bool>("saveEventList", false);
     TTree * eventList{nullptr};
     if ( saveEventList ) {
@@ -90,10 +90,12 @@ int main(int argc, char* argv[])
         eventList->Branch("run", &eventList_run);
         eventList->Branch("lumi", &eventList_lumi);
         eventList->Branch("evt", &eventList_evt);
+        eventList->Branch("category", &eventList_category);
         eventList->Branch("nJets", &eventList_nJets);
         eventList->Branch("met", &eventList_met);
         eventList->Branch("mt", &eventList_mt);
         eventList->Branch("llpt", &eventList_llpt);
+        eventList->Branch("mll", &eventList_mll);
     }
 
     int fType(0);
@@ -781,6 +783,12 @@ int main(int argc, char* argv[])
         LorentzVectorCollection variedMET;
 
         //METUtils::computeVariation(phys.jets, phys.leptons, phys.metNoHF, variedJets, variedMET, &jecUnc);
+        if ( !isMC ) {
+            for(size_t ijet=0; ijet<phys.jets.size(); ijet++) {
+                if ( phys.jets[ijet].genPt > 0. )
+                    cout << "fuck" << endl;
+            }
+        }
         METUtils::computeVariation(phys.jets, phys.leptons, phys.met, variedJets, variedMET, &jecUnc);
 
         LorentzVector metP4=variedMET[0];
@@ -996,18 +1004,11 @@ int main(int argc, char* argv[])
         //JET AND BTAGING ANALYSIS
         //
         PhysicsObjectJetCollection GoodIdJets;
-        bool passBveto(true);
-        int nJetsGood30(0);
-        int nCSVLtags(0),nCSVMtags(0),nCSVTtags(0);
-        double BTagScaleFactor(1.0);
         for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
-
             if(corrJets[ijet].pt()<30) continue;
             if(fabs(corrJets[ijet].eta())>5.) continue;
 
-            //jet ID
             if(!corrJets[ijet].isPFLoose) continue;
-            //if(corrJets[ijet].pumva<0.5) continue;
 
             //check overlaps with good leptons
             double minDR(999.);
@@ -1020,18 +1021,24 @@ int main(int argc, char* argv[])
 
 
             GoodIdJets.push_back(corrJets[ijet]);
-            if(corrJets[ijet].pt()>30) nJetsGood30++; // unused currently
 
+        }
 
-            if ( fabs(corrJets[ijet].eta())<2.4 ) {
-                nCSVLtags += (corrJets[ijet].btag0>0.605);
-                nCSVMtags += (corrJets[ijet].btag0>0.890);
-                nCSVTtags += (corrJets[ijet].btag0>0.970);
-            }
+        bool passBveto(true);
+        int nCSVLtags(0),nCSVMtags(0),nCSVTtags(0);
+        double BTagScaleFactor(1.0);
+        for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
+            if(corrJets[ijet].pt()<30) continue;
+            if(fabs(corrJets[ijet].eta())>2.4) continue;
+            if(!corrJets[ijet].isPFLoose) continue;
+
+            nCSVLtags += (corrJets[ijet].btag0>0.605);
+            nCSVMtags += (corrJets[ijet].btag0>0.890);
+            nCSVTtags += (corrJets[ijet].btag0>0.970);
 
 
             if(!isMC) continue;
-            bool isCSVMtagged(corrJets[ijet].btag0>0.890 && fabs(corrJets[ijet].eta())<2.4);
+            bool isCSVMtagged(corrJets[ijet].btag0>0.890);
             if(abs(corrJets[ijet].flavid)==5) {
                 if(isCSVMtagged) BTagScaleFactor *= btag_reader.eval( BTagEntry::FLAV_B, corrJets[ijet].eta(), (corrJets[ijet].pt()<670. ? corrJets[ijet].pt() : 670.) );
             } else if(abs(corrJets[ijet].flavid)==4) {
@@ -1042,7 +1049,7 @@ int main(int argc, char* argv[])
             }
 
             // for Btag efficiency
-            if((isMC_ttbar||isMC_stop) && corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4) {
+            if(isMC_ttbar||isMC_stop) {
                 int flavid = abs(corrJets[ijet].flavid);
                 for(size_t csvtag=0; csvtag<CSVkey.size(); csvtag++) {
 
@@ -1115,6 +1122,7 @@ int main(int argc, char* argv[])
             mon.fillHisto("jet_eta_raw",  tags, GoodIdJets[ij].eta(),weight);
         }
         if ( GoodIdJets.size() > 0 ) mon.fillHisto("leadingjet_pt_raw", tags, GoodIdJets[iLeadingJet].pt(), weight);
+        mon.fillHisto("njets_raw"                       ,tags, GoodIdJets.size(), weight);
 
         mon.fillHisto("nGoodleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nleptons_raw",tags, allLeptons.size(), weight);
@@ -1136,7 +1144,6 @@ int main(int argc, char* argv[])
         mon.fillHisto("pfmet_noHF_raw"                  ,tags, phys.metNoHF.pt(), weight);
         mon.fillHisto("pfmet_puppi_raw"                 ,tags, phys.metPUPPI.pt(), weight);
         mon.fillHisto("zmass_raw"                       ,tags, zll.mass(), weight);
-        mon.fillHisto("njets_raw"                       ,tags, nJetsGood30, weight);
         mon.fillHisto("nbjets_raw"                      ,tags, nCSVMtags, weight);
         mon.fillHisto("nSoftMuons_raw"                      ,tags, nSoftMuons, weight);
         if(lep1.pt()>lep2.pt()) mon.fillHisto("ptlep1vs2_raw"                   ,tags, lep1.pt(), lep2.pt(), weight);
@@ -1233,9 +1240,11 @@ int main(int argc, char* argv[])
                                                 eventList_lumi = ev.lumi;
                                                 eventList_evt = ev.event;
                                                 eventList_nJets = GoodIdJets.size();
+                                                eventList_category = evcat; // MUMU=1,EE=2,EMU=3
                                                 eventList_met = metP4.pt();
                                                 eventList_mt = MT_massless;
                                                 eventList_llpt = zll.pt();
+                                                eventList_mll = zll.mass();
                                                 eventList->Fill();
                                             }
 
