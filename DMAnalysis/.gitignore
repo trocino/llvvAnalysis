@@ -10,7 +10,10 @@ LSFJOB*
 *pyc
 # no python init file
 python/__init__.py
-
+# no temp files in test
+test/*.root
+test/*.txt
+test/analysis_*
 # no private directory
 backup
 private

@@ -6,9 +6,9 @@ CWD=`pwd`
 outfile=$CWD/analysis_$(git describe --always)
 runlog=$outfile/LOGFILES
 mkdir -p $runlog
-json="$main/data/sample_13TeV_25ns_ZHinv_04Feb2016.json"
+json="$main/data/sample_13TeV_25ns_ZHinv_13Feb2016.json"
 #json="$main/data/sample_13TeV_25ns_ZHinv_plot.json"
-input="/store/user/nsmith/llvvNtuple_04Feb2016/"
+input="/store/user/nsmith/llvvNtuple_13Feb2016/"
 wimpweights="$main/data/weights/PileupWeights_Sep182015.root"
 queue="2nd"
 mkdir -p /tmp/`whoami`

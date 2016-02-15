@@ -288,6 +288,7 @@ MainAnalyzer::MainAnalyzer(const edm::ParameterSet& iConfig):
     controlHistos_.addHistogram("nevents",";nevents; nevents",1,-0.5,0.5);
     controlHistos_.addHistogram("n_negevents",";n_negevents; n_negevents",1,-0.5,0.5);
     controlHistos_.addHistogram("n_posevents",";n_posevents; n_posevents",1,-0.5,0.5);
+    controlHistos_.addHistogram("lheWeights",";LHE Weights Vector Index;Sum weights",500,0,500);
     controlHistos_.addHistogram("pileup", ";Pileup; Events",100,-0.5,99.5);
     //controlHistos_.addHistogram("integlumi", ";Integrated luminosity ; Events",100,0,1e5);
     //controlHistos_.addHistogram("instlumi", ";Max average inst. luminosity; Events",100,0,1e5);
@@ -1013,6 +1014,7 @@ MainAnalyzer::getMCtruth(const edm::Event& event, const edm::EventSetup& iSetup)
 {
     DataEvtSummary_t &ev=summaryHandler_.getEvent();
     ev.nmcparticles = 0;
+    ev.nlheWeights = 0;
     //if(event.isRealData()) return;
 
     edm::Handle<std::vector<PileupSummaryInfo> > puInfoH;
@@ -1218,6 +1220,13 @@ MainAnalyzer::getMCtruth(const edm::Event& event, const edm::EventSetup& iSetup)
             ev.weight_QCDscale_muR0p5_muF2   = lheProduct->weights()[7].wgt/lheProduct->originalXWGTUP();
             ev.weight_QCDscale_muR0p5_muF0p5 = lheProduct->weights()[8].wgt/lheProduct->originalXWGTUP();
         }
+
+        for(size_t i=0; i<lheProduct->weights().size() && i<MAXLHEWEIGHTS; ++i) {
+            ev.lheWeights[i] = lheProduct->weights()[i].wgt;
+            controlHistos_.fillHisto("lheWeights","all",i, ev.lheWeights[i]);
+            ev.nlheWeights++;
+        }
+        ev.lheOriginalWeight = lheProduct->originalXWGTUP();
 
         const lhef::HEPEUP& lheeventinfo = lheProduct->hepeup();
         float sumPartonHT=0.;
