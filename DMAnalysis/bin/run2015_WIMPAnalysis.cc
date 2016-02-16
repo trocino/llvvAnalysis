@@ -1028,7 +1028,7 @@ int main(int argc, char* argv[])
         int nCSVLtags(0),nCSVMtags(0),nCSVTtags(0);
         double BTagScaleFactor(1.0);
         for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
-            if(corrJets[ijet].pt()<30) continue;
+            if(corrJets[ijet].pt()<20) continue;
             if(fabs(corrJets[ijet].eta())>2.4) continue;
             if(!corrJets[ijet].isPFLoose) continue;
 
