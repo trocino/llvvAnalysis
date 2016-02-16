@@ -11,7 +11,7 @@ fi
 output="$2" 
 
 main="${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis"
-json="$main/data/sample_13TeV_25ns_ZHinv_plot_13Feb2016.json"
+json="$main/data/sample_13TeV_25ns_ZHinv_plot_15Feb2016.json"
 Ecm="13"
 Lumi="2263.55"
 
