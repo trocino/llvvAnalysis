@@ -2,6 +2,11 @@
 inputdir=$1
 shift
 
+if [[ $@ != *"--resubmit-failed-jobs"* ]]; then
+  rm -rf /nfs_scratch/nsmith/llvvAnalysis-run2015_WIMPAnalysis
+  gsido rm -rf /hdfs/store/user/nsmith/llvvAnalysis-run2015_WIMPAnalysis
+fi
+
 farmoutAnalysisJobs \
   --infer-cmssw-path \
   --fwklite \
