@@ -136,6 +136,9 @@ int main(int argc, char* argv[])
     // EWK corrections (from table or from plot) 
     bool useEwkTable = false; 
 
+    // Use MET phi correction?
+    bool useMETPhiCorr = runProcess.getUntrackedParameter<bool>("useMETPhiCorr", false);
+
     // Systematics
     bool runSystematics                        = runProcess.getParameter<bool>("runSystematics");
     std::vector<TString> varNames(1,"");
@@ -1083,25 +1086,29 @@ int main(int argc, char* argv[])
         if(isMC) weight *= BTagScaleFactor;
 
         LorentzVector metP4_XYCorr = METUtils::applyMETXYCorr(metP4,isMC,phys.nvtx);
-        TVector2 met2D(metP4_XYCorr.px(), metP4_XYCorr.py());
+        LorentzVector metP4_final = metP4;
+        if ( useMETPhiCorr )
+            metP4_final = metP4_XYCorr;
+
+        TVector2 met2D(metP4_final.px(), metP4_final.py());
         TVector2 zPt2D(zll.px(), zll.py());
         TVector2 metZBasis = met2D.Rotate(-zPt2D.Phi());
         double metParallelZ = metZBasis.X();
         double metPerpZ = metZBasis.Y();
 
-        double dphiZMET=fabs(deltaPhi(zll.phi(),metP4_XYCorr.phi()));
+        double dphiZMET=fabs(deltaPhi(zll.phi(),metP4_final.phi()));
         bool passDphiZMETcut(dphiZMET>2.8);
 
         //missing ET
-        bool passMETcut=(metP4_XYCorr.pt()>100);
-        bool passMETcut120=(metP4_XYCorr.pt()>120);
+        bool passMETcut=(metP4_final.pt()>100);
+        bool passMETcut120=(metP4_final.pt()>120);
 
         //missing ET balance
-        double balanceDif = fabs(1-metP4_XYCorr.pt()/zll.pt());
+        double balanceDif = fabs(1-metP4_final.pt()/zll.pt());
         bool passBalanceCut=(balanceDif<0.4);
 
         //transverse mass
-        double MT_massless = METUtils::transverseMass(zll,metP4_XYCorr,false);
+        double MT_massless = METUtils::transverseMass(zll,metP4_final,false);
 
         //event category
         int eventSubCat  = eventCategoryInst.Get(phys,&GoodIdJets);
@@ -1143,7 +1150,7 @@ int main(int argc, char* argv[])
         }
 
         mon.fillHisto("zpt_raw"                         ,tags, zll.pt(),   weight);
-        mon.fillHisto("pfmet_raw"                       ,tags, metP4_XYCorr.pt(), weight);
+        mon.fillHisto("pfmet_raw"                       ,tags, metP4_final.pt(), weight);
         mon.fillHisto("pfmet_wocorr_raw"                ,tags, metP4.pt(), weight);
         mon.fillHisto("pfmet_noHF_raw"                  ,tags, phys.metNoHF.pt(), weight);
         mon.fillHisto("pfmet_puppi_raw"                 ,tags, phys.metPUPPI.pt(), weight);
@@ -1184,18 +1191,17 @@ int main(int argc, char* argv[])
                         mon.fillHisto("pfmetphi_wicorr_presel",tags, metP4_XYCorr.phi(), weight);
                         mon.fillHisto("pfmetParallelZ_presel",tags, metParallelZ, weight);
                         mon.fillHisto("pfmetPerpZ_presel",    tags, metPerpZ, weight);
-                        mon.fillHisto("pfmetphi_wicorr_presel",tags, metP4_XYCorr.phi(), weight);
-                        mon.fillHisto("pfmetx_vs_nvtx_presel",tags,phys.nvtx,metP4_XYCorr.px(), weight);
-                        mon.fillHisto("pfmety_vs_nvtx_presel",tags,phys.nvtx,metP4_XYCorr.py(), weight);
+                        mon.fillHisto("pfmetx_vs_nvtx_presel",tags,phys.nvtx,metP4_final.px(), weight);
+                        mon.fillHisto("pfmety_vs_nvtx_presel",tags,phys.nvtx,metP4_final.py(), weight);
                         mon.fillHisto("pfmetParallelZ_vs_nvtx_presel",tags,phys.nvtx, metParallelZ, weight);
                         mon.fillHisto("pfmetPerpZ_vs_nvtx_presel",    tags,phys.nvtx, metPerpZ, weight);
 
                         //preselection plots
                         mon.fillHisto("zmass_presel", tags, zll.mass(), weight);
                         mon.fillHisto("zpt_presel", tags, zll.pt(), weight);
-                        mon.fillHisto("pfmet_presel", tags, metP4_XYCorr.pt(), weight, true);
-                        mon.fillHisto("pfmet2_presel",tags, metP4_XYCorr.pt(), weight, true);
-                        mon.fillHisto("pfmetCtrl_presel", tags, metP4_XYCorr.pt(), weight);
+                        mon.fillHisto("pfmet_presel", tags, metP4_final.pt(), weight, true);
+                        mon.fillHisto("pfmet2_presel",tags, metP4_final.pt(), weight, true);
+                        mon.fillHisto("pfmetCtrl_presel", tags, metP4_final.pt(), weight);
                         mon.fillHisto("pfmetCtrl_wocorr_presel", tags, metP4.pt(), weight);
                         mon.fillHisto("pfmetCtrl_noHF_presel", tags, phys.metNoHF.pt(), weight);
                         mon.fillHisto("pfmetCtrl_puppi_presel", tags, phys.metPUPPI.pt(), weight);
@@ -1234,18 +1240,18 @@ int main(int argc, char* argv[])
                                             mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
 
                                             mon.fillHisto("mt_final",   tags, MT_massless, weight);
-                                            mon.fillHisto("pfmet_final",tags, metP4.pt(), weight);
-                                            mon.fillHisto("pfmet2_final",tags, metP4_XYCorr.pt(), weight);
+                                            mon.fillHisto("pfmet_final",tags, metP4_final.pt(), weight);
+                                            mon.fillHisto("pfmet2_final",tags, metP4_final.pt(), weight);
                                             if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
-                                            if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4.pt(), MT_massless);
+                                            if(!isMC && outTxtFile_final) fprintf(outTxtFile_final,"%d | %d | %d | pfmet: %f | mt: %f \n",ev.run,ev.lumi,ev.event,metP4_final.pt(), MT_massless);
                                             if(saveEventList) {
                                                 eventList_run = ev.run;
                                                 eventList_lumi = ev.lumi;
                                                 eventList_evt = ev.event;
                                                 eventList_nJets = GoodIdJets.size();
                                                 eventList_category = evcat; // MUMU=1,EE=2,EMU=3
-                                                eventList_met = metP4.pt();
+                                                eventList_met = metP4_final.pt();
                                                 eventList_mt = MT_massless;
                                                 eventList_llpt = zll.pt();
                                                 eventList_mll = zll.mass();
@@ -1287,7 +1293,7 @@ int main(int argc, char* argv[])
         // WW/ttbar/Wt/tautau control
         mon.fillHisto("zpt_wwctrl_raw"                      ,tags, zll.pt(),   weight);
         mon.fillHisto("zmass_wwctrl_raw"                    ,tags, zll.mass(), weight);
-        mon.fillHisto("pfmet_wwctrl_raw"                    ,tags, metP4.pt(), weight);
+        mon.fillHisto("pfmet_wwctrl_raw"                    ,tags, metP4_final.pt(), weight);
         mon.fillHisto("mt_wwctrl_raw"              	    ,tags, MT_massless, weight);
 
 
@@ -1377,6 +1383,8 @@ int main(int argc, char* argv[])
                     varNames[ivar]=="_umetup" || varNames[ivar]=="_umetdown" || varNames[ivar]=="_lesup" || varNames[ivar]=="_lesdown") {
                 vMET = variedMET[ivar];
             }
+            if ( useMETPhiCorr )
+                vMET = METUtils::applyMETXYCorr(vMET,isMC,phys.nvtx);
 
             PhysicsObjectJetCollection &vJets = variedJets[0];
             if(varNames[ivar]=="_jerup" || varNames[ivar]=="_jerdown" || varNames[ivar]=="_jesup" || varNames[ivar]=="_jesdown") {
@@ -1424,8 +1432,8 @@ int main(int argc, char* argv[])
 
             }
 
-            double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt 
-	    bool passLocalMt(mt_massless>200.); 
+            double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt
+            bool passLocalMt(mt_massless>200.); 
             bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi && passLocalMt );
 
             double LocalDphiZMET=fabs(deltaPhi(zll.phi(),vMET.phi()));
