@@ -1359,13 +1359,13 @@ int main(int argc, char* argv[])
 	      float meanPDFweight(0.); 
 	      float rmsPDFweight(0.); 
 	      for(size_t i=9; i<=108; ++i) { 
-		meanPDFweight += ev.lheWeights[i]; 
-		rmsPDFweight  += ev.lheWeights[i]*ev.lheWeights[i]; 
+		meanPDFweight += ev.lheWeights[i]/ev.lheOriginalWeight; 
+		rmsPDFweight  += ev.lheWeights[i]*ev.lheWeights[i]/pow(ev.lheOriginalWeight,2); 
 	      } 
 	      meanPDFweight /= 100.; 
 	      rmsPDFweight = sqrt( rmsPDFweight/100. - meanPDFweight*meanPDFweight ); // should still be multiplied by 100./99. 
 
-	      float avgASvar = 0.75*(fabs(ev.lheWeights[109]-1.)+fabs(ev.lheWeights[110]-1.)); // 0.75 = 1.5/2.
+	      float avgASvar = 0.75*(fabs(ev.lheWeights[109]/ev.lheOriginalWeight-1.)+fabs(ev.lheWeights[110]/ev.lheOriginalWeight-1.)); // 0.75 = 1.5/2.
 	      float pdfAsVar = sqrt(rmsPDFweight*rmsPDFweight + avgASvar*avgASvar); 
 	      pdfAsVar = (pdfAsVar>1. ? 1. : pdfAsVar); 
 
