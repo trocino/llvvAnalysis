@@ -157,6 +157,10 @@ int main(int argc, char* argv[])
             varNames.push_back("_pdfup");
             varNames.push_back("_pdfdown");
         }
+        if(isSignal || url.Contains("MC13TeV_ZZTo") || url.Contains("MC13TeV_WZTo") ) {
+	  varNames.push_back("_qcdup");
+	  varNames.push_back("_qcddown");
+        }
 	if( url.Contains("MC13TeV_ZZTo") || 
 	    ((url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) ) { 
             varNames.push_back("_ewkup"); 
@@ -1028,7 +1032,7 @@ int main(int argc, char* argv[])
         int nCSVLtags(0),nCSVMtags(0),nCSVTtags(0);
         double BTagScaleFactor(1.0);
         for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
-            if(corrJets[ijet].pt()<30) continue;
+            if(corrJets[ijet].pt()<20) continue;
             if(fabs(corrJets[ijet].eta())>2.4) continue;
             if(!corrJets[ijet].isPFLoose) continue;
 
@@ -1126,22 +1130,6 @@ int main(int argc, char* argv[])
 
         mon.fillHisto("nGoodleptons_raw",tags, nGoodLeptons, weight);
         mon.fillHisto("nleptons_raw",tags, allLeptons.size(), weight);
-        if(lep1.pt()>lep2.pt()) {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep2.eta(), weight);
-        } else {
-            mon.fillHisto("leadlep_pt_raw",   tags, lep2.pt(), weight);
-            mon.fillHisto("leadlep_eta_raw",  tags, lep2.eta(), weight);
-            mon.fillHisto("trailep_pt_raw",   tags, lep1.pt(), weight);
-            mon.fillHisto("trailep_eta_raw",  tags, lep1.eta(), weight);
-        }
-
-        mon.fillHisto("eventflow",tags,0,weight);
-        mon.fillHisto("eventflow_unweighted",tags,0,1.);
-
-        mon.fillHisto("nleptons_raw",tags, nGoodLeptons, weight);
         if(lep1.pt()>lep2.pt()) {
             mon.fillHisto("leadlep_pt_raw",   tags, lep1.pt(), weight);
             mon.fillHisto("leadlep_eta_raw",  tags, lep1.eta(), weight);
@@ -1332,6 +1320,38 @@ int main(int argc, char* argv[])
 	    }
 	  }
 
+	  if( (isSignal || url.Contains("MC13TeV_ZZTo") || url.Contains("MC13TeV_WZTo")) 
+	      && (varNames[ivar]=="_qcdup" || varNames[ivar]=="_qcddown") ) {
+	    if(varNames[ivar]=="_qcdup"  ) {  
+	      float maxQcdScl(-999.); 
+	      if( ev.weight_QCDscale_muR0p5_muF0p5 > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR0p5_muF0p5; 
+	      if( ev.weight_QCDscale_muR0p5_muF1   > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR0p5_muF1  ; 
+	      //if( ev.weight_QCDscale_muR0p5_muF2   > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR0p5_muF2  ; 
+	      if( ev.weight_QCDscale_muR1_muF0p5   > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR1_muF0p5  ; 
+	      //if( ev.weight_QCDscale_muR1_muF1     > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR1_muF1    ; // 1 by construction 
+	      if( ev.weight_QCDscale_muR1_muF2     > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR1_muF2    ; 
+	      //if( ev.weight_QCDscale_muR2_muF0p5   > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR2_muF0p5  ; 
+	      if( ev.weight_QCDscale_muR2_muF1     > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR2_muF1    ; 
+	      if( ev.weight_QCDscale_muR2_muF2     > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR2_muF2    ; 
+	      if( maxQcdScl < -998. ) maxQcdScl = 1.000; 
+	      iweight *= maxQcdScl; 
+	    } 
+	    else { 
+	      float minQcdScl(999.); 
+	      if( ev.weight_QCDscale_muR0p5_muF0p5 < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR0p5_muF0p5; 
+	      if( ev.weight_QCDscale_muR0p5_muF1   < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR0p5_muF1  ; 
+	      //if( ev.weight_QCDscale_muR0p5_muF2   < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR0p5_muF2  ; 
+	      if( ev.weight_QCDscale_muR1_muF0p5   < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR1_muF0p5  ; 
+	      //if( ev.weight_QCDscale_muR1_muF1     < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR1_muF1    ; // 1 by construction 
+	      if( ev.weight_QCDscale_muR1_muF2     < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR1_muF2    ; 
+	      //if( ev.weight_QCDscale_muR2_muF0p5   < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR2_muF0p5  ; 
+	      if( ev.weight_QCDscale_muR2_muF1     < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR2_muF1    ; 
+	      if( ev.weight_QCDscale_muR2_muF2     < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR2_muF2    ; 
+	      if( minQcdScl >  998. ) minQcdScl = 1.000; 
+	      iweight *= minQcdScl; 
+	    }
+	  }
+
 	  if( url.Contains("MC13TeV_ZZTo") ) { 
 	    if(varNames[ivar]=="_ewkup"  ) { iweight /= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk up 
 	    if(varNames[ivar]=="_ewkdown") { iweight *= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk down
@@ -1382,9 +1402,10 @@ int main(int argc, char* argv[])
                     minDR = dR;
                 }
                 if(minDR < 0.3) continue;
+	    }
 
-
-                if(vJets[ijet].pt()>30 && fabs(vJets[ijet].eta())<2.4) {
+            for(size_t ijet=0; ijet<vJets.size(); ijet++) {
+                if(vJets[ijet].pt()>20 && fabs(vJets[ijet].eta())<2.4) {
                     passLocalBveto &= (vJets[ijet].btag0<0.890);
                     bool isLocalCSVMtagged(vJets[ijet].btag0>0.890);
                     double BTagWeights_Up=1., BTagWeights_Down=1.;
@@ -1403,9 +1424,10 @@ int main(int argc, char* argv[])
 
             }
 
-            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi );
+            double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt 
+	    bool passLocalMt(mt_massless>200.); 
+            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi && passLocalMt );
 
-            double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt
             double LocalDphiZMET=fabs(deltaPhi(zll.phi(),vMET.phi()));
 
             //############

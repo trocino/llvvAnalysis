@@ -45,7 +45,7 @@ double WWtopSyst_mm0jet = 0.;
 double WWtopSyst_mm1jet = 0.;
 double WWtopSyst_mmlesq1jet = 0.;
 
-double GammaJetSyst = 0.7;//1.0; //0.5;//0.5, 1.0;
+double GammaJetSyst = 1.0; //0.7;//1.0; //0.5;//0.5, 1.0;
 double ZjetsExtropSyst = 0.6;
 double WjetsSyst_ee = 0.146;
 double WjetsSyst_mm = 0.229;
@@ -56,6 +56,7 @@ struct YIELDS_T {
     double Zjets;
     double WWtop;
     double Wjets;
+    double VVV;
     double Data;
     double Sig;
     double totBkg;
@@ -65,13 +66,14 @@ struct YIELDS_T {
     double Zjets_StatErr;
     double WWtop_StatErr;
     double Wjets_StatErr;
+    double VVV_StatErr;
     double Data_StatErr;
     double Sig_StatErr;
     double totBkg_StatErr;
 
-    YIELDS_T():WZ(0.),ZZ(0.),Zjets(0.),WWtop(0.),Wjets(0.),Data(0.),Sig(0.),totBkg(0.),
+    YIELDS_T():WZ(0.),ZZ(0.),Zjets(0.),WWtop(0.),Wjets(0.),VVV(0.),Data(0.),Sig(0.),totBkg(0.),
         WZ_StatErr(0.),ZZ_StatErr(0.),Zjets_StatErr(0.),WWtop_StatErr(0.),
-        Wjets_StatErr(0.),Data_StatErr(0.),Sig_StatErr(0.),totBkg_StatErr(0.) { }
+        Wjets_StatErr(0.),VVV_StatErr(0.),Data_StatErr(0.),Sig_StatErr(0.),totBkg_StatErr(0.) { }
 };
 
 
@@ -174,6 +176,7 @@ void RescaleForInterference(std::vector<TString>& selCh,map<TString, Shape_t>& a
 
 bool subNRB2011 = false;
 bool subNRB2012 = false;
+bool subNRB2015 = true;
 bool MCclosureTest = false;
 
 bool mergeWWandZZ = false;
@@ -216,7 +219,7 @@ void initNormalizationSysts()
 {
     normSysts["lumi_7TeV"] = 0.022;
     normSysts["lumi_8TeV"] = 0.026;
-    normSysts["lumi_13TeV"] = 0.026;
+    normSysts["lumi_13TeV"] = 0.046;
     normSysts["accept_7TeV"] = 0.;//0.02;//0.003; //RJ
     normSysts["accept_8TeV"] = 0.;//0.02;//0.018; //RJ
     normSysts["sherpa_kin_syst"] = sysSherpa-1.0;
@@ -333,6 +336,10 @@ int main(int argc, char* argv[])
         if(arg.find("--help")          !=string::npos) {
             printHelp();
             return -1;
+        } else if(arg.find("--subNRB15") !=string::npos) {
+            subNRB2015=true;
+            skipWW=false;
+            printf("subNRB2015 = True\n");
         } else if(arg.find("--subNRB12") !=string::npos) {
             subNRB2012=true;
             skipWW=false;
@@ -607,12 +614,12 @@ Shape_t getShapeFromFile(TFile* inF, TString ch, TString shapeName, int cutBin, 
             if(hshape2D) {
                 histoName.ReplaceAll(ch,ch+"_proj"+procCtr);
                 hshape   = hshape2D->ProjectionY(histoName,cutBin,cutBin);
-                if(hshape->Integral()<=0 && varName=="" && !isData) {
+                if(hshape->Integral(0,-1)<=0 && varName=="" && !isData) {
                     hshape->Reset();
                     hshape->SetBinContent(1, 1E-10);
                 }
 
-                if(isnan((float)hshape->Integral())) {
+                if(isnan((float)hshape->Integral(0,-1))) {
                     hshape->Reset();
                 }
                 hshape->SetDirectory(0);
@@ -1677,7 +1684,12 @@ void getYieldsFromShape(std::vector<TString> ch, const map<TString, Shape_t> &al
                     fortableYields.WZ_StatErr = valerr;
                     sum_allbkgs += val;
                     err_allbkgs += valerr*valerr;
-                } else if(procTitle.Contains("Z+jets (data)")) {
+                // } else if(procTitle.Contains("Z+jets (data)")) {
+                //     fortableYields.Zjets = val;
+                //     fortableYields.Zjets_StatErr = valerr;
+                //     sum_allbkgs += val;
+                //     err_allbkgs += valerr*valerr;
+                } else if(procTitle.Contains("Z+jets")) {
                     fortableYields.Zjets = val;
                     fortableYields.Zjets_StatErr = valerr;
                     sum_allbkgs += val;
@@ -1690,6 +1702,11 @@ void getYieldsFromShape(std::vector<TString> ch, const map<TString, Shape_t> &al
                 } else if(procTitle.Contains("Wjets (data)")) {
                     fortableYields.Wjets = val;
                     fortableYields.Wjets_StatErr = valerr;
+                    sum_allbkgs += val;
+                    err_allbkgs += valerr*valerr;
+                } else if(procTitle.Contains("VVV")) {
+                    fortableYields.VVV = val;
+                    fortableYields.VVV_StatErr = valerr;
                     sum_allbkgs += val;
                     err_allbkgs += valerr*valerr;
                 }
@@ -1807,28 +1824,35 @@ void getYieldsFromShape(std::vector<TString> ch, const map<TString, Shape_t> &al
 
     fprintf(pFile,"\\hline\n");
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"$Z/\\gamma^*\\rightarrow\\ell^+\\ell^-$"
+            ,"$\\cPZ/\\PGg^*\\rightarrow\\Pl^+\\Pl^-$"
             ,ee0jet_Yields.Zjets, ee0jet_Yields.Zjets_StatErr
             ,mm0jet_Yields.Zjets, mm0jet_Yields.Zjets_StatErr
             ,ee1jet_Yields.Zjets, ee1jet_Yields.Zjets_StatErr
             ,mm1jet_Yields.Zjets, mm1jet_Yields.Zjets_StatErr
            );
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"$WZ\\rightarrow 3\\ell\\nu$"
+            ,"$\\PW\\cPZ\\rightarrow 3\\Pl\\PGn$"
             ,ee0jet_Yields.WZ, ee0jet_Yields.WZ_StatErr
             ,mm0jet_Yields.WZ, mm0jet_Yields.WZ_StatErr
             ,ee1jet_Yields.WZ, ee1jet_Yields.WZ_StatErr
             ,mm1jet_Yields.WZ, mm1jet_Yields.WZ_StatErr
            );
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"$ZZ\\rightarrow 2\\ell2\\nu$"
+            ,"$\\cPZ\\cPZ\\rightarrow 2\\Pl2\\PGn$"
             ,ee0jet_Yields.ZZ, ee0jet_Yields.ZZ_StatErr
             ,mm0jet_Yields.ZZ, mm0jet_Yields.ZZ_StatErr
             ,ee1jet_Yields.ZZ, ee1jet_Yields.ZZ_StatErr
             ,mm1jet_Yields.ZZ, mm1jet_Yields.ZZ_StatErr
            );
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"Top/WW/$Z\\to\\tau^+\\tau^-$"
+            ,"VVV"
+            ,ee0jet_Yields.VVV, ee0jet_Yields.VVV_StatErr
+            ,mm0jet_Yields.VVV, mm0jet_Yields.VVV_StatErr
+            ,ee1jet_Yields.VVV, ee1jet_Yields.VVV_StatErr
+            ,mm1jet_Yields.VVV, mm1jet_Yields.VVV_StatErr
+           );
+    fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
+            ,"Top/$\\PW\\PW$/$\\cPZ\\to\\PGt^+\\PGt^-$"
             ,ee0jet_Yields.WWtop, ee0jet_Yields.WWtop_StatErr
             ,mm0jet_Yields.WWtop, mm0jet_Yields.WWtop_StatErr
             ,ee1jet_Yields.WWtop, ee1jet_Yields.WWtop_StatErr
@@ -1837,7 +1861,7 @@ void getYieldsFromShape(std::vector<TString> ch, const map<TString, Shape_t> &al
 
 
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"W+jets"
+            ,"\\PW + jets"
             ,ee0jet_Yields.Wjets, ee0jet_Yields.Wjets_StatErr
             ,mm0jet_Yields.Wjets, mm0jet_Yields.Wjets_StatErr
             ,ee1jet_Yields.Wjets, ee1jet_Yields.Wjets_StatErr
@@ -1887,29 +1911,34 @@ void getYieldsFromShape(std::vector<TString> ch, const map<TString, Shape_t> &al
 
     fprintf(pFile,"\\hline\n");
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"$Z/\\gamma^*\\rightarrow\\ell^+\\ell^-$"
+            ,"$\\cPZ/\\PGg^*\\rightarrow\\Pl^+\\Pl^-$"
             ,eelesq1jet_Yields.Zjets, eelesq1jet_Yields.Zjets_StatErr
             ,mmlesq1jet_Yields.Zjets, mmlesq1jet_Yields.Zjets_StatErr
            );
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"$WZ\\rightarrow 3\\ell\\nu$"
+            ,"$\\PW\\cPZ\\rightarrow 3\\Pl\\PGn$"
             ,eelesq1jet_Yields.WZ, eelesq1jet_Yields.WZ_StatErr
             ,mmlesq1jet_Yields.WZ, mmlesq1jet_Yields.WZ_StatErr
            );
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"$ZZ\\rightarrow 2\\ell2\\nu$"
+            ,"$\\cPZ\\cPZ\\rightarrow 2\\Pl2\\PGn$"
             ,eelesq1jet_Yields.ZZ, eelesq1jet_Yields.ZZ_StatErr
             ,mmlesq1jet_Yields.ZZ, mmlesq1jet_Yields.ZZ_StatErr
            );
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"Top/WW/$Z\\to\\tau^+\\tau^-$"
+            ,"VVV"
+            ,eelesq1jet_Yields.VVV, eelesq1jet_Yields.VVV_StatErr
+            ,mmlesq1jet_Yields.VVV, mmlesq1jet_Yields.VVV_StatErr
+           );
+    fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
+            ,"Top/$\\PW\\PW$/$\\cPZ\\to\\PGt^+\\PGt^-$"
             ,eelesq1jet_Yields.WWtop, eelesq1jet_Yields.WWtop_StatErr
             ,mmlesq1jet_Yields.WWtop, mmlesq1jet_Yields.WWtop_StatErr
            );
 
 
     fprintf(pFile,"%40s & %.2f $\\pm$ %.2f & %.2f $\\pm$ %.2f \\\\\n"
-            ,"W+jets"
+            ,"\\PW + jets"
             ,eelesq1jet_Yields.Wjets, eelesq1jet_Yields.Wjets_StatErr
             ,mmlesq1jet_Yields.Wjets, mmlesq1jet_Yields.Wjets_StatErr
            );
@@ -2100,7 +2129,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 fprintf(pFile,"%45s %10s ", "lumi_13TeV", "lnN");
                 for(size_t j=1; j<=dci.procs.size(); j++) {
                     if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
-                    if(!dci.procs[j-1].Contains("EM") && !dci.procs[j-1].Contains("Zjets") && !dci.procs[j-1].Contains("Wjets")) {
+                    //if(!dci.procs[j-1].Contains("EM") && !dci.procs[j-1].Contains("Zjets") && !dci.procs[j-1].Contains("Wjets")) {
+                    if(!dci.procs[j-1].Contains("EM")) {
                         fprintf(pFile,"%6f ",1.0+normSysts["lumi_13TeV"]);
                     } else {
                         fprintf(pFile,"%6s ","-");
@@ -2178,7 +2208,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 fprintf(pFile,"%45s %10s ", "CMS_eff_e", "lnN");
                 for(size_t j=1; j<=dci.procs.size(); j++) {
                     if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
-                    if(!dci.procs[j-1].Contains("EM") && !dci.procs[j-1].Contains("Zjets") && !dci.procs[j-1].Contains("Wjets")) {
+                    //if(!dci.procs[j-1].Contains("EM") && !dci.procs[j-1].Contains("Zjets") && !dci.procs[j-1].Contains("Wjets")) {
+                    if(!dci.procs[j-1].Contains("EM")) {
                         fprintf(pFile,"%6f ",1.0+normSysts["CMS_eff_e"]);
                     } else {
                         fprintf(pFile,"%6s ","-");
@@ -2189,7 +2220,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 fprintf(pFile,"%45s %10s ", "CMS_eff_m", "lnN");
                 for(size_t j=1; j<=dci.procs.size(); j++) {
                     if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
-                    if(!dci.procs[j-1].Contains("EM") && !dci.procs[j-1].Contains("Zjets") && !dci.procs[j-1].Contains("Wjets")) {
+                    //if(!dci.procs[j-1].Contains("EM") && !dci.procs[j-1].Contains("Zjets") && !dci.procs[j-1].Contains("Wjets")) {
+                    if(!dci.procs[j-1].Contains("EM")) {
                         fprintf(pFile,"%6f ",1.0+normSysts["CMS_eff_m"]);
                     } else {
                         fprintf(pFile,"%6s ","-");
@@ -2263,7 +2295,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
             */
 
 
-
+	    // ZZ generator??? 
+	    /* 
             fprintf(pFile,"%45s %10s ", "CMS_zllwimps_ZZ_generator", "lnN");
             for(size_t j=1; j<=dci.procs.size(); j++) {
                 if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
@@ -2288,12 +2321,13 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 }
             }
             fprintf(pFile,"\n");
-
-
+	    */
 
 
             //Oct 30, 2013
 
+	    // WZ lepton veto??? 
+	    /*
             if(dci.ch[i-1].Contains("mumueq0jets")) {
                 fprintf(pFile,"%45s %10s ", "CMS_zllwimps_WZ3l", "lnN");
                 for(size_t j=1; j<=dci.procs.size(); j++) {
@@ -2348,7 +2382,7 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 }
                 fprintf(pFile,"\n");
             }
-
+	    */
 
 
             // Scale-e and scale-mu replaced by shape-unncertainty "les"
@@ -2381,6 +2415,23 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                         } //mass>0
             */
 
+	    // (DT) Temporary... 
+
+            fprintf(pFile,"%45s %10s ", ("CMS_zllwimps_sys_"+dci.ch[i-1]+"_zjets_13TeV").Data(), "lnN");
+            for(size_t j=1; j<=dci.procs.size(); j++) {
+	      if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
+	      if(dci.procs[j-1].BeginsWith("zjets")) {
+		if(systpostfix.Contains("13")) {
+		  fprintf(pFile,"%6f ", 2.0);
+		} 
+	      }
+	      else { 
+		fprintf(pFile,"%6s ","-");	
+	      } 
+            }
+            fprintf(pFile,"\n");
+
+
             ///////////////////////////////////////////////
             // RJ, for count and cut
             ///////////////////////////////////////////////
@@ -2391,14 +2442,18 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 if(dci.procs[j-1].BeginsWith("ZZ")) {
                     if(systpostfix.Contains('8')) {
                         fprintf(pFile,"%6f ",1.067);
-                    } else {
+                    } else if(systpostfix.Contains('7')) {
                         fprintf(pFile,"%6f ",1.067);
+                    } else {
+                        fprintf(pFile,"%6f ",1.040);
                     }
                 } else if(dci.procs[j-1].BeginsWith("WZ")) {
                     if(systpostfix.Contains('8')) {
                         fprintf(pFile,"%6f ",1.077);
-                    } else {
+                    } else if(systpostfix.Contains('7')) {
                         fprintf(pFile,"%6f ",1.077);
+                    } else {
+                        fprintf(pFile,"%6f ",1.040);
                     }
                 } else {
                     fprintf(pFile,"%6s ","-");
@@ -2607,6 +2662,7 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                     for(size_t j=1; j<=dci.procs.size(); j++) {
                         if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
                         if(it->first.Contains("sherpa")) continue; //RJ
+			if(it->first.Contains("CMS_scale_met")) continue; //DT
                         //if(it->first.Contains("CMS_scale_j")) continue; //RJ
                         //if(it->first.Contains("CMS_res_j")) continue; //RJ
                         if(it->first.Contains("CMS_zllwimps_les") && dci.ch[i-1].Contains("mumu")) continue; //RJ
@@ -2640,17 +2696,23 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 if(dci.procs[j-1].BeginsWith("ZH")) {
                     if(systpostfix.Contains('8')) {
                         fprintf(pFile,"%6f ",1.055);
+                    } else if(systpostfix.Contains('7')) {
+                        fprintf(pFile,"%6f ",1.055);
                     } else {
                         fprintf(pFile,"%6f ",1.055);
                     }
                 } else if(dci.procs[j-1].BeginsWith("ZZ")) {
                     if(systpostfix.Contains('8')) {
                         fprintf(pFile,"%6f ",1.057);
+                    } else if(systpostfix.Contains('7')) {
+                        fprintf(pFile,"%6f ",1.057);
                     } else {
                         fprintf(pFile,"%6f ",1.057);
                     }
                 } else if(dci.procs[j-1].BeginsWith("WZ")) {
                     if(systpostfix.Contains('8')) {
+                        fprintf(pFile,"%6f ",1.048);
+                    } else if(systpostfix.Contains('7')) {
                         fprintf(pFile,"%6f ",1.048);
                     } else {
                         fprintf(pFile,"%6f ",1.048);
@@ -2795,11 +2857,13 @@ DataCardInputs convertHistosForLimits(TString atgcpar,Int_t mass,TString histo,T
     */
 
 
-    // Mono-Z analysis (new)   Top/WW/Ztautau (data)
-    //MC closure test, adding systematics
-    dodataDrivenWWtW(selCh,"emu",allShapes,histo,true);
-    //new data-driven WW/tW/Ztautau background
-    dodataDrivenWWtW(selCh,"emu",allShapes,histo,false);
+    if(subNRB2015) { 
+      // Mono-Z analysis (new)   Top/WW/Ztautau (data)
+      //MC closure test, adding systematics
+      dodataDrivenWWtW(selCh,"emu",allShapes,histo,true); // D.T. temporarily removed! 
+      //new data-driven WW/tW/Ztautau background
+      dodataDrivenWWtW(selCh,"emu",allShapes,histo,false); // D.T. temporarily removed! 
+    }
 
     /*
 
@@ -2927,7 +2991,7 @@ DataCardInputs convertHistosForLimits(TString atgcpar,Int_t mass,TString histo,T
             size_t nNonNullBckg=0;
             for(size_t ibckg=0; ibckg<nbckg; ibckg++) {
                 TH1* h=shapeSt.bckg[ibckg];
-                if(h->Integral()<=1e-10) continue;
+                if(h->Integral()<=1e-10 && !TString(h->GetTitle()).Contains("Z+jets")) continue; // TEMPORARY! (Daniele) 
                 cout << "\n" << h->GetTitle() << " has rate: " << h->Integral() << endl;
 
 
@@ -2937,7 +3001,7 @@ DataCardInputs convertHistosForLimits(TString atgcpar,Int_t mass,TString histo,T
                     //cout << "bin: " << bin << " val: " << h->GetBinContent(bin) << endl;
                     if(h->GetBinContent(bin)<0) h->SetBinContent(bin,0);
                 }
-                h->Scale(tot_integralval/h->Integral());
+                if(h->Integral()>1.1e-10) h->Scale(tot_integralval/h->Integral());
                 //cout << "---------------------------------" << endl;
                 //for(int bin=0; bin<h->GetXaxis()->GetNbins()+1; bin++) {
                 //cout << "bin: " << bin << " val: " << h->GetBinContent(bin) << endl;
