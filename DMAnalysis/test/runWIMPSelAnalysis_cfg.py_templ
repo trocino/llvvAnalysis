@@ -29,8 +29,8 @@ runProcess = cms.PSet(
     BtagEffFiles = cms.vstring("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/BtagEff_13TeV_27Jan2016.root"),
     BtagSF = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/CSVv2.csv"),
     PU_Central = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_Central.root"),
-    PU_Up = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_Central.root"),
-    PU_Down = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_Central.root"),
+    PU_Up = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_minBiasUP.root"),
+    PU_Down = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_minBiasDOWN.root"),
 #   hqtWeightsFile = cms.vstring(
 #	"${CMSSW_BASE}/src/CMGTools/HtoZZ2l2nu/data/HiggsQtWeights.root",
 #	"${CMSSW_BASE}/src/CMGTools/HtoZZ2l2nu/data/LineShapes.root",
