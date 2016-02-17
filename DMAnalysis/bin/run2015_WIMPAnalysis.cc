@@ -1166,6 +1166,7 @@ int main(int argc, char* argv[])
         //########  Main Event Selection        ########
         //##############################################
 
+        bool passFinal=false;
         if(passZmass) {
             mon.fillHisto("eventflow",  tags, 1, weight);
             mon.fillHisto("eventflow_unweighted",  tags, 1, 1.);
@@ -1236,6 +1237,7 @@ int main(int argc, char* argv[])
                                         mon.fillHisto("eventflow_unweighted",  tags, 8, 1.);
 
                                         if(MT_massless>200) {
+                                            passFinal=true;
                                             mon.fillHisto("eventflow",  tags, 9, weight);
                                             mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
 
@@ -1459,6 +1461,19 @@ int main(int argc, char* argv[])
                 // fill shapes for limit setting
                 if( passOptimSelection ) {
                     mon.fillHisto(TString("mt_shapes")+varNames[ivar],tags,index, mt_massless, iweight);
+                    if ( index==17 && passFinal==false && ivar==0 ) {
+                        cerr << "Found one!" << endl
+                            << " MET, Balance, dphi values = " << minMET << ", " << minBalance << ", " << minDphi << endl
+                            << "_run = " <<  ev.run << endl
+                            << "_lumi = " <<  ev.lumi << endl
+                            << "_evt = " <<  ev.event << endl
+                            << "_nJets = " <<  GoodIdJets.size() << endl
+                            << "_category = " <<  evcat << endl
+                            << "_met = " <<  metP4_final.pt() << endl
+                            << "_mt = " <<  MT_massless << endl
+                            << "_llpt = " <<  zll.pt() << endl
+                            << "_mll = " <<  zll.mass() << endl;
+                   }
                 }
 
 
