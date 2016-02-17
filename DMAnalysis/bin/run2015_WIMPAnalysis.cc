@@ -109,18 +109,20 @@ int main(int argc, char* argv[])
     bool isSingleElePD(!isMC && url.Contains("SingleElectron"));
     bool isDoubleElePD(!isMC && url.Contains("DoubleEG"));
 
-//  bool isMC_ZZ  = isMC && ( string(url.Data()).find("TeV_ZZ_")  != string::npos);
-//  bool isMC_WZ  = isMC && ( string(url.Data()).find("TeV_WZ_")  != string::npos);
-//  bool isMC_WW  = isMC && ( string(url.Data()).find("TeV_WW_")  != string::npos);
-    bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TT")  != string::npos);
-    bool isMC_stop  = isMC && (string(url.Data()).find("TeV_SingleT")  != string::npos);
-    bool isMC_WIMP  = isMC && (string(url.Data()).find("TeV_DM_V_Mx") != string::npos
-                               || string(url.Data()).find("TeV_DM_A_Mx") != string::npos);
-    bool isMC_ADD  = isMC && (string(url.Data()).find("TeV_ADD_D") != string::npos);
-    bool isMC_Unpart = isMC && (string(url.Data()).find("TeV_Unpart") != string::npos);
+    bool isMC_ZZ     = isMC && (string(url.Data()).find("TeV_ZZ") != string::npos) && (string(url.Data()).find("TeV_ZZZ") == string::npos);
+    bool isMC_WZ     = isMC && (string(url.Data()).find("TeV_WZ") != string::npos) && (string(url.Data()).find("TeV_WZZ") == string::npos);
+    //bool isMC_WW     = isMC && (string(url.Data()).find("TeV_WW_")  != string::npos);
+    bool isMC_ttbar  = isMC && (string(url.Data()).find("TeV_TT")  != string::npos);
+    bool isMC_stop   = isMC && (string(url.Data()).find("TeV_SingleT")  != string::npos);
+    //bool isMC_WIMP   = isMC && (string(url.Data()).find("TeV_DM_V_Mx") != string::npos
+    //                 || string(url.Data()).find("TeV_DM_A_Mx") != string::npos);
+    //bool isMC_ADD    = isMC && (string(url.Data()).find("TeV_ADD_D") != string::npos);
+    //bool isMC_Unpart = isMC && (string(url.Data()).find("TeV_Unpart") != string::npos);
 
+    bool isMC_ZH     = isMC && (string(url.Data()).find("TeV_ZH") != string::npos);
 
-    bool isSignal = (isMC_WIMP || isMC_ADD || isMC_Unpart);
+    //bool isSignal = (isMC_WIMP || isMC_ADD || isMC_Unpart);
+    bool isSignal    = isMC_ZH;
 
 
     // https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration
@@ -156,16 +158,15 @@ int main(int argc, char* argv[])
         varNames.push_back("_pudown"); 	//10
         varNames.push_back("_btagup"); 	//11
         varNames.push_back("_btagdown");//12
-        if(isSignal)            {
+        if(isSignal || isMC_ZZ || isMC_WZ)            {
             varNames.push_back("_pdfup");
             varNames.push_back("_pdfdown");
         }
-        if(isSignal || url.Contains("MC13TeV_ZZTo") || url.Contains("MC13TeV_WZTo") ) {
+        if(isSignal || isMC_ZZ || isMC_WZ) {
 	  varNames.push_back("_qcdup");
 	  varNames.push_back("_qcddown");
         }
-	if( url.Contains("MC13TeV_ZZTo") || 
-	    ((url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) ) { 
+	if(isMC_ZZ) { 
             varNames.push_back("_ewkup"); 
             varNames.push_back("_ewkdown"); 
 	} 
@@ -188,18 +189,18 @@ int main(int argc, char* argv[])
 
 
     //pdf info
-    PDFInfo *mPDFInfo=0;
-    if(isSignal) {
-	TString pdfUrl = runProcess.getParameter<std::string>("pdfInput");
-	std::string Url = runProcess.getParameter<std::string>("input");
-	std::size_t found = Url.find_last_of("/\\");
-        pdfUrl += '/';
-	pdfUrl += Url.substr(found+1);
-        pdfUrl.ReplaceAll(".root","_pdf.root");
+    // PDFInfo *mPDFInfo=0;
+    // if(isSignal) {
+    // 	TString pdfUrl = runProcess.getParameter<std::string>("pdfInput");
+    // 	std::string Url = runProcess.getParameter<std::string>("input");
+    // 	std::size_t found = Url.find_last_of("/\\");
+    //     pdfUrl += '/';
+    // 	pdfUrl += Url.substr(found+1);
+    //     pdfUrl.ReplaceAll(".root","_pdf.root");
 
-        mPDFInfo=new PDFInfo(pdfUrl,"cteq66.LHgrid");
-        cout << "Readout " << mPDFInfo->numberPDFs() << " pdf variations: " << pdfUrl << endl;
-    }
+    //     mPDFInfo=new PDFInfo(pdfUrl,"cteq66.LHgrid");
+    //     cout << "Readout " << mPDFInfo->numberPDFs() << " pdf variations: " << pdfUrl << endl;
+    // }
 
 
     //##################################################################################
@@ -1313,22 +1314,65 @@ int main(int argc, char* argv[])
 	  if(varNames[ivar]=="_puup")        iweight *=puWeight_plus/puWeight;   //pu up
 	  if(varNames[ivar]=="_pudown")      iweight *=puWeight_minus/puWeight;  //pu down
 
-	  if(isSignal && (varNames[ivar]=="_pdfup" || varNames[ivar]=="_pdfdown")) {
-	    if(mPDFInfo) {
-	      float PDFWeight_plus(1.0), PDFWeight_down(1.0);
-	      std::vector<float> wgts=mPDFInfo->getWeights(iev);
-	      for(size_t ipw=0; ipw<wgts.size(); ipw++) {
-		PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
-		PDFWeight_down = TMath::Min(PDFWeight_down,wgts[ipw]);
-	      }
-	      if(varNames[ivar]=="_pdfup")    iweight *= PDFWeight_plus;
-	      if(varNames[ivar]=="_pdfdown")  iweight *= PDFWeight_down;
-	    }
-	  }
+	  if(isSignal || isMC_ZZ || isMC_WZ) { 
+	    ///// 
+	    // (varNames[ivar]=="_pdfup" || varNames[ivar]=="_pdfdown") ) {
+	    // if(mPDFInfo) {
+	    //   float PDFWeight_plus(1.0), PDFWeight_down(1.0);
+	    //   std::vector<float> wgts=mPDFInfo->getWeights(iev);
+	    //   for(size_t ipw=0; ipw<wgts.size(); ipw++) {
+	    // 	PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
+	    // 	PDFWeight_down = TMath::Min(PDFWeight_down,wgts[ipw]);
+	    //   }
+	    //   if(varNames[ivar]=="_pdfup")    iweight *= PDFWeight_plus;
+	    //   if(varNames[ivar]=="_pdfdown")  iweight *= PDFWeight_down;
+	    // }
+	    // }
+	    ///// 
 
-	  if( (isSignal || url.Contains("MC13TeV_ZZTo") || url.Contains("MC13TeV_WZTo")) 
-	      && (varNames[ivar]=="_qcdup" || varNames[ivar]=="_qcddown") ) {
-	    if(varNames[ivar]=="_qcdup"  ) {  
+	    //// *** Long if/else if/else *** 
+	    /// * 1 * 
+	    /// 
+	    // // PDF uncertainties' Rosetta stone: 
+	    // // NNPDF30_lo_as_0130: 
+	    // //   LHAID 263000, pdf uncertainties: 263001-263100 
+	    // //                 no alpha_s uncertainties
+	    // // NNPDF30_lo_as_0130_nf_4: 
+	    // //   LHAID 263400, pdf uncertainties: 263401-263500 
+	    // //                 no alpha_s uncertainties
+	    // // NNPDF30_nlo_as_0118:  <========= this should be the one for NLO samples (not WZ...) 
+	    // //   LHAID 260000, pdf uncertainties: 260001-260100 (index in ntuples: 9-108 [starting from 0]) 
+	    // //                 alpha_s uncertainties: 265000,266000 (index in ntuples: 109,110 [starting from 0])
+	    // // NPDF30_nlo_as_0118_nf_4: 
+	    // //   LHAID 260400, pdf uncertainties: 260401-260500 
+	    // //                 alpha_s uncertainties: 265400,266400 
+	    // // NNPDF30_nlo_nf_5_pdfas: 
+	    // //   LHAID 292200, pdf uncertainties: 292201-292300 
+	    // //                 alpha_s uncertainties: 292301,292302 
+	    // // NNPDF30_nlo_nf_4_pdfas: 
+	    // //   LHAID 292000, pdf uncertainties: 292001-292100 
+	    // //                 alpha_s uncertainties: 292101,292102
+	    if(varNames[ivar]=="_pdfup") { 
+	      float maxPDFweight(-999.); 
+	      for(size_t i=9; i<=110; ++i) { 
+		if(ev.lheWeights[i]>maxPDFweight) maxPDFweight = ev.lheWeights[i]; 
+	      } 
+	      if(maxPDFweight<-998.) maxPDFweight = 1.000; 
+	      iweight *= maxPDFweight; 
+	    } 
+
+	    /// * 2 * 
+	    else if(varNames[ivar]=="_pdfdown") { 
+	      float minPDFweight(999.); 
+	      for(size_t i=9; i<=110; ++i) { 
+		if(ev.lheWeights[i]<minPDFweight) minPDFweight = ev.lheWeights[i]; 
+	      } 
+	      if(minPDFweight>998.) minPDFweight = 1.000; 
+	      iweight *= minPDFweight; 
+	    } 
+
+	    /// * 3 * 
+	    else if(varNames[ivar]=="_qcdup") {  
 	      float maxQcdScl(-999.); 
 	      if( ev.weight_QCDscale_muR0p5_muF0p5 > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR0p5_muF0p5; 
 	      if( ev.weight_QCDscale_muR0p5_muF1   > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR0p5_muF1  ; 
@@ -1342,7 +1386,9 @@ int main(int argc, char* argv[])
 	      if( maxQcdScl < -998. ) maxQcdScl = 1.000; 
 	      iweight *= maxQcdScl; 
 	    } 
-	    else { 
+
+	    /// * 4 * 
+	    else if(varNames[ivar]=="_qcddown") { 
 	      float minQcdScl(999.); 
 	      if( ev.weight_QCDscale_muR0p5_muF0p5 < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR0p5_muF0p5; 
 	      if( ev.weight_QCDscale_muR0p5_muF1   < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR0p5_muF1  ; 
@@ -1356,19 +1402,22 @@ int main(int argc, char* argv[])
 	      if( minQcdScl >  998. ) minQcdScl = 1.000; 
 	      iweight *= minQcdScl; 
 	    }
-	  }
 
-	  if( url.Contains("MC13TeV_ZZTo") ) { 
-	    if(varNames[ivar]=="_ewkup"  ) { iweight /= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk up 
-	    if(varNames[ivar]=="_ewkdown") { iweight *= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk down
-	  }
+	    /// * 5 * 
+	    else if(isMC_ZZ && varNames[ivar]=="_ewkup"  ) { iweight /= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk up 
 
-	  // WZ: assign 100% uncertainty (TEMPORARY) 
-	  if( url.Contains("MC13TeV_WZ") && (!url.Contains("MC13TeV_WZZ")) ) { 
-	    if(varNames[ivar]=="_ewkup"  ) { iweight /= ewk_w; } // Ewk up
-	    if(varNames[ivar]=="_ewkdown") { iweight *= ewk_w; } // Ewk down
-	    //if(varNames[ivar]=="_ewkdown") { iweight /= ewk_w; iweight *=(1-(1-EWK_w)*2);} // Ewk down
-	  }
+	    /// * 6 * 
+	    else if(isMC_ZZ && varNames[ivar]=="_ewkdown") { iweight *= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk down
+
+	    // WZ: assign 100% uncertainty (TEMPORARY) 
+	    /// * 7 * 
+	    //else if(isMC_WZ && varNames[ivar]=="_ewkup"  ) { iweight /= ewk_w; } // Ewk up
+
+	    /// * 8 * 
+	    //else if(isMC_WZ && varNames[ivar]=="_ewkdown") { iweight *= ewk_w; } // Ewk down
+	    // //if(varNames[ivar]=="_ewkdown") { iweight /= ewk_w; iweight *=(1-(1-EWK_w)*2);} // Ewk down 2012 
+
+	  } // end if(isSignal || isMC_ZZ || isMC_WZ)
 
 
             //##############################################
