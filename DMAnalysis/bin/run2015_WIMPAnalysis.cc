@@ -1331,7 +1331,7 @@ int main(int argc, char* argv[])
 	    ///// 
 
 	    //// *** Long if/else if/else *** 
-	    /// * 1 * 
+	    /// * 1, 2 * 
 	    /// 
 	    // // PDF uncertainties' Rosetta stone: 
 	    // // NNPDF30_lo_as_0130: 
@@ -1351,24 +1351,24 @@ int main(int argc, char* argv[])
 	    // //                 alpha_s uncertainties: 292301,292302 
 	    // // NNPDF30_nlo_nf_4_pdfas: 
 	    // //   LHAID 292000, pdf uncertainties: 292001-292100 
-	    // //                 alpha_s uncertainties: 292101,292102
-	    if(varNames[ivar]=="_pdfup") { 
-	      float maxPDFweight(-999.); 
-	      for(size_t i=9; i<=110; ++i) { 
-		if(ev.lheWeights[i]>maxPDFweight) maxPDFweight = ev.lheWeights[i]; 
-	      } 
-	      if(maxPDFweight<-998.) maxPDFweight = 1.000; 
-	      iweight *= maxPDFweight; 
-	    } 
+	    // //                 alpha_s uncertainties: 292101,292102 
 
-	    /// * 2 * 
-	    else if(varNames[ivar]=="_pdfdown") { 
-	      float minPDFweight(999.); 
-	      for(size_t i=9; i<=110; ++i) { 
-		if(ev.lheWeights[i]<minPDFweight) minPDFweight = ev.lheWeights[i]; 
+	    if(varNames[ivar]=="_pdfup" || varNames[ivar]=="_pdfdown") { 
+	      float meanPDFweight(0.); 
+	      float rmsPDFweight(0.); 
+	      for(size_t i=9; i<=108; ++i) { 
+		meanPDFweight += ev.lheWeights[i]; 
+		rmsPDFweight  += ev.lheWeights[i]*ev.lheWeights[i]; 
 	      } 
-	      if(minPDFweight>998.) minPDFweight = 1.000; 
-	      iweight *= minPDFweight; 
+	      meanPDFweight /= 100.; 
+	      rmsPDFweight = sqrt( rmsPDFweight/100. - meanPDFweight*meanPDFweight ); // should still be multiplied by 100./99. 
+
+	      float avgASvar = 0.75*(fabs(ev.lheWeights[109]-1.)+fabs(ev.lheWeights[110]-1.)); // 0.75 = 1.5/2.
+	      float pdfAsVar = sqrt(rmsPDFweight*rmsPDFweight + avgASvar*avgASvar); 
+	      pdfAsVar = (pdfAsVar>1. ? 1. : pdfAsVar); 
+
+	      if(varNames[ivar]=="_pdfup") iweight *= (1. + pdfAsVar); 
+	      else                         iweight *= (1. - pdfAsVar); 
 	    } 
 
 	    /// * 3 * 
