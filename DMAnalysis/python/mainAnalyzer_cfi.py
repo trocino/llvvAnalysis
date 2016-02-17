@@ -25,6 +25,22 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
    reverseDecision = cms.bool(False)
 )
 
+from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated
+process.patJetCorrFactorsReapplyJEC = patJetCorrFactorsUpdated.clone(
+  src = cms.InputTag("slimmedJets"),
+  levels = ['L1FastJet', 
+        'L2Relative', 
+        'L3Absolute'],
+  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
+
+from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
+process.patJetsReapplyJEC = patJetsUpdated.clone(
+  jetSource = cms.InputTag("slimmedJets"),
+  jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
+  )
+
+process.jetSequence = cms.Sequence( process.patJetCorrFactorsReapplyJEC + process.patJetsReapplyJEC )
+
 process.mainAnalyzer = cms.EDAnalyzer('MainAnalyzer',
     dtag = cms.string('llvv'),
     isMC = cms.bool(True),
@@ -73,7 +89,7 @@ process.mainAnalyzer = cms.EDAnalyzer('MainAnalyzer',
 
     photonsTag = cms.InputTag("slimmedPhotons"),
 
-    jetsTag = cms.InputTag("slimmedJets"),
+    jetsTag = cms.InputTag("patJetsReapplyJEC"),
     jetsPuppiTag = cms.InputTag("slimmedJetsPuppi"),
     fatjetsTag = cms.InputTag("slimmedJetsAK8"),
 

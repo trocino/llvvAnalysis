@@ -80,6 +80,7 @@ process.TFileService = cms.Service("TFileService",
 process.p = cms.Path( process.HBHENoiseFilterResultProducer * #produces HBHE baseline bools
                         #process.ApplyBaselineHBHENoiseFilter *  #reject events based
                         #process.ApplyBaselineHBHEIsoNoiseFilter *   #reject events based  < 10e-3 mistake rate
+                        process.jetSequence * 
                         process.egmGsfElectronIDSequence * process.mainAnalyzer
 )
 
