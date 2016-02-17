@@ -1434,7 +1434,7 @@ int main(int argc, char* argv[])
 
             double mt_massless = METUtils::transverseMass(zll,vMET,false); //massless mt
             bool passLocalMt(mt_massless>200.); 
-            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && passDiLepDphi && passLocalMt );
+            bool passBaseSelection( passZmass && passZpt && pass3dLeptonVeto && passLocalBveto && (nSoftMuons==0) && passDiLepDphi && passLocalMt );
 
             double LocalDphiZMET=fabs(deltaPhi(zll.phi(),vMET.phi()));
 
