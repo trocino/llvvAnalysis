@@ -599,6 +599,7 @@ Shape_t getShapeFromFile(TFile* inF, TString ch, TString shapeName, int cutBin, 
             TH1D* hshape   = NULL;
 
             TString varName = syst->GetXaxis()->GetBinLabel(ivar);
+	    if( varName.BeginsWith("_pdf") || varName.BeginsWith("_qcd") ) continue; // D.T. temp: don't use shapes for PDF and QCD uncert. 
             TString histoName = ch+"_"+shapeName+varName ;
             TH2* hshape2D = (TH2*)pdir->Get(histoName );
             if(!hshape2D) {
@@ -2436,6 +2437,7 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
             // RJ, for count and cut
             ///////////////////////////////////////////////
 
+            /*
             fprintf(pFile,"%45s %10s ", "QCDscale_VV", "lnN");
             for(size_t j=1; j<=dci.procs.size(); j++) {
                 if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
@@ -2461,7 +2463,6 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
             }
             fprintf(pFile,"\n");
 
-            /*
                         fprintf(pFile,"%45s %10s ", "QCDscale_DM", "lnN");
                         for(size_t j=1; j<=dci.procs.size(); j++) {
                             if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
@@ -2671,7 +2672,7 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                             if(it->first.Contains("sherpa") && (!dci.procs[j-1].Contains("zz2l2nu"))) {
                                 sprintf(sFile,"%s%6s ",sFile,"-");
                             } else {
-                                if(it->first.Contains("CMS_zllwimps_pdf")) {
+                                if(it->first == "CMS_zllwimps_pdf") {
                                     normSysts["CMS_zllwimps_pdf"]=it->second[RateKey_t(dci.procs[j-1],dci.ch[i-1])];
                                     continue;
                                 }
@@ -2688,7 +2689,7 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
 
 
 
-
+	    // PDF, cross section 
             fprintf(pFile,"%45s %10s ", "pdf_qqbar", "lnN");
             for(size_t j=1; j<=dci.procs.size(); j++) {
                 //cout << "pdf_qqbar: dci.procs[j-1] " << dci.procs[j-1] << endl;
@@ -2699,7 +2700,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                     } else if(systpostfix.Contains('7')) {
                         fprintf(pFile,"%6f ",1.055);
                     } else {
-                        fprintf(pFile,"%6f ",1.055);
+		      //fprintf(pFile,"%6f ",1.055); // pre-approval
+		      fprintf(pFile,"%6f ",1.047); // unblinding 
                     }
                 } else if(dci.procs[j-1].BeginsWith("ZZ")) {
                     if(systpostfix.Contains('8')) {
@@ -2707,7 +2709,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                     } else if(systpostfix.Contains('7')) {
                         fprintf(pFile,"%6f ",1.057);
                     } else {
-                        fprintf(pFile,"%6f ",1.057);
+		      //fprintf(pFile,"%6f ",1.057); // pre-approval 
+		      fprintf(pFile,"%6f ",1.038); // unblinding 
                     }
                 } else if(dci.procs[j-1].BeginsWith("WZ")) {
                     if(systpostfix.Contains('8')) {
@@ -2715,13 +2718,73 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                     } else if(systpostfix.Contains('7')) {
                         fprintf(pFile,"%6f ",1.048);
                     } else {
-                        fprintf(pFile,"%6f ",1.048);
+		      //fprintf(pFile,"%6f ",1.048); // pre-approval
+		      fprintf(pFile,"%6f ",1.033); // unblinding 
                     }
                 } else if(dci.procs[j-1].BeginsWith("D5") || dci.procs[j-1].BeginsWith("D8")
                           || dci.procs[j-1].BeginsWith("C3") || dci.procs[j-1].BeginsWith("D9")
                           || dci.procs[j-1].BeginsWith("UnPart")
                           || dci.procs[j-1].BeginsWith("dm") ) {
                     fprintf(pFile,"%6f ",normSysts["CMS_zllwimps_pdf"]); //convert shape -> normalization
+                } else {
+                    fprintf(pFile,"%6s ","-");
+                }
+            }
+            fprintf(pFile,"\n");
+
+
+	    // PDF, acceptance 
+            fprintf(pFile,"%45s %10s ", "CMS_zllwimps_pdf_qqbar", "lnN");
+            for(size_t j=1; j<=dci.procs.size(); j++) {
+                //cout << "pdf_qqbar: dci.procs[j-1] " << dci.procs[j-1] << endl;
+                if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
+                if(dci.procs[j-1].BeginsWith("ZH")) {
+		  fprintf(pFile,"%6f ",1.0025); // unblinding 
+                } else if(dci.procs[j-1].BeginsWith("ZZ")) {
+		  fprintf(pFile,"%6f ",1.0013); // unblinding 
+                } else if(dci.procs[j-1].BeginsWith("WZ")) {
+		  fprintf(pFile,"%6f ",1.0012); // unblinding 
+                } else {
+                    fprintf(pFile,"%6s ","-");
+                }
+            }
+            fprintf(pFile,"\n");
+
+
+
+	    // QCD scales, cross section 
+            fprintf(pFile,"%45s %10s ", "QCDscale_qqbar", "lnN");
+            for(size_t j=1; j<=dci.procs.size(); j++) {
+                //cout << "pdf_qqbar: dci.procs[j-1] " << dci.procs[j-1] << endl;
+                if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
+                if(dci.procs[j-1].BeginsWith("ZH")) {
+		  //fprintf(pFile,"%6f ",1.060); // pre-approval
+		  //fprintf(pFile,"%6f ",1.17); // unblinding, error from samples  
+		  fprintf(pFile,"%6f ",1.056); // unblinding, error from LHCHXSWG 
+                } else if(dci.procs[j-1].BeginsWith("ZZ")) {
+		  //fprintf(pFile,"%6f ",1.040); // pre-approval 
+		  fprintf(pFile,"%6f ",1.032); // unblinding 
+                } else if(dci.procs[j-1].BeginsWith("WZ")) {
+		  //fprintf(pFile,"%6f ",1.040); // pre-approval
+		  fprintf(pFile,"%6f ",1.051); // unblinding 
+                } else {
+		  fprintf(pFile,"%6s ","-");
+                }
+            }
+            fprintf(pFile,"\n");
+
+
+	    // QCD, acceptance 
+            fprintf(pFile,"%45s %10s ", "CMS_zllwimps_QCDscale_qqbar", "lnN");
+            for(size_t j=1; j<=dci.procs.size(); j++) {
+                //cout << "pdf_qqbar: dci.procs[j-1] " << dci.procs[j-1] << endl;
+                if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
+                if(dci.procs[j-1].BeginsWith("ZH")) {
+		  fprintf(pFile,"%6f ",1.0020); // unblinding (varies with m(H)...) 
+                } else if(dci.procs[j-1].BeginsWith("ZZ")) {
+		  fprintf(pFile,"%6f ",1.0005); // unblinding 
+                } else if(dci.procs[j-1].BeginsWith("WZ")) {
+		  fprintf(pFile,"%6f ",1.0012); // unblinding 
                 } else {
                     fprintf(pFile,"%6s ","-");
                 }
