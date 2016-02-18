@@ -22,7 +22,7 @@ runPlotter --json $json --inDir $input --outDir $output --outFile $output/plotte
 #onlyplots=" --channel all_ --channel ee --channel mumu --only final --isDataBlind "
 
 ### Limits
-onlyplots=" --channel all_ --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes "
+onlyplots=" --channel all_ --channel lleq0jets --channel lleq1jets --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes "
 output=${output/all/limits}
 runPlotter --json $json --inDir $input --outDir $output --outFile $output/plotter.root $onlyplots --iEcm $Ecm --iLumi $Lumi   
 
