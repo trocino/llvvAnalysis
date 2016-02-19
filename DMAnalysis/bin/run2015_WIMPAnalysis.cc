@@ -38,6 +38,46 @@
 
 using namespace std;
 
+
+float kfactor_qqZZ_qcd_dPhi(float GENdPhiZZ) {
+
+  float k = 0.0;
+  k += 1.513834489150 * (abs(GENdPhiZZ)>0.0 && abs(GENdPhiZZ)<=0.1);
+  k += 1.541738780180 * (abs(GENdPhiZZ)>0.1 && abs(GENdPhiZZ)<=0.2);
+  k += 1.497829632510 * (abs(GENdPhiZZ)>0.2 && abs(GENdPhiZZ)<=0.3);
+  k += 1.534956782920 * (abs(GENdPhiZZ)>0.3 && abs(GENdPhiZZ)<=0.4);
+  k += 1.478217033060 * (abs(GENdPhiZZ)>0.4 && abs(GENdPhiZZ)<=0.5);
+  k += 1.504330859290 * (abs(GENdPhiZZ)>0.5 && abs(GENdPhiZZ)<=0.6);
+  k += 1.520626246850 * (abs(GENdPhiZZ)>0.6 && abs(GENdPhiZZ)<=0.7);
+  k += 1.507013090030 * (abs(GENdPhiZZ)>0.7 && abs(GENdPhiZZ)<=0.8);
+  k += 1.494243156250 * (abs(GENdPhiZZ)>0.8 && abs(GENdPhiZZ)<=0.9);
+  k += 1.450536096150 * (abs(GENdPhiZZ)>0.9 && abs(GENdPhiZZ)<=1.0);
+  k += 1.460812521660 * (abs(GENdPhiZZ)>1.0 && abs(GENdPhiZZ)<=1.1);
+  k += 1.471603622200 * (abs(GENdPhiZZ)>1.1 && abs(GENdPhiZZ)<=1.2);
+  k += 1.467700038200 * (abs(GENdPhiZZ)>1.2 && abs(GENdPhiZZ)<=1.3);
+  k += 1.422408690640 * (abs(GENdPhiZZ)>1.3 && abs(GENdPhiZZ)<=1.4);
+  k += 1.397184022730 * (abs(GENdPhiZZ)>1.4 && abs(GENdPhiZZ)<=1.5);
+  k += 1.375593447520 * (abs(GENdPhiZZ)>1.5 && abs(GENdPhiZZ)<=1.6);
+  k += 1.391901318370 * (abs(GENdPhiZZ)>1.6 && abs(GENdPhiZZ)<=1.7);
+  k += 1.368564350560 * (abs(GENdPhiZZ)>1.7 && abs(GENdPhiZZ)<=1.8);
+  k += 1.317884804290 * (abs(GENdPhiZZ)>1.8 && abs(GENdPhiZZ)<=1.9);
+  k += 1.314019950800 * (abs(GENdPhiZZ)>1.9 && abs(GENdPhiZZ)<=2.0);
+  k += 1.274641749910 * (abs(GENdPhiZZ)>2.0 && abs(GENdPhiZZ)<=2.1);
+  k += 1.242346606820 * (abs(GENdPhiZZ)>2.1 && abs(GENdPhiZZ)<=2.2);
+  k += 1.244727403840 * (abs(GENdPhiZZ)>2.2 && abs(GENdPhiZZ)<=2.3);
+  k += 1.146259351670 * (abs(GENdPhiZZ)>2.3 && abs(GENdPhiZZ)<=2.4);
+  k += 1.107804993520 * (abs(GENdPhiZZ)>2.4 && abs(GENdPhiZZ)<=2.5);
+  k += 1.042053646740 * (abs(GENdPhiZZ)>2.5 && abs(GENdPhiZZ)<=2.6);
+  k += 0.973608545141 * (abs(GENdPhiZZ)>2.6 && abs(GENdPhiZZ)<=2.7);
+  k += 0.872169942668 * (abs(GENdPhiZZ)>2.7 && abs(GENdPhiZZ)<=2.8);
+  k += 0.734505279177 * (abs(GENdPhiZZ)>2.8 && abs(GENdPhiZZ)<=2.9);
+  k += 1.163152837230 * (abs(GENdPhiZZ)>2.9 && abs(GENdPhiZZ)<=3.1416);       
+
+  if (k==0.0) return 1.1; // if something goes wrong return inclusive k-factor
+  else return k;
+}
+
+
 int main(int argc, char* argv[])
 {
     //##################################################################################
@@ -560,21 +600,12 @@ int main(int argc, char* argv[])
         PhysicsEvent_t phys=getPhysicsEventFrom(ev);
 
         float ewk_w = 1.; 
-        /// Also include an extra 10% to account for gg->ZZ contribution. 
-        ///  N.B.:  sigma(gg->ZZ) = sigma(qq->ZZ) BEFORE NLO EWK contribution!!! 
-        ///  Therefore it's not  sigma(qq->ZZ) * (1 + ewk_corr) * (1 + gg_contr) 
-        ///  but rather  
-        ///    sigma(qq->ZZ) + ewk_corr*sigma(qq->ZZ) + gg_contr*sigma(qq->ZZ) 
-        ///    = sigma(qq->ZZ) * (1 + ewk_corr + gg_contr) 
-        ///  where gg_contr = 0.1 
-        float ggZZ_contr = 0.1; 
         
         /////// 
         // EWK correction for ZZ and WZ (ewk_w = 1.0 otherwise) 
         /// 
         // WZ 
-        if(false && // turn them off for now (probably negligible) 
-           isMC && (url.Contains("MC13TeV_WZ")) && (!url.Contains("MC13TeV_WZZ"))) {
+        if(false && isMC_WZ) {  // turn them off for now (probably negligible) 
           TLorentzVector wz_z, wz_w;
           TLorentzVector 
             nu(0., 0., 0., 0.), l1(0., 0., 0., 0.), 
@@ -639,24 +670,24 @@ int main(int argc, char* argv[])
             float wz_min_pt = wz_z.Pt() < wz_w.Pt() ? wz_z.Pt() : wz_w.Pt(); 
             if( !useEwkTable ) { 
               // Reading by eye from the paper
-              if(     wz_min_pt<60.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
-              else if(wz_min_pt<80.)  ewk_w = 1. - ( 0.9/100.) + ggZZ_contr; 
-              else if(wz_min_pt<100.) ewk_w = 1. - ( 1.0/100.) + ggZZ_contr; 
-              else if(wz_min_pt<120.) ewk_w = 1. - ( 1.5/100.) + ggZZ_contr; 
-              else if(wz_min_pt<140.) ewk_w = 1. - ( 2.0/100.) + ggZZ_contr; 
-              else if(wz_min_pt<160.) ewk_w = 1. - ( 2.6/100.) + ggZZ_contr; 
-              else if(wz_min_pt<180.) ewk_w = 1. - ( 3.0/100.) + ggZZ_contr; 
-              else if(wz_min_pt<200.) ewk_w = 1. - ( 4.9/100.) + ggZZ_contr; 
-              else if(wz_min_pt<220.) ewk_w = 1. - ( 5.2/100.) + ggZZ_contr; 
-              else if(wz_min_pt<240.) ewk_w = 1. - ( 6.5/100.) + ggZZ_contr; 
-              else if(wz_min_pt<260.) ewk_w = 1. - ( 7.5/100.) + ggZZ_contr; 
-              else if(wz_min_pt<280.) ewk_w = 1. - ( 8.0/100.) + ggZZ_contr; 
-              else if(wz_min_pt<300.) ewk_w = 1. - ( 9.9/100.) + ggZZ_contr; 
-              else if(wz_min_pt<320.) ewk_w = 1. - (10.9/100.) + ggZZ_contr; 
-              else if(wz_min_pt<340.) ewk_w = 1. - (12.3/100.) + ggZZ_contr; 
-              else if(wz_min_pt<360.) ewk_w = 1. - (12.6/100.) + ggZZ_contr; 
-              else if(wz_min_pt<380.) ewk_w = 1. - (13.5/100.) + ggZZ_contr; 
-              else                    ewk_w = 1. - (14.0/100.) + ggZZ_contr; 
+              if(     wz_min_pt<60.)  ewk_w = 1. - ( 0.9/100.); 
+              else if(wz_min_pt<80.)  ewk_w = 1. - ( 0.9/100.); 
+              else if(wz_min_pt<100.) ewk_w = 1. - ( 1.0/100.); 
+              else if(wz_min_pt<120.) ewk_w = 1. - ( 1.5/100.); 
+              else if(wz_min_pt<140.) ewk_w = 1. - ( 2.0/100.); 
+              else if(wz_min_pt<160.) ewk_w = 1. - ( 2.6/100.); 
+              else if(wz_min_pt<180.) ewk_w = 1. - ( 3.0/100.); 
+              else if(wz_min_pt<200.) ewk_w = 1. - ( 4.9/100.); 
+              else if(wz_min_pt<220.) ewk_w = 1. - ( 5.2/100.); 
+              else if(wz_min_pt<240.) ewk_w = 1. - ( 6.5/100.); 
+              else if(wz_min_pt<260.) ewk_w = 1. - ( 7.5/100.); 
+              else if(wz_min_pt<280.) ewk_w = 1. - ( 8.0/100.); 
+              else if(wz_min_pt<300.) ewk_w = 1. - ( 9.9/100.); 
+              else if(wz_min_pt<320.) ewk_w = 1. - (10.9/100.); 
+              else if(wz_min_pt<340.) ewk_w = 1. - (12.3/100.); 
+              else if(wz_min_pt<360.) ewk_w = 1. - (12.6/100.); 
+              else if(wz_min_pt<380.) ewk_w = 1. - (13.5/100.); 
+              else                    ewk_w = 1. - (14.0/100.); 
             } // end "if not useEwkTable" 
           } // end "if all gen-particles are identified" 
           else { 
@@ -668,8 +699,22 @@ int main(int argc, char* argv[])
         
         /// 
         // ZZ 
+        /// Also include an extra 10% to account for gg->ZZ contribution. 
+        ///  N.B.:  sigma(gg->ZZ) = 0.10 * sigma(qq->ZZ) BEFORE NLO EWK contribution!!! 
+        ///  Therefore it's not  sigma(qq->ZZ) * (1 + ewk_corr) * (1 + gg_contr) 
+        ///  but rather  
+        ///    sigma(qq->ZZ) + ewk_corr*sigma(qq->ZZ) + gg_contr*sigma(qq->ZZ) 
+        ///    = sigma(qq->ZZ) * (1 + ewk_corr + gg_contr) 
+        ///  where gg_contr = 0.1 
+
+        float ggZZ_contr = 0.0; // ==> Set it to 0 because we are applying this 10% directly on the ZZ cross section 
+	                        //     (i.e. we apply the same EWK corrections to both qq and gg contributions...) 
+
+	// NNLO/NLO k-factor on qq->ZZ -- it should be applied only to qq->ZZ, but we are actually applying it to (qq+gg)->ZZ ... 
+	float qqZZ_NNLO = 1.0; 
+
         TLorentzVector l1(0.,0.,0.,0.), l2(0.,0.,0.,0.), v1(0.,0.,0.,0.), v2(0.,0.,0.,0.); 
-        if(isMC && (url.Contains("MC13TeV_ZZTo2L2Nu"))) { // No 4l nor 2l2q for now 
+        if(isMC_ZZ) { 
           // Neutrinos 
           bool foundNeut1(false), foundNeut2(false); 
           bool foundLept1(false), foundLept2(false); 
@@ -725,24 +770,24 @@ int main(int argc, char* argv[])
         
             if( !useEwkTable ) { 
               //Reading by eye from the paper
-              if(     z_min_pt<60.)  ewk_w = 1.-(4.0/100.);
-              else if(z_min_pt<80.)  ewk_w = 1.-(5.0/100.);
-              else if(z_min_pt<100.) ewk_w = 1.-(6.3/100.);
-              else if(z_min_pt<120.) ewk_w = 1.-(7.6/100.);
-              else if(z_min_pt<140.) ewk_w = 1.-(9.2/100.);
-              else if(z_min_pt<160.) ewk_w = 1.-(10.0/100.);
-              else if(z_min_pt<180.) ewk_w = 1.-(11.4/100.);
-              else if(z_min_pt<200.) ewk_w = 1.-(12.8/100.);
-              else if(z_min_pt<220.) ewk_w = 1.-(14.2/100.);
-              else if(z_min_pt<240.) ewk_w = 1.-(15.6/100.);
-              else if(z_min_pt<260.) ewk_w = 1.-(17.0/100.);
-              else if(z_min_pt<280.) ewk_w = 1.-(18.4/100.);
-              else if(z_min_pt<300.) ewk_w = 1.-(20.0/100.);
-              else if(z_min_pt<320.) ewk_w = 1.-(21.2/100.);
-              else if(z_min_pt<340.) ewk_w = 1.-(22.4/100.);
-              else if(z_min_pt<360.) ewk_w = 1.-(23.6/100.);
-              else if(z_min_pt<380.) ewk_w = 1.-(24.8/100.);
-              else                   ewk_w = 1.-(26.0/100.);
+              if(     z_min_pt<60.)  ewk_w = 1.-( 4.0/100.) + ggZZ_contr; // N.B.: ggZZ_contr = 0 
+              else if(z_min_pt<80.)  ewk_w = 1.-( 5.0/100.) + ggZZ_contr;
+              else if(z_min_pt<100.) ewk_w = 1.-( 6.3/100.) + ggZZ_contr;
+              else if(z_min_pt<120.) ewk_w = 1.-( 7.6/100.) + ggZZ_contr;
+              else if(z_min_pt<140.) ewk_w = 1.-( 9.2/100.) + ggZZ_contr;
+              else if(z_min_pt<160.) ewk_w = 1.-(10.0/100.) + ggZZ_contr;
+              else if(z_min_pt<180.) ewk_w = 1.-(11.4/100.) + ggZZ_contr;
+              else if(z_min_pt<200.) ewk_w = 1.-(12.8/100.) + ggZZ_contr;
+              else if(z_min_pt<220.) ewk_w = 1.-(14.2/100.) + ggZZ_contr;
+              else if(z_min_pt<240.) ewk_w = 1.-(15.6/100.) + ggZZ_contr;
+              else if(z_min_pt<260.) ewk_w = 1.-(17.0/100.) + ggZZ_contr;
+              else if(z_min_pt<280.) ewk_w = 1.-(18.4/100.) + ggZZ_contr;
+              else if(z_min_pt<300.) ewk_w = 1.-(20.0/100.) + ggZZ_contr;
+              else if(z_min_pt<320.) ewk_w = 1.-(21.2/100.) + ggZZ_contr;
+              else if(z_min_pt<340.) ewk_w = 1.-(22.4/100.) + ggZZ_contr;
+              else if(z_min_pt<360.) ewk_w = 1.-(23.6/100.) + ggZZ_contr;
+              else if(z_min_pt<380.) ewk_w = 1.-(24.8/100.) + ggZZ_contr;
+              else                   ewk_w = 1.-(26.0/100.) + ggZZ_contr;
             } // end "if not useEwkTable" 
           } // end "foundNeut2 and foundLept2" 
           else { 
@@ -750,11 +795,17 @@ int main(int argc, char* argv[])
               std::cout << " ### WARNING: some gen-particles not identified: v1:" << v1id 
         		<< ", v2:" << v2id << ", l1:" << l1id << ", l2:" << l2id << "###" << std::endl; 
           } 
+
+	  // NNLO/NLO k-factor 
+	  qqZZ_NNLO = kfactor_qqZZ_qcd_dPhi( deltaPhi((l1+l2).Phi(), (v1+v2).Phi()) ); 
+
         } // end "if isMC and is ZZ" 
         
-        // Apply EWK weight! 
-        weight *= ewk_w; 
+        // Apply EWK + NNLO k-factor weight 
+        weight *= ewk_w * qqZZ_NNLO; 
         
+
+
         // End EWK corrections 
         ////// 
 
@@ -1588,4 +1639,5 @@ int main(int argc, char* argv[])
 
     if(outTxtFile_final)fclose(outTxtFile_final);
 }
+
 /* vim: set ts=4 sw=4 tw=0 et :*/
