@@ -1,7 +1,7 @@
 #!/bin/sh 
 execute="run2015_WIMPAnalysis"
 main="${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis"
-templ="$main/test/runWIMPSelAnalysis_cfg.py_templ"
+templ="$main/test/runAnalysis_template.py"
 CWD=`pwd`
 outfile=$CWD/analysis_$(git describe --always)
 runlog=$outfile/LOGFILES

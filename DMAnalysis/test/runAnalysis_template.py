@@ -1,0 +1,46 @@
+##
+import FWCore.ParameterSet.Config as cms
+
+blinding=False
+
+#use this if you don't want to apply any weight
+#datapileupToUse=cms.vdouble()
+
+runProcess = cms.PSet(
+    input = cms.string("@input"),
+    outdir = cms.string("."),
+    saveFinalList = cms.untracked.bool(False),
+    suffix = cms.string("@suffix"),
+    tag = cms.string("@tag"),
+    wimpweights = cms.vstring("@wimpweights"),
+    pdfInput = cms.string("root://eoscms.cern.ch//eos/cms/store/group/phys_exotica/monoZ/llvvNtuple_25ns_PDFs/"),
+    isMC = cms.bool(@isMC),
+    is2011 = cms.bool(@is2011),
+    mctruthmode=cms.int32(@mctruthmode),
+    runBlinded = cms.bool(blinding),
+    xsec = cms.double(@xsec),
+    cprime = cms.double(@cprime),
+    brnew = cms.double(@brnew),
+    saveSummaryTree = cms.bool(@saveSummaryTree),
+    runSystematics = cms.bool(@runSystematics),
+    runOptimization = cms.bool(@runOptimization),
+    weightsFile = cms.vstring(@weightsFile),
+    fakeRateFile = cms.vstring("${CMSSW_BASE}/src/CMGTools/HiggsAna2l2v/data/fr_pt.root"), ##FIXME
+    BtagEffFiles = cms.vstring("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/BtagEff_13TeV_27Jan2016.root"),
+    BtagSF = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/CSVv2.csv"),
+    PU_Central = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_Central.root"),
+    PU_Up = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_minBiasUP.root"),
+    PU_Down = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/PU_minBiasDOWN.root"),
+#   hqtWeightsFile = cms.vstring(
+#	"${CMSSW_BASE}/src/CMGTools/HtoZZ2l2nu/data/HiggsQtWeights.root",
+#	"${CMSSW_BASE}/src/CMGTools/HtoZZ2l2nu/data/LineShapes.root",
+#	"${CMSSW_BASE}/src/CMGTools/HtoZZ2l2nu/data/ShapeInterferences.root"
+#    ),
+    evStart = cms.int32(0),
+    evEnd = cms.int32(-1),
+    dirName = cms.string("mainAnalyzer/data"),
+    ptResolFileName = cms.string("${CMSSW_RELEASE_BASE}/src/CondFormats/JetMETObjects/data/Spring10_PtResolution_AK5PF.txt"),
+    phiResolFileName = cms.string("${CMSSW_RELEASE_BASE}/src/CondFormats/JetMETObjects/data/Spring10_PhiResolution_AK5PF.txt"),
+    etaResolFileName = cms.string("${CMSSW_RELEASE_BASE}/src/CondFormats/JetMETObjects/data/Spring10_EtaResolution_AK5PF.txt"),
+    jesUncFileName = cms.string("${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis/data/weights/Summer15_25nsV6_MC_Uncertainty_AK4PFchs.txt"),
+    )
