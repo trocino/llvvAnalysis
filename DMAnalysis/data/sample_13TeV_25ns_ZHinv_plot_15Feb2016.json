@@ -9,7 +9,7 @@
             "data": [
                 {
                     "dtag": "MC13TeV_ZZTo2L2Nu", 
-                    "xsec": 0.564, 
+                    "xsec": 0.6204,
                     "split": 13, 
                     "br": [
                         1
@@ -17,7 +17,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZZTo4L", 
-                    "xsec": 1.212, 
+                    "xsec": 1.3332, 
                     "split": 9, 
                     "br": [
                         1
@@ -25,7 +25,7 @@
                 }, 
                 {
                     "dtag": "MC13TeV_ZZTo2L2Q", 
-                    "xsec": 3.22, 
+                    "xsec": 3.542, 
                     "split": 15, 
                     "br": [
                         1
