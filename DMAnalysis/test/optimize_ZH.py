@@ -43,8 +43,8 @@ LandSArg+=' --bins eq0jets,eq1jets'
 DataCardsDir='cards'
 
 #MASS = [ 400, 500, 600 ] 
-#MASS = [ 110, 125, 150, 200, 300, 400, 500, 600 ] 
-MASS = [ 125 ] 
+MASS = [ 110, 125, 150, 200, 300, 400, 500, 600 ] 
+#MASS = [ 125 ] 
 SUBMASS = MASS
 
 cl=0.95
@@ -436,7 +436,10 @@ elif(phase == 3 ):
       #SCRIPT.writelines("combine -M MaxLikelihoodFit -m " + str(m) + " --plot --rMin=-2 --rMax=4 --robustFit=1 --X-rtd FITTER_DYN_STEP -n HZ card_combined.dat > COMB_maxlkl.log;\n")
       #SCRIPT.writelines("combine -M HybridNew --frequentist  -m 0 --testStat LHC card_combined.dat -H ProfileLikelihood --fork 4 > COMB_hybrid.log;\n")
 
-      SCRIPT.writelines("combine -M Asymptotic --cl " + str(cl) + " --rRelAcc 0.00000001 --rAbsAcc 0.000000001 -m 1 --run expected --expectSignal=1 -t -1 card_combined.dat > COMB_asympt.log;\n") 
+      ## Blinded 
+      #SCRIPT.writelines("combine -M Asymptotic --cl " + str(cl) + " --rRelAcc 0.00000001 --rAbsAcc 0.000000001 -m 1 --run expected --expectSignal=1 -t -1 card_combined.dat > COMB_asympt.log;\n") 
+      ## Unblinded 
+      SCRIPT.writelines("combine -M Asymptotic --cl " + str(cl) + " --rRelAcc 0.00000001 --rAbsAcc 0.000000001 -m 1 card_combined.dat > COMB_asympt.log;\n") 
 
       SCRIPT.writelines('cd ..;\n\n')
       SCRIPT.close()

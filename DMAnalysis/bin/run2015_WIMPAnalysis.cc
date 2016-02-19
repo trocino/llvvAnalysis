@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 
 
     //for MC normalization (to 1/pb)
-    TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,6,0,6) ) ;
+    TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow", "cutflow", 9, -0.5, 8.5) ) ;
 
     mon.addHistogram( new TH1F( "nvtx_raw",	";Vertices;Events",50,0,50) );
     mon.addHistogram( new TH1F( "nvtxwgt_raw",	";Vertices;Events",50,0,50) );
@@ -1369,8 +1369,14 @@ int main(int argc, char* argv[])
 	      float pdfAsVar = sqrt(rmsPDFweight*rmsPDFweight + avgASvar*avgASvar); 
 	      pdfAsVar = (pdfAsVar>1. ? 1. : pdfAsVar); 
 
-	      if(varNames[ivar]=="_pdfup") iweight *= (1. + pdfAsVar); 
-	      else                         iweight *= (1. - pdfAsVar); 
+	      if(varNames[ivar]=="_pdfup") { 
+		iweight *= (1. + pdfAsVar); 
+		Hcutflow->Fill(5, iweight); 
+	      } 
+	      else { 
+		iweight *= (1. - pdfAsVar); 
+		Hcutflow->Fill(6, iweight); 
+	      } 
 	    } 
 
 	    /// * 3 * 
@@ -1387,6 +1393,7 @@ int main(int argc, char* argv[])
 	      if( ev.weight_QCDscale_muR2_muF2     > maxQcdScl ) maxQcdScl = ev.weight_QCDscale_muR2_muF2    ; 
 	      if( maxQcdScl < -998. ) maxQcdScl = 1.000; 
 	      iweight *= maxQcdScl; 
+	      Hcutflow->Fill(7, iweight); 
 	    } 
 
 	    /// * 4 * 
@@ -1403,6 +1410,7 @@ int main(int argc, char* argv[])
 	      if( ev.weight_QCDscale_muR2_muF2     < minQcdScl ) minQcdScl = ev.weight_QCDscale_muR2_muF2    ; 
 	      if( minQcdScl >  998. ) minQcdScl = 1.000; 
 	      iweight *= minQcdScl; 
+	      Hcutflow->Fill(8, iweight); 
 	    }
 
 	    /// * 5 * 

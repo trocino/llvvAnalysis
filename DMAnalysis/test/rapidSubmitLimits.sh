@@ -1,10 +1,10 @@
 #! /bin/sh 
 
 phase=3 
-out="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/2016-02-16_analysis_unblinding/limits_shape/"
+out="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/analysis_unblinding_20160218/limits_shape/"
 shapeName="mt_shapes" 
-inUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/2016-02-16_analysis_unblinding/plotter.root"
-jsonUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/data/sample_13TeV_25ns_ZHinv_plot_13Feb2016.json" 
+inUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/analysis_unblinding_20160218/plotter.root"
+jsonUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/data/sample_13TeV_25ns_ZHinv_plot_15Feb2016.json" 
 queue="2nd" 
 otherOpts=""
 #otherOpts=" -O --shapeMin -O 200 "

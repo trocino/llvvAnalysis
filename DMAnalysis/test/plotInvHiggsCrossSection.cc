@@ -54,14 +54,14 @@ void makeBetterLimitPlot(string folder)
     if(myfolder.Contains("/C3")) tag="C3";
     if(myfolder.Contains("/Unpart")) tag="Unpart";
 
-    string dbpars[] = {"110","125","150","200","300"};
+    string dbpars[] = {"110","125","150","200","300","400","500","600"};
     string parName = "m_{H} [GeV]";
     bool is7TeV  = false;
     bool is8TeV  = false;
     bool is13TeV = true;
     bool savePlots = true;
     bool normalizePlot = true;
-    bool showObserved = false;
+    bool showObserved = true;
 
 
     if(is7TeV && is8TeV) normalizePlot = true; // doesn't make sense to use xs in combination 7+8 TeV
@@ -69,7 +69,8 @@ void makeBetterLimitPlot(string folder)
     UInt_t nPts = sizeof(dbpars)/sizeof(string);
     const UInt_t npts(nPts);
 
-    Double_t xSect[] = {1145.53, 763.9, 413.177, 148.135, 30.576}; 
+    //Double_t xSect[] = {1145.53, 763.9, 413.177, 148.135, 30.576}; 
+    Double_t xSect[] = {1282.5, 869.6, 483.3, 177.79, 34.07, 9.565, 9.565, 9.565}; 
     Double_t bFrac(0.100974); 
 
     Double_t xPts[npts];
@@ -340,7 +341,7 @@ void makeBetterLimitPlot(string folder)
     if(grExp_r)                    mg->Add(grExp_r, "L");
     //if(grObs_l && showObserved)    mg->Add(grObs_l, "PL");
     if(grObs_r && showObserved)    mg->Add(grObs_r, "PL");
-    if(grThXs_r)                   mg->Add(grThXs_r, "L");
+    //if(grThXs_r)                   mg->Add(grThXs_r, "L");
 
     TCanvas *canv = new TCanvas("canv", "limits canvas", 800., 650.);
     canv->cd();
@@ -349,7 +350,7 @@ void makeBetterLimitPlot(string folder)
     TPad* t1 = new TPad("t1","t1", 0.0, 0., 1.0, 1.0);
     t1->Draw();
     t1->cd();
-    t1->SetLogy(true);
+    //t1->SetLogy(true);
     t1->SetLogx(false);
 
 
@@ -361,12 +362,14 @@ void makeBetterLimitPlot(string folder)
     //mg->SetMaximum(1000);//45.25);//10.25);
     //if(tag=="D9") mg->SetMaximum(9000);
 
+    mg->GetXaxis()->SetRangeUser(110., 600.);
     mg->GetXaxis()->SetTitle(parName.c_str());
     mg->GetXaxis()->SetTitleSize(0.055);
     mg->GetXaxis()->SetTitleOffset(1.1);
     //if(normalizePlot) mg->GetYaxis()->SetTitle("95% CL limit on #Lambda [GeV]");
     //else              mg->GetYaxis()->SetTitle("95% CL limit on #sigma#timesBR [fb]");
     mg->GetYaxis()->SetTitle("95% CL limit on #sigma #times B(inv) [fb]");
+    //mg->GetYaxis()->SetTitle("95% CL limit on #sigma(pp #rightarrow ZH #rightarrow l^{+}l^{#minus} + inv) #times B(inv) [fb]");
     mg->GetYaxis()->SetTitleSize(0.055);
     mg->GetYaxis()->SetTitleOffset(1.35);
 
@@ -378,10 +381,10 @@ void makeBetterLimitPlot(string folder)
     // ll->Draw();
 
 
-    float posx1 = 0.2;
-    float posx2 = 0.48;
-    float posy1 = 0.2;
-    float posy2 = 0.42;
+    float posx1 = 0.20 + 0.45;
+    float posx2 = 0.48 + 0.45;
+    float posy1 = 0.20 + 0.25;
+    float posy2 = 0.42 + 0.25;
     TLegend *leg = new TLegend(posx1, posy1, posx2, posy2);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
@@ -406,7 +409,7 @@ void makeBetterLimitPlot(string folder)
     //else 
     leg->AddEntry(gr2s_r, "Expected #pm 2#sigma", "F");
 
-    leg->AddEntry(grThXs_r, "#sigma(pp#rightarrowZH)#timesB(Z#rightarrow2l)", "L");
+    //leg->AddEntry(grThXs_r, "#sigma(pp#rightarrowZH)#timesB(Z#rightarrow2l)", "L");
 
     leg->Draw();
 
@@ -423,12 +426,13 @@ void makeBetterLimitPlot(string folder)
     double iEcm_13  = 13.0;
     double iLumi_7  = 5051;
     double iLumi_8  = 19712;
-    double iLumi_13 = 2110;
+    double iLumi_13 = 2260;
 
 
-    T = new TPaveText(0.47, 0.85, 0.73, 0.80, "NDC");
-    sprintf(Buffer, "pp #rightarrow ZH #rightarrow l^{+}l^{-} + inv");
+    T = new TPaveText(0.57, 0.80, 0.93, 0.73, "NDC");
+    sprintf(Buffer, "#splitline{pp #rightarrow ZH #rightarrow l^{+}l^{#minus} + #it{E}_{T}^{miss}}{          #leq 1 jet}");
     T->AddText(Buffer);
+    //T->SetTextAlign(23);
     T->SetTextFont(42);
     T->SetFillColor(0);
     T->SetFillStyle(0);
@@ -437,8 +441,8 @@ void makeBetterLimitPlot(string folder)
 
 
     if(is13TeV) {
-        T = new TPaveText(0.45, 0.90, 0.75, 0.85, "NDC");
-        sprintf(Buffer, "#sqrt{s} = %.1f TeV, L = %.1f fb^{-1}", iEcm_13, iLumi_13/1000);
+        T = new TPaveText(0.59, 0.90, 0.91, 0.85, "NDC");
+        sprintf(Buffer, "#sqrt{s} = %.1f TeV,  %.1f fb^{-1}", iEcm_13, iLumi_13/1000);
         T->AddText(Buffer);
         T->SetTextAlign(12);
         T->SetTextFont(42);

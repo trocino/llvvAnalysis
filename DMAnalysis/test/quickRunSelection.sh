@@ -5,11 +5,11 @@ main="${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis"
 stamp=`date +%Y%m%d_%H%M`
 templ="$main/test/runWIMPSelAnalysis_cfg.py_templ"
 CWD=`pwd`
-outfile=$CWD/analysis_prova_${stamp}
+outfile=$CWD/analysis_theorySysts_${stamp}
 #outfile=$CWD/analysis_pfmet120_newTruePUweights_byEyeEWKcorr_noOptimization_noSysts_${stamp}
 runlog=$outfile/LOGFILES
 mkdir -p $runlog
-json="$main/data/sample_13TeV_25ns_ZHinv_15Feb2016.json"
+json="$main/data/sample_13TeV_25ns_ZHinv_plot_15Feb2016.json"
 #json="$main/data/sample_13TeV_25ns_ZHinv_plot.json"
 input="/store/user/nsmith/llvvNtuple_15Feb2016/"
 wimpweights="$main/data/weights/PileupWeights_Sep182015.root"
