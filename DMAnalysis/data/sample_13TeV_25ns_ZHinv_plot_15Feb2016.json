@@ -4,13 +4,29 @@
             "isdata": false, 
             "color": "842", 
             "lcolor": "1", 
-            "tag": "ZZ#rightarrow 2l2#nu", 
+            "tag": "ZZ", 
             "marker": 842, 
             "data": [
                 {
                     "dtag": "MC13TeV_ZZTo2L2Nu", 
                     "xsec": 0.564, 
                     "split": 13, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_ZZTo4L", 
+                    "xsec": 1.212, 
+                    "split": 9, 
+                    "br": [
+                        1
+                    ]
+                }, 
+                {
+                    "dtag": "MC13TeV_ZZTo2L2Q", 
+                    "xsec": 3.22, 
+                    "split": 15, 
                     "br": [
                         1
                     ]
@@ -21,12 +37,12 @@
             "isdata": false, 
             "color": "856", 
             "lcolor": "1", 
-            "tag": "WZ#rightarrow 3l#nu", 
+            "tag": "WZ", 
             "marker": 856, 
             "data": [
                 {
                     "dtag": "MC13TeV_WZpowheg", 
-                    "xsec": 4.102, 
+                    "xsec": 4.42965, 
                     "split": 2, 
                     "br": [
                         1
@@ -61,22 +77,6 @@
                     "dtag": "MC13TeV_WWZ", 
                     "xsec": 0.1651, 
                     "split": 1, 
-                    "br": [
-                        1
-                    ]
-                }, 
-                {
-                    "dtag": "MC13TeV_ZZTo4L", 
-                    "xsec": 1.212, 
-                    "split": 9, 
-                    "br": [
-                        1
-                    ]
-                }, 
-                {
-                    "dtag": "MC13TeV_ZZTo2L2Q", 
-                    "xsec": 3.22, 
-                    "split": 15, 
                     "br": [
                         1
                     ]
