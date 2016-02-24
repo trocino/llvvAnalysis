@@ -21,17 +21,17 @@ void extendXlimit(TH1D*&, double);
 
 void changeFirstPoint(TH1D*&, double, double); 
 
-void CrossSectionMacro() {
-  TString indir = "analysis_unblinding_20160218/limits_shape/cardsShape/125/"; 
+void CrossSectionMacro(bool plot0jets=true, bool isnormalized=false, bool islogy=false) {
+  TString indir = "analysis_freezeApproval_20160223_1312/limits_shape/cardsShape/125/"; 
   ifstream infile;
   bool saveplots = true; 
 
   bool stacksignal = false; 
-  bool stackatgc = true; 
+  bool stackatgc = false; 
   bool addcorrelation = true; 
-  bool normalizebins = true; 
-  bool dology = true; 
-  bool only0jets = true; 
+  bool normalizebins = isnormalized; 
+  bool dology = islogy; 
+  bool only0jets = plot0jets; 
   bool only1jets = !only0jets; 
   if(only0jets && only1jets) {
     std::cout << " *** ERROR: only0jets and only1jets cannot be both true at the same time!" << std::endl; 

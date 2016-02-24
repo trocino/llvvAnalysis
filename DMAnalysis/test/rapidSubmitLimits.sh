@@ -1,12 +1,13 @@
 #! /bin/sh 
 
 phase=3 
-out="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/analysis_unblinding_20160218/limits_shape/"
+out="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/analysis_freezeApproval_20160223_1312/limits_count/"
 shapeName="mt_shapes" 
-inUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/analysis_unblinding_20160218/plotter.root"
+inUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/test/analysis_freezeApproval_20160223_1312/plotter.root"
 jsonUrl="/afs/cern.ch/work/t/trocino/Work/Analysis_2015/ZHtoLLInv/2016-02-12_Preapproval/CMSSW_7_4_14/src/llvvAnalysis/DMAnalysis/data/sample_13TeV_25ns_ZHinv_plot_15Feb2016.json" 
 queue="2nd" 
 otherOpts=""
+#otherOpts=" -O --channels -O ll "
 #otherOpts=" -O --shapeMin -O 200 "
 #otherOpts=" -O --subNRB15 "
 landsArg=" _13TeV "
@@ -14,10 +15,10 @@ cl="0.95"
 #cl="0.90"
 
 ### Mode 0 (cut-n-count) 
-#python optimize_ZH.py -m 0 -p $phase -f CUTS_ZH.txt -o $out -s $shapeName -G phase${phase}_${shapeName}_mode_0.log -i $inUrl -j $jsonUrl -Q $queue -L $landsArg $otherOpts -C $cl
+python optimize_ZH.py -m 0 -p $phase -f CUTS_ZH.txt -o $out -s $shapeName -G phase${phase}_${shapeName}_mode_0.log -i $inUrl -j $jsonUrl -Q $queue -L $landsArg $otherOpts -C $cl
 
 ### Mode 1 (shape) -- cut at 120 GeV 
-python optimize_ZH.py -m 1 -p $phase -f CUTS_ZH.txt -o $out -s $shapeName -G phase${phase}_${shapeName}_mode_1.log -i $inUrl -j $jsonUrl -Q $queue -L $landsArg $otherOpts -C $cl 
+#python optimize_ZH.py -m 1 -p $phase -f CUTS_ZH.txt -o $out -s $shapeName -G phase${phase}_${shapeName}_mode_1.log -i $inUrl -j $jsonUrl -Q $queue -L $landsArg $otherOpts -C $cl 
 
 ### Mode 1 (shape) 
 #python optimize_ZH.py -m 1 -p $phase -f CUTS_ZH_shapes.txt -o $out -s $shapeName -G phase${phase}_${shapeName}_mode_1.log -i $inUrl -j $jsonUrl -Q $queue -L $landsArg $otherOpts -C $cl 
