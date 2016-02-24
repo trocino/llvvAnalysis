@@ -247,8 +247,8 @@ void GetInitialNumberOfEvents(JSONWrapper::Object& Root, std::string RootDir, Na
          if(cnorm==1 && isMC)printf("is there a problem with %s ? cnorm = %f\n",(Samples[j])["dtag"].toString().c_str(), cnorm);
          if(!isMC)PUCentralnnorm = 1;
 
-         double VBFMCRescale = tmphist->GetXaxis()->GetNbins()>5 ? tmphist->GetBinContent(6) / tmphist->GetBinContent(2) : 1.0;
-	 if(VBFMCRescale!=0)          cnorm *= VBFMCRescale;
+         //double VBFMCRescale = tmphist->GetXaxis()->GetNbins()>5 ? tmphist->GetBinContent(6) / tmphist->GetBinContent(2) : 1.0;
+	 //if(VBFMCRescale!=0)          cnorm *= VBFMCRescale;
          //printf("VBFMCRescale for sample %s is %f\n", (Samples[j])["dtag"].toString().c_str(), VBFMCRescale );
          sampleInfo.initialNumberOfEvents = cnorm / PUCentralnnorm;
 	 //cout << "initialNumberOfEvents: " << sampleInfo.initialNumberOfEvents << endl;
@@ -669,6 +669,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
    THStack* stack = new THStack("MC","MC");
    TH1 *     mc   = NULL;
    TH1 *     mcPlusRelUnc = NULL;
+   TGraphErrors * mcgr=NULL;
    TH1 *     mctotalUnc = NULL;
    std::vector<TH1 *> spimpose;
    std::vector<TString> spimposeOpts;
@@ -924,7 +925,8 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
           }
         mctotalUnc->SetDirectory(0);
 
-        TGraphErrors *mcgr=new TGraphErrors("mcStatErrGraph", "mcstaterrors");
+        mcgr=new TGraphErrors();
+        mcgr->SetName("mcStatErrGraph");
         for(int ibin=1; ibin<=mctotalUnc->GetXaxis()->GetNbins(); ibin++)
           {
         	mcgr->SetPoint(ibin-1,mctotalUnc->GetXaxis()->GetBinCenter(ibin),mctotalUnc->GetBinContent(ibin));
@@ -935,6 +937,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
         mcgr->SetMarkerStyle(1);
        	mcgr->Draw("2 same");
 	legA->AddEntry(mcgr,"Stat. Unc.", "F");
+        delete mctotalUnc;
    }
 
    //compare data and MC
@@ -1158,6 +1161,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
    savePath(c1,outDir,SaveName,".root");
 
    delete c1;
+   delete mcgr;
    for(unsigned int d=0;d<ObjectToDelete.size();d++){delete ObjectToDelete[d];}ObjectToDelete.clear();
    delete legA;
    delete T;

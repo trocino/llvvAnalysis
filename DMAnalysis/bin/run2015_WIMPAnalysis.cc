@@ -390,13 +390,14 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
 
 
-    TH1F *hfinalWeights=(TH1F*) mon.addHistogram( new TH1F ("weights_final", ";;Events", 6,0,6) );
+    TH1F *hfinalWeights=(TH1F*) mon.addHistogram( new TH1F ("weights_final", ";;Events", 7,0,7) );
     hfinalWeights->GetXaxis()->SetBinLabel(1,"Raw");
     hfinalWeights->GetXaxis()->SetBinLabel(2,"*(gen sign)");
     hfinalWeights->GetXaxis()->SetBinLabel(3,"*(ewk)");
-    hfinalWeights->GetXaxis()->SetBinLabel(4,"*(PU)");
-    hfinalWeights->GetXaxis()->SetBinLabel(5,"*(btagSF)");
-    hfinalWeights->GetXaxis()->SetBinLabel(6,"*(lepSF)");
+    hfinalWeights->GetXaxis()->SetBinLabel(4,"*(NNLO k)");
+    hfinalWeights->GetXaxis()->SetBinLabel(5,"*(PU)");
+    hfinalWeights->GetXaxis()->SetBinLabel(6,"*(btagSF)");
+    hfinalWeights->GetXaxis()->SetBinLabel(7,"*(lepSF)");
 
     mon.addHistogram( (TH1F*) hfinalWeights->Clone("weights_presel") );
 
@@ -1267,9 +1268,10 @@ int main(int argc, char* argv[])
                         mon.fillHisto("weights_presel", tags, 0., 1.);
                         mon.fillHisto("weights_presel", tags, 1., 1.*genWeight);
                         mon.fillHisto("weights_presel", tags, 2., 1.*genWeight*ewk_w);
-                        mon.fillHisto("weights_presel", tags, 3., 1.*genWeight*ewk_w*puWeight);
-                        mon.fillHisto("weights_presel", tags, 4., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor);
-                        mon.fillHisto("weights_presel", tags, 5., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor*llScaleFactor);
+                        mon.fillHisto("weights_presel", tags, 3., 1.*genWeight*ewk_w*qqZZ_NNLO);
+                        mon.fillHisto("weights_presel", tags, 4., 1.*genWeight*ewk_w*qqZZ_NNLO*puWeight);
+                        mon.fillHisto("weights_presel", tags, 5., 1.*genWeight*ewk_w*qqZZ_NNLO*puWeight*BTagScaleFactor);
+                        mon.fillHisto("weights_presel", tags, 6., 1.*genWeight*ewk_w*qqZZ_NNLO*puWeight*BTagScaleFactor*llScaleFactor);
 
 
                         if(passDphiZMETcut) {
@@ -1315,9 +1317,10 @@ int main(int argc, char* argv[])
                                             mon.fillHisto("weights_final", tags, 0., 1.);
                                             mon.fillHisto("weights_final", tags, 1., 1.*genWeight);
                                             mon.fillHisto("weights_final", tags, 2., 1.*genWeight*ewk_w);
-                                            mon.fillHisto("weights_final", tags, 3., 1.*genWeight*ewk_w*puWeight);
-                                            mon.fillHisto("weights_final", tags, 4., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor);
-                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*puWeight*BTagScaleFactor*llScaleFactor);
+                                            mon.fillHisto("weights_final", tags, 3., 1.*genWeight*ewk_w*qqZZ_NNLO);
+                                            mon.fillHisto("weights_final", tags, 4., 1.*genWeight*ewk_w*qqZZ_NNLO*puWeight);
+                                            mon.fillHisto("weights_final", tags, 5., 1.*genWeight*ewk_w*qqZZ_NNLO*puWeight*BTagScaleFactor);
+                                            mon.fillHisto("weights_final", tags, 6., 1.*genWeight*ewk_w*qqZZ_NNLO*puWeight*BTagScaleFactor*llScaleFactor);
 
                                         } //pass MT cut
 
