@@ -209,6 +209,8 @@ int main(int argc, char* argv[])
 	if(isMC_ZZ) { 
             varNames.push_back("_ewkup"); 
             varNames.push_back("_ewkdown"); 
+            varNames.push_back("_nnloqcdup"); 
+            varNames.push_back("_nnloqcddown"); 
 	} 
     }
     size_t nvarsToInclude=varNames.size();
@@ -708,11 +710,14 @@ int main(int argc, char* argv[])
         ///    = sigma(qq->ZZ) * (1 + ewk_corr + gg_contr) 
         ///  where gg_contr = 0.1 
 
-        float ggZZ_contr = 0.0; // ==> Set it to 0 because we are applying this 10% directly on the ZZ cross section 
+        float ggZZ_contr = 0.1; // ==> Set it to 0 because we are applying this 10% directly on the ZZ cross section 
 	                        //     (i.e. we apply the same EWK corrections to both qq and gg contributions...) 
 
 	// NNLO/NLO k-factor on qq->ZZ -- it should be applied only to qq->ZZ, but we are actually applying it to (qq+gg)->ZZ ... 
 	float qqZZ_NNLO = 1.0; 
+
+	// Variable to assess the hadronic activity in the event 
+	float rhoZZ = 1.0; 
 
         TLorentzVector l1(0.,0.,0.,0.), l2(0.,0.,0.,0.), v1(0.,0.,0.,0.), v2(0.,0.,0.,0.); 
         if(isMC_ZZ) { 
@@ -761,7 +766,9 @@ int main(int argc, char* argv[])
             float z2_pt = (v1+v2).Pt();
             //z_max_pt = z1_pt<z2_pt ? z2_pt : z1_pt; 
             z_min_pt = z1_pt>z2_pt ? z2_pt : z1_pt;
-        
+
+	    rhoZZ = (l1+l2+v1+v2).Pt() / (l1.Pt() + l2.Pt() + v1.Pt() + v2.Pt()); 
+
             if(debug) {
               std::cout << std::endl; 
               std::cout << " *** Zll pt: " << z1_pt << ";  Zvv: " << z2_pt << ";  Zmin: " << z_min_pt << std::endl; 
@@ -771,24 +778,24 @@ int main(int argc, char* argv[])
         
             if( !useEwkTable ) { 
               //Reading by eye from the paper
-              if(     z_min_pt<60.)  ewk_w = 1.-( 4.0/100.) + ggZZ_contr; // N.B.: ggZZ_contr = 0 
-              else if(z_min_pt<80.)  ewk_w = 1.-( 5.0/100.) + ggZZ_contr;
-              else if(z_min_pt<100.) ewk_w = 1.-( 6.3/100.) + ggZZ_contr;
-              else if(z_min_pt<120.) ewk_w = 1.-( 7.6/100.) + ggZZ_contr;
-              else if(z_min_pt<140.) ewk_w = 1.-( 9.2/100.) + ggZZ_contr;
-              else if(z_min_pt<160.) ewk_w = 1.-(10.0/100.) + ggZZ_contr;
-              else if(z_min_pt<180.) ewk_w = 1.-(11.4/100.) + ggZZ_contr;
-              else if(z_min_pt<200.) ewk_w = 1.-(12.8/100.) + ggZZ_contr;
-              else if(z_min_pt<220.) ewk_w = 1.-(14.2/100.) + ggZZ_contr;
-              else if(z_min_pt<240.) ewk_w = 1.-(15.6/100.) + ggZZ_contr;
-              else if(z_min_pt<260.) ewk_w = 1.-(17.0/100.) + ggZZ_contr;
-              else if(z_min_pt<280.) ewk_w = 1.-(18.4/100.) + ggZZ_contr;
-              else if(z_min_pt<300.) ewk_w = 1.-(20.0/100.) + ggZZ_contr;
-              else if(z_min_pt<320.) ewk_w = 1.-(21.2/100.) + ggZZ_contr;
-              else if(z_min_pt<340.) ewk_w = 1.-(22.4/100.) + ggZZ_contr;
-              else if(z_min_pt<360.) ewk_w = 1.-(23.6/100.) + ggZZ_contr;
-              else if(z_min_pt<380.) ewk_w = 1.-(24.8/100.) + ggZZ_contr;
-              else                   ewk_w = 1.-(26.0/100.) + ggZZ_contr;
+              if(     z_min_pt<60.)  ewk_w = 1.-( 4.0/100.); 
+              else if(z_min_pt<80.)  ewk_w = 1.-( 5.0/100.);
+              else if(z_min_pt<100.) ewk_w = 1.-( 6.3/100.);
+              else if(z_min_pt<120.) ewk_w = 1.-( 7.6/100.);
+              else if(z_min_pt<140.) ewk_w = 1.-( 9.2/100.);
+              else if(z_min_pt<160.) ewk_w = 1.-(10.0/100.);
+              else if(z_min_pt<180.) ewk_w = 1.-(11.4/100.);
+              else if(z_min_pt<200.) ewk_w = 1.-(12.8/100.);
+              else if(z_min_pt<220.) ewk_w = 1.-(14.2/100.);
+              else if(z_min_pt<240.) ewk_w = 1.-(15.6/100.);
+              else if(z_min_pt<260.) ewk_w = 1.-(17.0/100.);
+              else if(z_min_pt<280.) ewk_w = 1.-(18.4/100.);
+              else if(z_min_pt<300.) ewk_w = 1.-(20.0/100.);
+              else if(z_min_pt<320.) ewk_w = 1.-(21.2/100.);
+              else if(z_min_pt<340.) ewk_w = 1.-(22.4/100.);
+              else if(z_min_pt<360.) ewk_w = 1.-(23.6/100.);
+              else if(z_min_pt<380.) ewk_w = 1.-(24.8/100.);
+              else                   ewk_w = 1.-(26.0/100.);
             } // end "if not useEwkTable" 
           } // end "foundNeut2 and foundLept2" 
           else { 
@@ -802,8 +809,8 @@ int main(int argc, char* argv[])
 
         } // end "if isMC and is ZZ" 
         
-        // Apply EWK + NNLO k-factor weight 
-        weight *= ewk_w * qqZZ_NNLO; 
+        // Apply EWK + NNLO k-factor weight to qqZZ, then add ggZZ contribution (ggZZ_contr must be ~0.10) 
+        weight *= (ewk_w * qqZZ_NNLO + ggZZ_contr); 
         
 
 
@@ -1467,11 +1474,23 @@ int main(int argc, char* argv[])
 	      Hcutflow->Fill(8, iweight); 
 	    }
 
+	    // 
+	    //// N.B.: weight *= (ewk_w * qqZZ_NNLO + ggZZ_contr) 
+	    // 
+
 	    /// * 5 * 
-	    else if(isMC_ZZ && varNames[ivar]=="_ewkup"  ) { iweight /= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk up 
+	    else if(isMC_ZZ && varNames[ivar]=="_ewkup"  ) { // Ewk up 
+	      iweight /= (ewk_w * qqZZ_NNLO + ggZZ_contr);    // remove the qqZZ NNLO, ggZZ, and EWK weights  
+	      float newEwk_w = ewk_w;  newEwk_w /= (rhoZZ<0.3 ? (1. - (1.6 - 1.)*(1. - ewk_w)) : ewk_w); 
+	      iweight *= (newEwk_w * qqZZ_NNLO + ggZZ_contr); // put back the qqZZ NNLO, ggZZ, and modified EWK weights 
+	    } 
 
 	    /// * 6 * 
-	    else if(isMC_ZZ && varNames[ivar]=="_ewkdown") { iweight *= (1. + (1.56 - 1.)*(1. - ewk_w)); } // Ewk down
+	    else if(isMC_ZZ && varNames[ivar]=="_ewkdown") { // Ewk down
+	      iweight /= (ewk_w * qqZZ_NNLO + ggZZ_contr);    // remove the qqZZ NNLO, ggZZ, and EWK weights  
+	      float newEwk_w = ewk_w;  newEwk_w *= (rhoZZ<0.3 ? (1. - (1.6 - 1.)*(1. - ewk_w)) : ewk_w); 
+	      iweight *= (newEwk_w * qqZZ_NNLO + ggZZ_contr); // put back the qqZZ NNLO, ggZZ, and modified EWK weights 
+	    } 
 
 	    // WZ: assign 100% uncertainty (TEMPORARY) 
 	    /// * 7 * 
@@ -1480,6 +1499,18 @@ int main(int argc, char* argv[])
 	    /// * 8 * 
 	    //else if(isMC_WZ && varNames[ivar]=="_ewkdown") { iweight *= ewk_w; } // Ewk down
 	    // //if(varNames[ivar]=="_ewkdown") { iweight /= ewk_w; iweight *=(1-(1-EWK_w)*2);} // Ewk down 2012 
+
+	    /// * 9 * 
+	    else if(isMC_ZZ && varNames[ivar]=="_nnloqcdup"  ) { // NNLO QCD up 
+	      iweight /= (ewk_w * qqZZ_NNLO             + ggZZ_contr); // remove the ggZZ, EWK, and qqZZ NNLO weights 
+	      iweight *= (ewk_w * qqZZ_NNLO * qqZZ_NNLO + ggZZ_contr); // put back the ggZZ, EWK, and modified qqZZ NNLO weights 
+	    } 
+
+	    /// * 10 * 
+	    else if(isMC_ZZ && varNames[ivar]=="_nnloqcddown") { // NNLO QCD down
+	      iweight /= (ewk_w * qqZZ_NNLO + ggZZ_contr); // remove the ggZZ, EWK, and qqZZ NNLO weights 
+	      iweight *= (ewk_w             + ggZZ_contr); // put back the ggZZ, EWK, and modified qqZZ NNLO weights 
+	    } 
 
 	  } // end if(isSignal || isMC_ZZ || isMC_WZ)
 
