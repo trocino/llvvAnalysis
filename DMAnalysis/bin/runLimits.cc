@@ -615,7 +615,7 @@ Shape_t getShapeFromFile(TFile* inF, TString ch, TString shapeName, int cutBin, 
             TH1D* hshape   = NULL;
 
             TString varName = syst->GetXaxis()->GetBinLabel(ivar);
-	    if( varName.BeginsWith("_pdf") || varName.BeginsWith("_qcd") ) continue; // D.T. temp: don't use shapes for PDF and QCD uncert. 
+	    if( varName.BeginsWith("_pdf") || varName.BeginsWith("_qcd") || varName.BeginsWith("_nnloqcd") ) continue; // D.T. temp: don't use shapes for PDF and QCD uncertainties, NNLO QCD k-factors 
             TString histoName = ch+"_"+shapeName+varName ;
             TH2* hshape2D = (TH2*)pdir->Get(histoName );
             if(!hshape2D) {
@@ -2280,7 +2280,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 fprintf(pFile,"%45s %10s ", "UEPS", "lnN");
                 for(size_t j=1; j<=dci.procs.size(); j++) {
                     if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
-                    if(!dci.procs[j-1].Contains("EM")) {
+                    //if(!dci.procs[j-1].Contains("EM")) {
+                    if(dci.procs[j-1].Contains("ZH")) {
                         fprintf(pFile,"%6f ",1.03);
                     } else {
                         fprintf(pFile,"%6s ","-");
@@ -2920,6 +2921,21 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
                 if(dci.procs[j-1].BeginsWith("ZH")) {
 		  fprintf(pFile,"%6f ",1.0020); // unblinding (varies with m(H)...) 
+                } else {
+                    fprintf(pFile,"%6s ","-");
+                }
+            }
+            fprintf(pFile,"\n");
+
+
+	    // --------------- 
+	    // gg->ZZ 
+            fprintf(pFile,"%45s %10s ", "CMS_zllhinv_ggZZCorr", "lnN");
+            for(size_t j=1; j<=dci.procs.size(); j++) {
+                //cout << "pdf_qqbar: dci.procs[j-1] " << dci.procs[j-1] << endl;
+                if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
+                if(dci.procs[j-1].BeginsWith("zz") || dci.procs[j-1].BeginsWith("ZZ")) {
+		  fprintf(pFile,"%6f ",1.100); // unblinding (varies with m(H)...) 
                 } else {
                     fprintf(pFile,"%6s ","-");
                 }
