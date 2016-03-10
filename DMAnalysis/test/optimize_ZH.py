@@ -43,9 +43,9 @@ LandSArg+=' --bins eq0jets,eq1jets'
 DataCardsDir='cards'
 
 #MASS = [ 400, 500, 600 ] 
-#MASS = [ 110, 125, 150, 200, 300, 400, 500, 600 ] 
+MASS = [ 110, 125, 150, 200, 300, 400, 500, 600 ] 
 #MASS = [ 110, 150, 200, 300, 400, 500, 600 ] 
-MASS = [ 125 ] 
+#MASS = [ 125 ] 
 SUBMASS = MASS
 
 cl=0.95

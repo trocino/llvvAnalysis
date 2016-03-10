@@ -368,7 +368,7 @@ void makeBetterLimitPlot(string folder)
     mg->GetXaxis()->SetTitleOffset(1.1);
     //if(normalizePlot) mg->GetYaxis()->SetTitle("95% CL limit on #Lambda [GeV]");
     //else              mg->GetYaxis()->SetTitle("95% CL limit on #sigma#timesBR [fb]");
-    mg->GetYaxis()->SetTitle("95% CL limit on #sigma #times B(inv) [fb]");
+    mg->GetYaxis()->SetTitle("95% CL limit on #sigma_{qq #rightarrow ZH} #times #it{B}_{inv} [fb]");
     //mg->GetYaxis()->SetTitle("95% CL limit on #sigma(pp #rightarrow ZH #rightarrow l^{+}l^{#minus} + inv) #times B(inv) [fb]");
     mg->GetYaxis()->SetTitleSize(0.055);
     mg->GetYaxis()->SetTitleOffset(1.35);

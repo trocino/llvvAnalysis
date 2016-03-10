@@ -2820,7 +2820,8 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                         fprintf(pFile,"%6f ",1.055);
                     } else {
 		      //fprintf(pFile,"%6f ",1.055); // pre-approval
-		      fprintf(pFile,"%6f ",1.047); // unblinding 
+		      //fprintf(pFile,"%6f ",1.047); // unblinding 
+		      fprintf(pFile,"%6f ",1.0179); // final PAS 
                     }
                 } else if(dci.procs[j-1].BeginsWith("ZZ") || dci.procs[j-1].BeginsWith("zz")) {
                     if(systpostfix.Contains('8')) {
@@ -2858,9 +2859,11 @@ std::vector<TString>  buildDataCard(TString atgcpar, Int_t mass, TString histo, 
                 if(dci.procs[j-1].BeginsWith("ZH")) {
 		  fprintf(pFile,"%6f ",1.0025); // unblinding 
                 } else if(dci.procs[j-1].BeginsWith("ZZ") || dci.procs[j-1].BeginsWith("zz")) {
-		  fprintf(pFile,"%6f ",1.038); // unblinding 
+		  //fprintf(pFile,"%6f ",1.038); // unblinding 
+		  fprintf(pFile,"%6f ",1.0162); // final PAS 
                 } else if(dci.procs[j-1].BeginsWith("WZ") || dci.procs[j-1].BeginsWith("wz")) {
-		  fprintf(pFile,"%6f ",1.048); // unblinding 
+		  //fprintf(pFile,"%6f ",1.048); // unblinding 
+		  fprintf(pFile,"%6f ",1.0157); // final PAS 
                 } else {
                     fprintf(pFile,"%6s ","-");
                 }

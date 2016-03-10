@@ -347,7 +347,7 @@ int main(int argc, char* argv[])
 
     mon.addHistogram( new TH1F( "zmass_presel",    ";#it{m}_{ll} [GeV];Events", 50,91-15,91+15) );
     mon.addHistogram( new TH1F( "zpt_presel",    ";#it{p}_{T}^{ll} [GeV];Events / 10 GeV", 45,50,500) );
-    mon.addHistogram( new TH1F( "zpt2_presel",    ";#it{p}_{T}^{ll} [GeV];Events / 10 GeV", nBinsPT, MTBins) );
+    mon.addHistogram( new TH1F( "zpt2_presel",    ";#it{p}_{T}^{ll} [GeV];Events / 10 GeV", nBinsPT, PTBins) );
     mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
     mon.addHistogram( new TH1F( "pfmetCtrl_presel",     ";E_{T}^{miss} [GeV];Events / 5 GeV", 20, 0, 100));
@@ -395,6 +395,10 @@ int main(int argc, char* argv[])
 
 
     mon.addHistogram( new TH1F( "mt_final",             ";m_{T} [GeV];Events", nBinsMT, MTBins) );
+    //TH1F *mt_pdferrsup   = (TH1F*) mon.addHistogram( new TH1F( "mt_final_pdferrorup",   ";m_{T} [GeV];PDF uncert. (RMS)", nBinsMT, MTBins) ); 
+    //TH1F *mt_pdferrsdown = (TH1F*) mon.addHistogram( new TH1F( "mt_final_pdferrordown", ";m_{T} [GeV];PDF uncert. (RMS)", nBinsMT, MTBins) ); 
+    //TH2F *mt_pdfvars = (TH2F*) 
+    mon.addHistogram( new TH2F( "mt_final_pdfvars", ";NNPDF replica;m_{T} [GeV];Events", 102, -0.5, 101.5, nBinsMT, MTBins) ); // Temporary for PDF uncert. 
     mon.addHistogram( new TH1F( "mt_final120",             ";m_{T} [GeV];Events", nBinsMT, MTBins) );
     mon.addHistogram( new TH1F( "pfmet_final",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
     mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
@@ -1313,6 +1317,7 @@ int main(int argc, char* argv[])
                                             mon.fillHisto("eventflow_unweighted",  tags, 9, 1.);
 
                                             mon.fillHisto("mt_final",   tags, MT_massless, weight);
+					    //mon.fillHisto("mt_final_pdferrorup",   tags, MT_massless, weight);
                                             mon.fillHisto("pfmet_final",tags, metP4_final.pt(), weight);
                                             mon.fillHisto("pfmet2_final",tags, metP4_final.pt(), weight);
                                             if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
@@ -1432,6 +1437,8 @@ int main(int argc, char* argv[])
 	      for(size_t i=9; i<=108; ++i) { 
 		meanPDFweight += ev.lheWeights[i]/ev.lheOriginalWeight; 
 		rmsPDFweight  += ev.lheWeights[i]*ev.lheWeights[i]/pow(ev.lheOriginalWeight,2); 
+
+		if(varNames[ivar]=="_pdfup") mon.fillHisto("mt_final_pdfvars", tags, i-9, MT_massless, (iweight * ev.lheWeights[i]/ev.lheOriginalWeight));
 	      } 
 	      meanPDFweight /= 100.; 
 	      rmsPDFweight = sqrt( rmsPDFweight/100. - meanPDFweight*meanPDFweight ); // should still be multiplied by 100./99. 
@@ -1443,6 +1450,9 @@ int main(int argc, char* argv[])
 	      if(varNames[ivar]=="_pdfup") { 
 		iweight *= (1. + pdfAsVar); 
 		Hcutflow->Fill(5, iweight); 
+
+		mon.fillHisto("mt_final_pdfvars", tags, 100., MT_massless, (iweight * 1.5 * ev.lheWeights[109]/ev.lheOriginalWeight)); 
+		mon.fillHisto("mt_final_pdfvars", tags, 101., MT_massless, (iweight * 1.5 * ev.lheWeights[110]/ev.lheOriginalWeight)); 
 	      } 
 	      else { 
 		iweight *= (1. - pdfAsVar); 
@@ -1656,8 +1666,29 @@ int main(int argc, char* argv[])
 
     } // loop on all events END
 
+    /*
+    for(size_t j=1; j<=nBinsMT; ++j) { 
+      float meanPDFweight(0.); 
+      float rmsPDFweight(0.); 
 
+      for(size_t i=1; i<=100; ++i) { 
+	meanPDFweight += mt_pdfvars->GetBinContent(i, j); 
+	rmsPDFweight  += pow(mt_pdfvars->GetBinContent(i, j), 2); 
+      } 
 
+      meanPDFweight /= 100.; 
+      rmsPDFweight = sqrt( rmsPDFweight/100. - meanPDFweight*meanPDFweight ); // should still be multiplied by 100./99. 
+      rmsPDFweight /= meanPDFweight; // I want the relative error 
+
+      float avgASvar = fabs(mt_pdfvars->GetBinContent(101, j) - mt_pdfvars->GetBinContent(102, j)) / (mt_pdfvars->GetBinContent(101, j) + mt_pdfvars->GetBinContent(102, j)); 
+      float pdfAsVar = sqrt(rmsPDFweight*rmsPDFweight + avgASvar*avgASvar); 
+      pdfAsVar = (pdfAsVar>1. ? 1. : pdfAsVar); 
+
+      float tmpBincont = mt_pdferrsup->GetBinError(j);  
+      mt_pdferrsup->SetBinContent(j, tmpBincont*(1.+pdfAsVar)); 
+      mt_pdferrsdown->SetBinContent(j, tmpBincont/(1.+pdfAsVar)); 
+    }
+    */
 
     printf("\n");
     file->Close();

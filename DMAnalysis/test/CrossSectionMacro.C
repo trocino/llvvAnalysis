@@ -22,7 +22,7 @@ void extendXlimit(TH1D*&, double);
 void changeFirstPoint(TH1D*&, double, double); 
 
 void CrossSectionMacro(bool plot0jets=true, bool isnormalized=false, bool islogy=false) {
-  TString indir = "analysis_freezeApproval_20160223_1312/limits_shape/cardsShape/125/"; 
+  TString indir = "analysis_approval_20160302_1536/limits_shape/cardsShape/125/"; 
   ifstream infile;
   bool saveplots = true; 
 

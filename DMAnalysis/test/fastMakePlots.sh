@@ -11,19 +11,21 @@ fi
 output="$2" 
 
 main="${CMSSW_BASE}/src/llvvAnalysis/DMAnalysis"
-json="$main/data/sample_13TeV_25ns_ZHinv_plot_15Feb2016.json"
+json="$main/data/sample_13TeV_25ns_ZHinv_plot_08Mar2016_forAddditionalMaterial.json"
 Ecm="13"
-Lumi="2263.55"
+#Lumi="2263.55"
+Lumi="2315.612"
 
 onlyplots="--channel all_ --channel ee --channel mumu --channel emu --channel ll --only raw --only presel --only final --only flow "
 runPlotter --json $json --inDir $input --outDir $output --outFile $output/plotter.root $onlyplots --iEcm $Ecm --iLumi $Lumi   
 
 ### Remove data final plots
-#onlyplots=" --channel all_ --channel ee --channel mumu --only final --isDataBlind "
+onlyplots=" --channel all_ --channel ee --channel mumu --channel ll --only mt2_presel --only dphiZMET_presel --only balancedif_presel --only zpt2_presel "
 
 ### Limits
-onlyplots=" --channel all_ --channel lleq0jets --channel lleq1jets --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes --only cutflow "
-output=${output/all/limits}
+#onlyplots=" --channel all_ --channel lleq0jets --channel lleq1jets --channel eeeq0jets  --channel mumueq0jets --channel emueq0jets --channel eeeq1jets  --channel mumueq1jets --channel emueq1jets  --only cut1 --only optim_systs --only mt_shapes --only cutflow "
+#output=${output/all/limits}
+
 runPlotter --json $json --inDir $input --outDir $output --outFile $output/plotter.root $onlyplots --iEcm $Ecm --iLumi $Lumi   
 
 
