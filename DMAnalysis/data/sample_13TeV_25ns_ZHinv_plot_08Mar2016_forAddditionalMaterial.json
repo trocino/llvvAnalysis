@@ -3,9 +3,6 @@
         {
             "isdata": false, 
             "color": "842", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "ZZ", 
             "marker": 842, 
             "data": [
@@ -38,9 +35,6 @@
         {
             "isdata": false, 
             "color": "856", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "WZ", 
             "marker": 856, 
             "data": [
@@ -57,9 +51,6 @@
         {
             "isdata": false, 
             "color": "832", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "VVV", 
             "marker": 832, 
             "data": [
@@ -92,9 +83,6 @@
         {
             "isdata": false, 
             "color": "400", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "W+jets", 
             "marker": 400, 
             "data": [
@@ -111,10 +99,7 @@
         {
             "isdata": false, 
             "color": "798", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
-            "tag": "WW#rightarrow l#nul#nu", 
+            "tag": "WW", 
             "marker": 798, 
             "data": [
                 {
@@ -130,9 +115,6 @@
         {
             "isdata": false, 
             "color": "876", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "Single top", 
             "marker": 876, 
             "data": [
@@ -156,9 +138,6 @@
         {
             "isdata": false, 
             "color": "885", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "t#bar{t}", 
             "marker": 885, 
             "data": [
@@ -191,9 +170,6 @@
         {
             "isdata": false, 
             "color": "900", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "Multijets", 
             "marker": 900, 
             "data": [
@@ -410,9 +386,6 @@
         {
             "isdata": false, 
             "color": "901", 
-            "lcolor": "0", 
-            "lwidth": "0", 
-            "lstyle": "0", 
             "tag": "Z+jets", 
             "marker": 901, 
             "data": [
@@ -509,8 +482,8 @@
             "issignal": true, 
             "lcolor": "809", 
             "spimpose": true, 
-            "tag": "ZH125", 
-            "lstyle": 8, 
+            "tag": "Higgs", 
+            "lstyle": 1, 
             "lwidth": 2, 
             "marker": 809, 
             "data": [

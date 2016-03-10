@@ -1332,7 +1332,8 @@ TString getChannelName(std::string SaveName){
    if(SaveName.find("emugeq2jets") != string::npos)     {Buffer2="#it{e#mu, #geq 2 jets channel}";}
    if(SaveName.find("lleq0jets") != string::npos)       {Buffer2="#it{ee,#mu#mu, 0 jets channel}";}
    if(SaveName.find("lleq1jets") != string::npos)       {Buffer2="#it{ee,#mu#mu, 1 jets channel}";}
-   if(SaveName.find("lllesq1jets") != string::npos)     {Buffer2="#it{ee,#mu#mu, #leq 1 jets channel}";}
+   //if(SaveName.find("lllesq1jets") != string::npos)     {Buffer2="#it{ee,#mu#mu, #leq 1 jets channel}";}
+   if(SaveName.find("lllesq1jets") != string::npos)     {Buffer2="ee,#mu#mu, 0/1 jets";} // consistency with rest of the PAS 
    if(SaveName.find("llgeq2jets") != string::npos)      {Buffer2="#it{ee,#mu#mu, #geq 2 jets channel}";}
    if(SaveName.find("ee") != string::npos && SaveName.find("eq0jets") == string::npos
         && SaveName.find("eq1jets") == string::npos && SaveName.find("lesq1jets") == string::npos
