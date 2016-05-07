@@ -2419,14 +2419,11 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                 //add the background estimate
 
                 double dataDrivenScale(1.0);
-                double dataDarvenScale_err(1.0);
                 if(selCh[i].Contains("ee")) {
                     dataDrivenScale = N_est_ee/N_mc_ee;
-                    dataDarvenScale_err = dataDrivenScale*sqrt(pow(Err_est_ee/N_est_ee,2)+pow(Err_mc_ee/N_mc_ee,2));
                 }
                 if(selCh[i].Contains("mumu")) {
                     dataDrivenScale = N_est_mm/N_mc_mm;
-                    dataDarvenScale_err = dataDrivenScale*sqrt(pow(Err_est_mm/N_est_mm,2)+pow(Err_mc_mm/N_mc_mm,2));
                 }
 
                 cout << "DATA/MC scale factors: " << dataDrivenScale << endl;
@@ -2435,19 +2432,21 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                     double val = NonResonant->GetBinContent(b);
                     double newval = val*dataDrivenScale;
                     double err = NonResonant->GetBinError(b);
-                    double newerr = newval*sqrt(pow(err/val,2)+pow(dataDarvenScale_err/dataDrivenScale,2));
+                    // Daniele's way (error on dataDrivenScale goes into the nirmalization error, later on)
+                    double newerr = err*dataDrivenScale;
 
                     NonResonant->SetBinContent(b, newval );
                     if(newval!=0)NonResonant->SetBinError(b, newerr );
                 }
 
+                // Daniele's way: systematic uncertainty is from control region sample (possibly summed in quadrature with MC closure test)
                 double Syst_WWTop(0.);
-                if(labelChan.Contains("eeeq0jets")) 	Syst_WWTop = WWtopSyst_ee0jet;
-                if(labelChan.Contains("mumueq0jets")) 	Syst_WWTop = WWtopSyst_mm0jet;
-                if(labelChan.Contains("eeeq1jets")) 	Syst_WWTop = WWtopSyst_ee1jet;
-                if(labelChan.Contains("mumueq1jets")) 	Syst_WWTop = WWtopSyst_mm1jet;
-                if(labelChan.Contains("eelesq1jets")) 	Syst_WWTop = WWtopSyst_eelesq1jet;
-                if(labelChan.Contains("mumulesq1jets")) 	Syst_WWTop = WWtopSyst_mmlesq1jet;
+                if(labelChan.Contains("eeeq0jets")) 	Syst_WWTop = sqrt( pow(Err_est_ee/N_est_ee, 2) + pow(WWtopSyst_ee0jet, 2) );
+                if(labelChan.Contains("mumueq0jets")) 	Syst_WWTop = sqrt( pow(Err_est_mm/N_est_mm, 2) + pow(WWtopSyst_mm0jet, 2) );
+                if(labelChan.Contains("eeeq1jets")) 	Syst_WWTop = sqrt( pow(Err_est_ee/N_est_ee, 2) + pow(WWtopSyst_ee1jet, 2) );
+                if(labelChan.Contains("mumueq1jets")) 	Syst_WWTop = sqrt( pow(Err_est_mm/N_est_mm, 2) + pow(WWtopSyst_mm1jet, 2) );
+                if(labelChan.Contains("eelesq1jets")) 	Syst_WWTop = sqrt( pow(Err_est_ee/N_est_ee, 2) + pow(WWtopSyst_eelesq1jet, 2) );
+                if(labelChan.Contains("mumulesq1jets")) Syst_WWTop = sqrt( pow(Err_est_mm/N_est_mm, 2) + pow(WWtopSyst_mmlesq1jet, 2) );
 
 
                 cout << "labelchan: " << labelChan << " >>> Adding syst: " << Syst_WWTop << endl;
