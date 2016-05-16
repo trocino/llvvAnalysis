@@ -1,8 +1,7 @@
 import shutil
 import os
 import subprocess
-inputpath = '/.automount/home/home__home1/institut_3a/albert/repos/llvv/CMSSW_8_0_4/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV.txt'
-#~ toppath = ''
+inputpath = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV.txt' )
 
 with open('/.automount/home/home__home1/institut_3a/albert/repos/crabcfg/crab_template_cfg.py', 'r') as f:
     template = f.read()
@@ -11,7 +10,7 @@ outtag = 'RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3'
 
 outpath = '/store/user/aalbert/crab/llvv_80/'
 workarea = '/disk1/albert/crab/llvv_80/'
-configfile = '/.automount/home/home__home1/institut_3a/albert/repos/llvv/CMSSW_8_0_4/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg.py'
+configfile = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg.py' )
 filesperjob = 3
 test = 0;
 
@@ -21,7 +20,7 @@ datasets = []
 with open(inputpath,'r') as f:
     for l in f.readlines():
         if(':' in l):
-            datasets.append( tuple(l.split(':')) )
+            datasets.append( tuple(l.rstrip('\n').split(':')) )
 
 ### For each dataset
 ###     create a separate subfolder
