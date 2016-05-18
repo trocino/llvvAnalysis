@@ -19,6 +19,23 @@
     },
     {
       "isdata": false,
+      "color": "845",
+      "lcolor": "1",
+      "tag": "ggToZZ#rightarrow 2l2#nu",
+      "marker": 845,
+      "data": [
+        {
+          "dtag": "MC13TeV_ggToZZTo2L2Nu",
+          "xsec": 0.0344,
+          "split": 14,
+          "br": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "isdata": false,
       "color": "856",
       "lcolor": "1",
       "tag": "WZ#rightarrow 3l#nu",

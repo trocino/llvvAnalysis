@@ -53,6 +53,31 @@
     },
     {
       "isdata": false,
+      "color": "845",
+      "lcolor": "1",
+      "tag": "ggToZZ#rightarrow 2l2#nu",
+      "marker": 842,
+      "data": [
+        {
+          "dtag": "MC13TeV_ggToZZTo2e2nu",
+          "xsec": 0.00172,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo2mu2nu",
+          "xsec": 0.00172,
+          "split": 1,
+          "br": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "isdata": false,
       "color": "832",
       "lcolor": "1",
       "tag": "VVV",
@@ -94,6 +119,54 @@
           "dtag": "MC13TeV_ZZTo2L2Q",
           "xsec": 3.22,
           "split": 10,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo2e2mu",
+          "xsec": 0.00319,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo2mu2tau",
+          "xsec": 0.00319,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo2e2tau",
+          "xsec": 0.00319,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo4e",
+          "xsec": 0.001586,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo4mu",
+          "xsec": 0.001586,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo4tau",
+          "xsec": 0.001586,
+          "split": 1,
           "br": [
             1
           ]
