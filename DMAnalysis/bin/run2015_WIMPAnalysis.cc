@@ -844,16 +844,10 @@ int main(int argc, char* argv[])
             double dPhiZZ = deltaPhi((phys.genleptons[0]+phys.genleptons[1]).Phi(), (phys.genneutrinos[0]+phys.genneutrinos[1]).Phi());
             double qqZZ_NNLO = kfactor_qqZZ_qcd_dPhi(dPhiZZ);
 
-            //double qqZZwgt = (weight * qqZZ_EWKNLO * qqZZ_NNLO); //qqZZ
-            //double ggZZwgt = (weight * 0.1); // ggZZ: an extra 10% to account for gg->ZZ contribution
-            //weight = qqZZwgt+ggZZwgt;
-            weight *= (0.1 + qqZZ_EWKNLO * qqZZ_NNLO);
+            weight *= qqZZ_EWKNLO * qqZZ_NNLO;
 
-            float newEwk_up   = qqZZ_EWKNLO / (rhoZZ<0.3 ? (1. - (1.6 - 1.)*(1. - qqZZ_EWKNLO)) : qqZZ_EWKNLO);
-            float newEwk_down = qqZZ_EWKNLO * (rhoZZ<0.3 ? (1. - (1.6 - 1.)*(1. - qqZZ_EWKNLO)) : qqZZ_EWKNLO);
-
-            weight_ewkup   = (0.1 + newEwk_up * qqZZ_NNLO)  /(0.1 + qqZZ_EWKNLO * qqZZ_NNLO);
-            weight_ewkdown = (0.1 + newEwk_down * qqZZ_NNLO)/(0.1 + qqZZ_EWKNLO * qqZZ_NNLO);
+            weight_ewkup   = 1 /  (rhoZZ<0.3 ? (1. - (1.6 - 1.)*(1. - qqZZ_EWKNLO)) : qqZZ_EWKNLO);
+            weight_ewkdown = 1 *  (rhoZZ<0.3 ? (1. - (1.6 - 1.)*(1. - qqZZ_EWKNLO)) : qqZZ_EWKNLO);
         }
 
 

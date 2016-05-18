@@ -1124,17 +1124,6 @@ std::vector<TString>  buildDataCard(Int_t mass, TString histo, TString url, TStr
                 fprintf(pFile,"\n");
             }
 
-            fprintf(pFile,"%45s %10s ", "Norm_ggZZ", "lnN");
-            for(size_t j=1; j<=dci.procs.size(); j++) {
-                if(dci.procs[j-1].Contains("ZZ")) {
-                	fprintf(pFile,"%6.5f ",1.1);
-                } else {
-                    	fprintf(pFile,"%6s ","-");
-                }
-            }
-            fprintf(pFile,"\n");
-
-
             //leptont efficiency
             if(dci.ch[i-1].Contains("ee")) {
                 fprintf(pFile,"%45s %10s ", "CMS_eff_e", "lnN");
