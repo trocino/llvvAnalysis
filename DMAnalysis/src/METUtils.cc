@@ -46,6 +46,9 @@ double response(LorentzVector &Z, LorentzVector &MET)
 
 
 //Jet energy resoltuion, 13TeV scale factors, updated on 12/18/2015
+// mode:  1 -> Upwards variation
+//        2 -> Downwards variation
+//        anything else -> Nominal value
 PhysicsObject_Jet smearedJet(const PhysicsObject_Jet &origJet, double genJetPt, int mode)
 {
     if(genJetPt<=0) return origJet;
@@ -110,11 +113,10 @@ PhysicsObject_Jet smearedJet(const PhysicsObject_Jet &origJet, double genJetPt, 
     }
 
     if(mode==1) ptSF = ptSF_up;
-    if(mode==2) ptSF = ptSF_down;
-
+    else if(mode==2) ptSF = ptSF_down;
 
     ptSF=max(0.,(genJetPt+ptSF*(origJet.pt()-genJetPt)))/origJet.pt();                      //deterministic version
-    //ptSF=max(0.,(genJetPt+gRandom->Gaus(ptSF,ptSF_err)*(origJet.pt()-genJetPt)))/origJet.pt();  //deterministic version
+    // ptSF=max(0.,(genJetPt+gRandom->Gaus(ptSF,ptSF_err)*(origJet.pt()-genJetPt)))/origJet.pt();  //deterministic version
     if( ptSF<=0 /*|| isnan(ptSF)*/ ) return origJet;
 
     double px(origJet.px()*ptSF), py(origJet.py()*ptSF), pz(origJet.pz()*ptSF), mass(origJet.mass()*ptSF);
@@ -140,63 +142,85 @@ void computeVariation(PhysicsObjectJetCollection& jets,
 
     int vars[]= {JER, JER_UP,JER_DOWN, JES_UP,JES_DOWN, UMET_UP,UMET_DOWN, LES_UP,LES_DOWN};
     for(size_t ivar=0; ivar<sizeof(vars)/sizeof(int); ivar++) {
-        PhysicsObjectJetCollection newJets;
-        LorentzVector newMET(met), jetDiff(0,0,0,0), lepDiff(0,0,0,0), unclustDiff(0,0,0,0), clusteredFlux(0,0,0,0);
-        for(size_t ijet=0; ijet<jets.size(); ijet++) {
-            if(ivar==JER || ivar==JER_UP || ivar==JER_DOWN) {
-                PhysicsObject_Jet iSmearJet=METUtils::smearedJet(jets[ijet],jets[ijet].genPt,ivar);
-                jetDiff += (iSmearJet-jets[ijet]);
-                newJets.push_back( iSmearJet );
-            } else if(ivar==JES_UP || ivar==JES_DOWN) {
-                double varSign=(ivar==JES_UP ? 1.0 : -1.0 );
+
+        //// Perform JES variation
+        // The varied jets are stored in 'tempJets'
+        PhysicsObjectJetCollection tempJets;
+        LorentzVector jetDiff(0,0,0,0);
+        if(ivar==JES_UP || ivar==JES_DOWN) {
+            double varSign=(ivar==JES_UP ? 1.0 : -1.0 );
+            for(auto &jet:jets) {
                 double jetScale(1.0);
                 try {
-                    jecUnc->setJetEta(jets[ijet].eta());
-                    jecUnc->setJetPt(jets[ijet].pt());
+                    jecUnc->setJetEta(jet.eta());
+                    jecUnc->setJetPt(jet.pt());
                     jetScale = 1.0 + varSign*fabs(jecUnc->getUncertainty(true));
                 } catch(std::exception &e) {
-                    cout << "[METUtils::computeVariation]" << e.what() << ijet << " " << jets[ijet].pt() << endl;
+                    cout << "[METUtils::computeVariation]" << e.what() << " " << jet.pt() << endl;
                 }
-                PhysicsObject_Jet iScaleJet(jets[ijet]);
+                PhysicsObject_Jet iScaleJet(jet);
                 iScaleJet *= jetScale;
-                jetDiff += (iScaleJet-jets[ijet]);
-                newJets.push_back(iScaleJet);
-            } else if(ivar==UMET_UP || ivar==UMET_DOWN)  clusteredFlux += jets[ijet];
+                jetDiff += (iScaleJet-jet);
+                tempJets.push_back(iScaleJet);
+            }
+        } else {
+                tempJets = jets;
         }
 
-        if(ivar==UMET_UP || ivar==UMET_DOWN || ivar==LES_UP || ivar==LES_DOWN) {
-            for(size_t ilep=0; ilep<leptons.size(); ilep++) {
-                if(ivar==UMET_UP || ivar==UMET_DOWN)  clusteredFlux +=leptons[ilep];
-                else if(ivar==LES_UP  || ivar==LES_DOWN) {
-                    LorentzVector iScaleLepton=leptons[ilep];
+        //// Loop over the (potentially) JES corrected jets and perform JER smearing
+        // Smearing is applied to all variations.
+        // Which variation of JER smearing is performed is handled by the "mode" argument of METUtils::smearedJet.
+        // The smeared jets are stored in 'newJets'
+        PhysicsObjectJetCollection newJets;
+        for(auto &jet:tempJets) {
+            PhysicsObject_Jet iSmearJet=METUtils::smearedJet(jet,jet.genPt,ivar);
+            jetDiff += (iSmearJet-jet);
+            newJets.push_back( iSmearJet );
+        }
+        // The further steps do not change the jets, so we can return them already
+        jetsVar.push_back(newJets);
+
+
+        //// Unclustered MET variation
+        LorentzVector clusteredFlux(0,0,0,0), unclustDiff(0,0,0,0);
+        if(ivar==UMET_UP || ivar==UMET_DOWN) {
+            for(auto &jet:newJets) {
+                clusteredFlux += jet;
+            }
+            for(auto &lep:leptons) {
+                clusteredFlux += lep;
+            }
+            unclustDiff=(met+clusteredFlux);
+            double varSign=(ivar==UMET_UP ? 1.0 : -1.0);
+            unclustDiff *= (varSign*0.10); // 10% variation of residual recoil
+        }
+
+
+        //// LES Variation
+        LorentzVector lepDiff(0,0,0,0);
+        if( ivar==LES_UP || ivar==LES_DOWN) {
+            for(auto &lep:leptons) {
+                    LorentzVector iScaleLepton=lep;
                     double varSign=(ivar==LES_UP ? 1.0 : -1.0);
-                    if(fabs(leptons[ilep].id)==13)          iScaleLepton *= (1.0+varSign*0.01);
-                    else if(fabs(leptons[ilep].id)==11) {
-                        if(fabs(leptons[ilep].eta())<1.442) iScaleLepton *= (1.0+varSign*0.02);
-                        else                                iScaleLepton *= (1.0+varSign*0.05);
+                    if(fabs(lep.id)==13) {
+                        iScaleLepton *= (1.0+varSign*0.01);
+                    } else if(fabs(lep.id)==11) {
+                        if(fabs(lep.eta())<1.442) {
+                            iScaleLepton *= (1.0+varSign*0.02);
+                        } else {
+                            iScaleLepton *= (1.0+varSign*0.05);
+                        }
                     }
-                    lepDiff += (iScaleLepton-leptons[ilep]);
-                }
+                    lepDiff += (iScaleLepton-lep);
             }
         }
 
-        //vary unclustered component
-        if(ivar==UMET_UP || ivar==UMET_DOWN) {
-            unclustDiff=(met+clusteredFlux);
-            double varSign=(ivar==UMET_UP ? 1.0 : -1.0);
-            unclustDiff *= (varSign*0.10); //10% variation of residule recoil
-        }
-
-        //add new met
+        // Propagate changes to MET
+        LorentzVector newMET(met);
         newMET -= jetDiff;
         newMET -= lepDiff;
         newMET -= unclustDiff;
         metsVar.push_back(newMET);
-
-        //add new jets (if some change has occured)
-        jetsVar.push_back(newJets);
-
-
     }
 }
 
