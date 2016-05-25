@@ -3,20 +3,25 @@ import os
 import subprocess
 inputpath = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV.txt' )
 
-with open('/.automount/home/home__home1/institut_3a/albert/repos/crabcfg/crab_template_cfg.py', 'r') as f:
+### Read CRAB template config
+with open( os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/crab_template_cfg.py', 'r') )as f:
     template = f.read()
 
+### Input info for filling the template
 outtag = 'RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3'
-
 outpath = '/store/user/aalbert/crab/llvv_80/'
 workarea = '/disk1/albert/crab/llvv_80/'
-configfile = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg.py' )
 filesperjob = 3
-test = 0;
+
+### Config File to run via CRAB
+configfile = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg.py' )
+
+### Test Flag
+test = False;
 
 
-datasets = []
 ### Get datasets from input list
+datasets = []
 with open(inputpath,'r') as f:
     for l in f.readlines():
         if(':' in l):
