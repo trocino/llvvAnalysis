@@ -35,7 +35,7 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
                                                 ev.en_pileupIso[i],ev.en_chargedIso[i],ev.en_photonIso[i],ev.en_neutralHadIso[i],ev.en_relIsoWithEA[i],
                                                 ev.ta_IsLooseIso[i], ev.ta_IsMediumIso[i], ev.ta_IsTightIso[i]
                                                );
-
+            phys.leptons[nlep].setLeptonIPInfo(ev.mn_dZ[i], ev.mn_d0[i]);
             nlep++;
         }
     }

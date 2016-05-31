@@ -72,6 +72,10 @@ public :
 	ta_IsMediumIso = ta_IsMediumIso_;
 	ta_IsTightIso = ta_IsTightIso_;
     }
+    void setLeptonIPInfo(float mn_d0_, float mn_dZ_) {
+        mn_dZ = mn_dZ_;
+        mn_d0 = mn_d0_;
+    }
 
     float e_pfRelIsoDbeta() {
         return (en_chargedIso + TMath::Max(0., en_neutralHadIso + en_photonIso - 0.5 * en_pileupIso) )/pt();
@@ -92,6 +96,7 @@ public :
     float mn_pileupIso, mn_chargedIso, mn_photonIso, mn_neutralHadIso;
     float en_pileupIso, en_chargedIso, en_photonIso, en_neutralHadIso;
     float en_relIsoWithEA;
+    float mn_dZ, mn_d0;
     bool ta_IsLooseIso, ta_IsMediumIso, ta_IsTightIso;
 };
 
