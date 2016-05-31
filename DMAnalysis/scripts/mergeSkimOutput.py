@@ -105,8 +105,7 @@ def run( cmd ):
 
 def main():
    (options, inputpath) = parseCommandline()
-   jsonpath ='/.automount/home/home__home1/institut_3a/albert/repos/llvv/CMSSW_8_0_8/src/llvvAnalysis/DMAnalysis/data/sample_13TeV_25ns.json'
-   split_dict = get_split_dict( jsonpath )
+   split_dict = get_split_dict( os.path.expandvars( options.json ) )
 
    for part in inputpath.split('/'):
       if( 'crab_' in part ):
