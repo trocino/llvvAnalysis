@@ -1,23 +1,41 @@
 import shutil
 import os
 import subprocess
-inputpath = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV.txt' )
+import sys
 
-### Read CRAB template config
-with open( os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/crab_template_cfg.py', 'r') )as f:
-    template = f.read()
 
-### Input info for filling the template
-outtag = 'RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3'
-outpath = '/store/user/aalbert/crab/llvv_80/'
-workarea = '/disk1/albert/crab/llvv_80/'
-filesperjob = 3
-
-### Config File to run via CRAB
-configfile = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg.py' )
 
 ### Test Flag
 test = False;
+outpath = '/store/user/aalbert/crab/'
+workarea = '/disk1/albert/crab/'
+filesperjob = 3
+
+
+### Configuration dependent on the CMSSW version you sourced.
+cmssw = os.environ['CMSSW_VERSION']
+if( 'CMSSW_7_6' in cmssw ):
+    inputpath   = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV_76X.txt' )
+    configfile  = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg_76X.py' )
+    outtag      = 'RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12'
+    outpath     = os.path.join( outpath, 'llvv_76' )
+    workarea    = os.path.join( workarea, 'llvv_76' )
+elif( 'CMSSW_8_0' in cmssw ):
+    inputpath   = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV_80X.txt' )
+    configfile  = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg_80X.py' )
+    outtag      = 'RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3'
+    outpath     = os.path.join( outpath, 'llvv_80' )
+    workarea    = os.path.join( workarea, 'llvv_80' )
+else:
+    print "Unknown CMSSW version: %s" % cmssw
+    print "Exiting."
+    sys.exit(1)
+
+templatepath = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/crab_template_cfg.py')
+
+### Read CRAB template config
+with open( templatepath, 'r' )as f:
+    template = f.read()
 
 
 ### Get datasets from input list
