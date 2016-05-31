@@ -24,7 +24,7 @@ def parseCommandline():
    parser.add_option( '-j', '--jobs', metavar='NUMJOBS', type ='int', default=1,
                        help='Set the maximum number of parallel jobs to be ' \
                             'started [default = %default].' )
-   parser.add_option(       '--json',  default='$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV.txt',
+   parser.add_option(       '--json',  default='$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/sample_13TeV_25ns.json',
                        help='Set path to the json file to get splitting info from. [default = %default]' )
    parser.add_option( '-o', '--outpath', default='./out',
                        help='Set the output directory. [default = %default]' )
