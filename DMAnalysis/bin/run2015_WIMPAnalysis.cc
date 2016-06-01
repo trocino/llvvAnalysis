@@ -279,9 +279,7 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "zpt_raw",      ";#it{p}_{T}^{ll} [GeV];Events", 50,0,500) );
     mon.addHistogram( new TH1F( "pfmet_raw",    ";E_{T}^{miss} [GeV];Events", 50,0,500) );
     mon.addHistogram( new TH1F( "mt_raw",       ";#it{m}_{T} [GeV];Events", 100,0,2000) );
-    double MTBins[]= {0,10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,500,1000,2000};
-    const int nBinsMT = sizeof(MTBins)/sizeof(double) - 1;
-    mon.addHistogram( new TH1F( "mt2_raw",       ";#it{m}_{T} [GeV];Events", nBinsMT,MTBins) );
+
     mon.addHistogram( new TH1F( "zmass_raw",    ";#it{m}_{ll} [GeV];Events", 100,40,250) );
 
     mon.addHistogram( new TH2F( "ptlep1vs2_raw",";#it{p}_{T}^{l1} [GeV];#it{p}_{T}^{l2} [GeV];Events",250,0,500, 250,0,500) );
@@ -324,45 +322,35 @@ int main(int argc, char* argv[])
 
 
     // preselection plots
-    double METBins[]= {0,10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,500};
-    const int nBinsMET = sizeof(METBins)/sizeof(double) - 1;
-
-    double METBins2[]= {0,10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,500,1000};
-    const int nBinsMET2 = sizeof(METBins2)/sizeof(double) - 1;
-
-    //double METBins3[]= {0,40,50,60,120,260,1000};
-//    double METBins3[]= {0,10,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,500,1000};
-//    const int nBinsMET3 = sizeof(METBins3)/sizeof(double) - 1;
-
     double MET2Bins[]= {0,80,160,240,320,400,480,560,640,800,1200};
-    const int xnBinsMET2 = sizeof(MET2Bins)/sizeof(double) - 1;
+    const int nBinsMET2 = sizeof(MET2Bins)/sizeof(double) - 1;
 
     double MT2Bins[]= {0,100,200,300,400,500,600,700,800,1000,1200};
-    const int xnBinsMT2 = sizeof(MT2Bins)/sizeof(double) - 1;
+    const int nBinsMT2 = sizeof(MT2Bins)/sizeof(double) - 1;
 
-    mon.addHistogram( new TH1F( "pfmet_presel",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
-    mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
+    mon.addHistogram( new TH1F( "pfmet_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV",15,0,1200));
+    mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, MET2Bins));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
     mon.addHistogram( new TH1F( "balancedif_presel", ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events", 5,0,1.0) );
     mon.addHistogram( new TH1F( "mt_presel",         ";#it{m}_{T} [GeV];Events", 12,0,1200) );
-    mon.addHistogram( new TH1F( "mt2_presel",         ";#it{m}_{T} [GeV];Events", nBinsMT,MTBins) );
+    mon.addHistogram( new TH1F( "mt2_presel",         ";#it{m}_{T} [GeV];Events", nBinsMT2,MT2Bins) );
     mon.addHistogram( new TH1F( "axialpfmet_presel", ";Axial E_{T}^{miss} [GeV];Events", 50,-150,150) );
 
     //adding N-1 plots
     mon.addHistogram( new TH1F( "pfmet_nm1",       ";E_{T}^{miss} [GeV];Events / 80 GeV", 15,0,1200));
-    mon.addHistogram( new TH1F( "pfmet2_nm1",      ";E_{T}^{miss} [GeV];Events / 1 GeV", xnBinsMET2,MET2Bins));
+    mon.addHistogram( new TH1F( "pfmet2_nm1",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2,MET2Bins));
     mon.addHistogram( new TH1F( "mt_nm1",          ";#it{m}_{T} [GeV];Events / 100 GeV", 12,0,1200));
-    mon.addHistogram( new TH1F( "mt2_nm1",         ";#it{m}_{T} [GeV];Events / 1 GeV", xnBinsMT2,MT2Bins));
+    mon.addHistogram( new TH1F( "mt2_nm1",         ";#it{m}_{T} [GeV];Events / 1 GeV", nBinsMT2,MT2Bins));
 
     mon.addHistogram( new TH1F( "pfmet_met80",       ";E_{T}^{miss} [GeV];Events / 80 GeV", 15,0,1200));
-    mon.addHistogram( new TH1F( "pfmet2_met80",      ";E_{T}^{miss} [GeV];Events / 1 GeV", xnBinsMET2,MET2Bins));
+    mon.addHistogram( new TH1F( "pfmet2_met80",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2,MET2Bins));
     mon.addHistogram( new TH1F( "mt_met80",          ";#it{m}_{T} [GeV];Events / 100 GeV", 12,0,1200));
-    mon.addHistogram( new TH1F( "mt2_met80",         ";#it{m}_{T} [GeV];Events / 1 GeV", xnBinsMT2,MT2Bins));
+    mon.addHistogram( new TH1F( "mt2_met80",         ";#it{m}_{T} [GeV];Events / 1 GeV", nBinsMT2,MT2Bins));
 
     mon.addHistogram( new TH1F( "pfmet_met140",       ";E_{T}^{miss} [GeV];Events / 80 GeV", 15,0,1200));
-    mon.addHistogram( new TH1F( "pfmet2_met140",      ";E_{T}^{miss} [GeV];Events / 1 GeV", xnBinsMET2,MET2Bins));
+    mon.addHistogram( new TH1F( "pfmet2_met140",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2,MET2Bins));
     mon.addHistogram( new TH1F( "mt_met140",          ";#it{m}_{T} [GeV];Events / 100 GeV", 12,0,1200));
-    mon.addHistogram( new TH1F( "mt2_met140",         ";#it{m}_{T} [GeV];Events / 1 GeV", xnBinsMT2,MT2Bins));
+    mon.addHistogram( new TH1F( "mt2_met140",         ";#it{m}_{T} [GeV];Events / 1 GeV", nBinsMT2,MT2Bins));
 
 
 
@@ -375,13 +363,13 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "pfmetphi_wocorr",";#it{#phi}(E_{T}^{miss});Events", 50,-1.*TMath::Pi(),TMath::Pi()) );
     mon.addHistogram( new TH1F( "pfmetphi_wicorr",";#it{#phi}(E_{T}^{miss});Events", 50,-1.*TMath::Pi(),TMath::Pi()) );
 
-    mon.addHistogram( new TH1F( "pfmet_wicorr",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
-    mon.addHistogram( new TH1F( "pfmet2_wicorr",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
+    mon.addHistogram( new TH1F( "pfmet_wicorr",      ";E_{T}^{miss} [GeV];Events / 1 GeV", 15,0,1200));
+    mon.addHistogram( new TH1F( "pfmet2_wicorr",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, MET2Bins));
 
 
     // generator level plots
     mon.addHistogram( new TH1F( "pileup", ";pileup;Events", 50,0,50) );
-    mon.addHistogram( new TH1F( "met_Gen", ";#it{p}_{T}(#bar{#chi}#chi) [GeV];Events", nBinsMET, METBins) );
+    mon.addHistogram( new TH1F( "met_Gen", ";#it{p}_{T}(#bar{#chi}#chi) [GeV];Events", 15,0,1200) );
     mon.addHistogram( new TH1F( "met2_Gen", ";#it{p}_{T}(#bar{#chi}#chi) [GeV];Events", 500, 0,1000) );
     mon.addHistogram( new TH1F( "zpt_Gen", ";#it{p}_{T}(Z) [GeV];Events", 800,0,800) );
     mon.addHistogram( new TH1F( "dphi_Gen", ";#Delta#phi(Z,#bar{#chi}#chi) [rad];Events", 100,0,TMath::Pi()) );
@@ -413,8 +401,8 @@ int main(int argc, char* argv[])
 
     mon.addHistogram( new TH1F( "mt_final",             ";#it{m}_{T} [GeV];Events", 12,0,1200) );
     mon.addHistogram( new TH1F( "mt_final120",             ";#it{m}_{T} [GeV];Events", 12,0,1200) );
-    mon.addHistogram( new TH1F( "pfmet_final",      ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET, METBins));
-    mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, METBins2));
+    mon.addHistogram( new TH1F( "pfmet_final",      ";E_{T}^{miss} [GeV];Events / 1 GeV", 15,0,1200));
+    mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, MET2Bins));
 
 
 
@@ -507,10 +495,10 @@ int main(int argc, char* argv[])
 
         //1D shapes for limit setting
         mon.addHistogram( new TH2F (TString("mt_shapes")+varNames[ivar],";cut index; #it{m}_{T} [GeV];#Events (/100GeV)",nOptims,0,nOptims,  12,0,1200) );
-        mon.addHistogram( new TH2F (TString("mt2_shapes")+varNames[ivar],";cut index; #it{m}_{T} [GeV];#Events",nOptims,0,nOptims, xnBinsMT2,MT2Bins) );
+        mon.addHistogram( new TH2F (TString("mt2_shapes")+varNames[ivar],";cut index; #it{m}_{T} [GeV];#Events",nOptims,0,nOptims, nBinsMT2,MT2Bins) );
 
         mon.addHistogram( new TH2F (TString("met_shapes")+varNames[ivar],";cut index; E_{T}^{miss} [GeV];#Events (/80GeV)",nOptims,0,nOptims, 15,0,1200) );
-        mon.addHistogram( new TH2F (TString("met2_shapes")+varNames[ivar],";cut index; E_{T}^{miss} [GeV];#Events",nOptims,0,nOptims, xnBinsMET2,MET2Bins) );
+        mon.addHistogram( new TH2F (TString("met2_shapes")+varNames[ivar],";cut index; E_{T}^{miss} [GeV];#Events",nOptims,0,nOptims, nBinsMET2,MET2Bins) );
 
         //2D shapes for limit setting
         //
@@ -1294,11 +1282,9 @@ int main(int argc, char* argv[])
         if(!isMC) {
             if(MT_massless<300) {
                 mon.fillHisto("mt_raw"                          ,tags, MT_massless, weight);
-                mon.fillHisto("mt2_raw"                          ,tags, MT_massless, weight,true);
             }
         } else {
             mon.fillHisto("mt_raw"                          ,tags, MT_massless, weight);
-            mon.fillHisto("mt2_raw"                          ,tags, MT_massless, weight,true);
         }
         mon.fillHisto("zmass_raw"                       ,tags, zll.mass(), weight);
         mon.fillHisto("njets_raw"                       ,tags, nJetsGood30, weight);
