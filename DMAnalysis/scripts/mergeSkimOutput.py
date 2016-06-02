@@ -131,9 +131,13 @@ def main():
    commands = []
    # Make command stubs containing the hadd call and the output file name
    # So each command corresponds to one output file
-   for count_out in range(split_out ):
-      cmd = [ 'hadd', os.path.join(options.outpath, '%s_%i.root' % (dtag,count_out) ) ]
+   if( split_out == 1 ):
+      cmd = [ 'hadd', os.path.join(options.outpath, '%s.root' % (dtag) ) ]
       commands.append(cmd)
+   else:
+      for count_out in range(split_out ):
+         cmd = [ 'hadd', os.path.join(options.outpath, '%s_%i.root' % (dtag,count_out) ) ]
+         commands.append(cmd)
 
 
    # Distribute the input files to the output files
