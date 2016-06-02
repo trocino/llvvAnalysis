@@ -110,7 +110,7 @@ for proc in procList :
 	mytag = mytag.replace("+","")
         ## split jobs by tag name
         SCRIPT_Temp = open('/tmp/'+who+'/SCRIPT_Local_'+mytag+'.sh',"w")
-        SCRIPT_Temp.writelines('#!bin/sh \n\n')
+        SCRIPT_Temp.writelines('#!/bin/sh \n\n')
         SCRIPT_Temp.writelines('cd $CMSSW_BASE/src/llvvAnalysis/DMAnalysis/; \n\n')
 
         data = desc['data']
@@ -160,6 +160,8 @@ for proc in procList :
                 sedcmd += 's%@suffix%' +suffix+'%;'
 		sedcmd += 's%@tag%' +str(getByLabel(desc,'tag',-1))+'%;'#RJ
 		sedcmd += 's%@genwimpweights%' +str(getByLabel(d,'genwimpweights',-1))+'%;'#RJ
+		sedcmd += 's%@genwimpweighttarg%' +str(getByLabel(d,'genwimpweighttarg',-1))+'%;'#DT
+		sedcmd += 's%@genwimpweightref%' +str(getByLabel(d,'genwimpweightref',-1))+'%;'#DT
 		sedcmd += 's%@doWIMPreweighting%' + str(doWIMPreweighting)+'%;'#RJ
             	if(params.find('@useMVA')<0) :          params = '@useMVA=False ' + params
                 if(params.find('@weightsFile')<0) :     params = '@weightsFile= ' + params

@@ -524,9 +524,36 @@ int main(int argc, char* argv[])
     //open the file and get events tree
     DataEvtSummaryHandler summaryHandler_;
     if(doWIMPreweighting) {
-        if(url.Contains("TeV_DM_V_Mx")) url = runProcess.getParameter<std::string>("WIMPreweighting_DM_V_Mx");
-        if(url.Contains("TeV_DM_A_Mx")) url = runProcess.getParameter<std::string>("WIMPreweighting_DM_A_Mx");
+       if(runProcess.existsAs<std::string>("genwimpweighttarg") &&
+	  runProcess.existsAs<std::string>("genwimpweightref")    ) {
+	   std::string refstr = runProcess.getParameter<std::string>("genwimpweightref");
+	   size_t refinit = refstr.find_last_of("/")+1;
+	   size_t refsize = refstr.size() - refinit; 
+	   refstr = refstr.substr(refinit, refsize);
 
+	   // Derive the name of the reference ntuple
+	   TString refntpl = "MC13TeV_";
+	   if     (refstr.find("vectorMediator_V")!=std::string::npos) refntpl += "DM_V_Mx"; 
+	   else if(refstr.find("vectorMediator_A")!=std::string::npos) refntpl += "DM_A_Mx";
+
+	   refinit = refstr.find("_Mx") + 3;
+	   refsize = refstr.find("_", refinit) - refinit;
+	   refntpl += (refstr.substr(refinit, refsize) + "Mv");
+	   refinit = refstr.find("_Mmed") + 5;
+	   refsize = refstr.find("_", refinit) - refinit;
+	   refntpl += refstr.substr(refinit, refsize);
+
+	   // Now replace URL
+	   refsize = url.Index("/MC13TeV_")+1;
+	   url = url(0, refsize); 
+	   url += (refntpl + ".root");
+	   std::cout << " - Reference sample: " << url.Data() << std::endl; 
+        }
+        else { 
+           if(url.Contains("TeV_DM_V_Mx")) url = runProcess.getParameter<std::string>("WIMPreweighting_DM_V_Mx");
+           if(url.Contains("TeV_DM_A_Mx")) url = runProcess.getParameter<std::string>("WIMPreweighting_DM_A_Mx");
+        }
+      
         if(url.Contains("K1_0.1_K2_1")) url.ReplaceAll("K1_0.1_K2_1","K1_1_K2_1");
         if(url.Contains("K1_0.2_K2_1")) url.ReplaceAll("K1_0.2_K2_1","K1_1_K2_1");
         if(url.Contains("K1_0.3_K2_1")) url.ReplaceAll("K1_0.3_K2_1","K1_1_K2_1");
