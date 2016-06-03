@@ -60,7 +60,7 @@ for ds in datasets:
         outtag = outtag_mc
     elif( 'Data13TeV' in tag ):
         configfile = configfile_data
-        outtag = datapath.split('/')[1]
+        outtag = datapath.split('/')[2]
     else:
         log.error( "Cannot decide whether this tag is MC or data: '%s'" % tag )
         log.info ( "Skipping tag: '%s'" % tag )
