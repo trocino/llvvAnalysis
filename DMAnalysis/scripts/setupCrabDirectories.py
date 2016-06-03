@@ -15,17 +15,18 @@ filesperjob = 3
 ### Configuration dependent on the CMSSW version you sourced.
 cmssw = os.environ['CMSSW_VERSION']
 if( 'CMSSW_7_6' in cmssw ):
-    inputpath   = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV_76X.txt' )
-    configfile  = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg_76X.py' )
-    outtag      = 'RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12'
-    outpath     = os.path.join( outpath, 'llvv_76' )
-    workarea    = os.path.join( workarea, 'llvv_76' )
+    inputpath       = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV_76X.txt' )
+    configfile_mc   = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg_76X.py' )
+    outtag_mc       = 'RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12'
+    outpath         = os.path.join( outpath, 'llvv_76' )
+    workarea        = os.path.join( workarea, 'llvv_76' )
 elif( 'CMSSW_8_0' in cmssw ):
-    inputpath   = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV_80X.txt' )
-    configfile  = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg_80X.py' )
-    outtag      = 'RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3'
-    outpath     = os.path.join( outpath, 'llvv_80' )
-    workarea    = os.path.join( workarea, 'llvv_80' )
+    inputpath       = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/data/skimlist_MC13TeV_80X.txt' )
+    configfile_mc   = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_mc_cfg_80X.py' )
+    configfile_data = os.path.expandvars( '$CMSSW_BASE/src/llvvAnalysis/DMAnalysis/test/run_mainAnalyzer_data_cfg_80X.py' )
+    outtag_mc       = 'RunIISpring16MiniAODv1-PUSpring16_80X_mcRun2_asymptotic_2016_v3'
+    outpath         = os.path.join( outpath, 'llvv_80' )
+    workarea        = os.path.join( workarea, 'llvv_80' )
 else:
     print "Unknown CMSSW version: %s" % cmssw
     print "Exiting."
@@ -52,6 +53,19 @@ with open(inputpath,'r') as f:
 for ds in datasets:
     tag = ds[0]
     datapath = ds[1]
+
+    ### Differentiate between MC and data
+    if( 'MC13TeV' in tag ):
+        configfile = configfile_mc
+        outtag = outtag_mc
+    elif( 'Data13TeV' in tag ):
+        configfile = configfile_data
+        outtag = datapath.split('/')[1]
+    else:
+        log.error( "Cannot decide whether this tag is MC or data: '%s'" % tag )
+        log.info ( "Skipping tag: '%s'" % tag )
+
+
     try:
         os.mkdir( os.path.join( workarea,'cfg') )
     except OSError: pass
