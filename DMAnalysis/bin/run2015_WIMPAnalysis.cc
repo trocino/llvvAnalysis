@@ -1374,26 +1374,13 @@ int main(int argc, char* argv[])
                         mon.fillHisto("eventflow",  tags, 4, weight);
 
                         //preselection plots
-                        if(!isMC) {
-                            //data blinded
-                            if(metP4.pt()<80) {
-                                mon.fillHisto("pfmet_presel",tags, metP4.pt(), weight, true);
-                                mon.fillHisto("pfmet2_presel",tags, metP4.pt(), weight, true);
-                                mon.fillHisto("mt_presel",   tags, MT_massless, weight);
-                                mon.fillHisto("mt2_presel",   tags, MT_massless, weight, true);
-                            }
-                        } else {
-                            mon.fillHisto("pfmet_presel",tags, metP4.pt(), weight, true);
-                            mon.fillHisto("pfmet2_presel",tags, metP4.pt(), weight, true);
-                            mon.fillHisto("mt_presel",   tags, MT_massless, weight);
-                            mon.fillHisto("mt2_presel",   tags, MT_massless, weight, true);
-                        }
-
-                        mon.fillHisto("dphiZMET_presel",tags, dphiZMET, weight);
-                        mon.fillHisto("balancedif_presel",tags, balanceDif, weight);
-
-                        mon.fillHisto("axialpfmet_presel",    tags,  axialmet,  weight);
-
+                        mon.fillHisto("pfmet_presel",       tags, metP4.pt(),  weight, true);
+                        mon.fillHisto("pfmet2_presel",      tags, metP4.pt(),  weight, true);
+                        mon.fillHisto("mt_presel",          tags, MT_massless, weight);
+                        mon.fillHisto("mt2_presel",         tags, MT_massless, weight, true);
+                        mon.fillHisto("dphiZMET_presel",    tags, dphiZMET,    weight);
+                        mon.fillHisto("balancedif_presel",  tags, balanceDif,  weight);
+                        mon.fillHisto("axialpfmet_presel",  tags, axialmet,    weight);
 
                         //forDY ctrl
                         if(passResponseCut) {
