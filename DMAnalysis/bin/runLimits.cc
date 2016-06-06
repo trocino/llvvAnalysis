@@ -2229,7 +2229,6 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                 if(proc.Contains("ZZ#rightarrow 2l2#nu")
                         || proc.Contains("WZ#rightarrow 3l#nu")
                         || proc.Contains("Z+jets")
-                        || proc.Contains("W+jets")
                   ) {
                     hCtrl_MCnonNRB->Add(shapeCtrl_SI.bckg[ibckg], 1);
                 }
@@ -2237,6 +2236,7 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                         || proc.Contains("Single top")
                         || proc.Contains("WW#rightarrow l#nul#nu")
                         || proc.Contains("Z#rightarrow #tau#tau")
+                        || proc.Contains("W+jets")
                   ) {
                     hCtrl_MCNRB->Add(shapeCtrl_SI.bckg[ibckg], 1);
                 }
@@ -2248,7 +2248,6 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                 if(proc.Contains("ZZ#rightarrow 2l2#nu")
                         || proc.Contains("WZ#rightarrow 3l#nu")
                         || proc.Contains("Z+jets")
-                        || proc.Contains("W+jets")
                   ) {
                     hChan_MCnonNRB->Add(shapeChan_SI.bckg[ibckg], 1);
                 }
@@ -2256,6 +2255,7 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                         || proc.Contains("Single top")
                         || proc.Contains("WW#rightarrow l#nul#nu")
                         || proc.Contains("Z#rightarrow #tau#tau")
+                        || proc.Contains("W+jets")
                   ) {
                     hChan_MCNRB->Add(shapeChan_SI.bckg[ibckg], 1);
                 }
@@ -2404,6 +2404,7 @@ void dodataDrivenWWtW(std::vector<TString>& selCh,TString ctrlCh,map<TString, Sh
                             || proc.Contains("Single top")
                             || proc.Contains("WW#rightarrow l#nul#nu")
                             || proc.Contains("Z#rightarrow #tau#tau")
+                            || proc.Contains("W+jets")
                       ) {
                         hChan_MCNRB->Add(shapeChan_SI.bckg[ibckg], 1);
                         //remove the separate parts
