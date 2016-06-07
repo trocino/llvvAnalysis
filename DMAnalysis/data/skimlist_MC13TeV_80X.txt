@@ -53,3 +53,4 @@ Data13TeV_DoubleEG2016B_PromptReco_v2:/DoubleEG/Run2016B-PromptReco-v2/MINIAOD
 Data13TeV_SingleElectron2016B_PromptReco_v2:/SingleElectron/Run2016B-PromptReco-v2/MINIAOD
 Data13TeV_DoubleMuon2016B_PromptReco_v2:/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD
 Data13TeV_SingleMuon2016B_PromptReco_v2:/SingleMuon/Run2016B-PromptReco-v2/MINIAOD
+Data13TeV_MuonEG2016B_PromptReco_v2:/MuonEG/Run2016B-PromptReco-v2/MINIAOD
