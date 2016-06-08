@@ -54,31 +54,6 @@
       "isdata": false,
       "color": "809",
       "issignal": true,
-      "tag": "DM(1)MV(200)",
-      "lwidth": 2,
-      "marker": 809,
-      "data": [
-        {
-          "dtag": "MC13TeV_DM_V_Mx1Mv200",
-          "xsec": 0.24152,
-          "split": 1,
-          "br": [
-            1.0
-          ],
-	  "genwimpweighttarg": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx1_Mmed200_LO.root",
-	  "genwimpweightref": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx50_Mmed200_LO.root" 
-        }
-      ],
-      "fill": 0,
-      "spimpose": true,
-      "lcolor": "809",
-      "lstyle": 8,
-      "doWIMPreweighting": true
-    },
-    {
-      "isdata": false,
-      "color": "809",
-      "issignal": true,
       "tag": "DM(50)MV(200)",
       "lwidth": 2,
       "marker": 809,
@@ -92,31 +67,6 @@
           ],
 	  "genwimpweighttarg": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx50_Mmed200_LO.root",
 	  "genwimpweightref": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx1_Mmed200_LO.root" 
-        }
-      ],
-      "fill": 0,
-      "spimpose": true,
-      "lcolor": "809",
-      "lstyle": 8,
-      "doWIMPreweighting": true
-    },
-    {
-      "isdata": false,
-      "color": "809",
-      "issignal": true,
-      "tag": "DM(50)MV(200)",
-      "lwidth": 2,
-      "marker": 809,
-      "data": [
-        {
-          "dtag": "MC13TeV_DM_V_Mx50Mv200",
-          "xsec": 0.22546,
-          "split": 1,
-          "br": [
-            1.0
-          ],
-	  "genwimpweighttarg": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx50_Mmed200_LO.root",
-	  "genwimpweightref": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx150_Mmed200_LO.root" 
         }
       ],
       "fill": 0,
@@ -192,31 +142,6 @@
           ],
 	  "genwimpweighttarg": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx1000_Mmed1000_LO.root",
 	  "genwimpweightref": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx1000_Mmed10_LO.root" 
-        }
-      ],
-      "fill": 0,
-      "spimpose": true,
-      "lcolor": "809",
-      "lstyle": 8,
-      "doWIMPreweighting": true
-    },
-    {
-      "isdata": false,
-      "color": "809",
-      "issignal": true,
-      "tag": "DM(1000)MV(10)",
-      "lwidth": 2,
-      "marker": 809,
-      "data": [
-        {
-          "dtag": "MC13TeV_DM_V_Mx1000Mv10",
-          "xsec": 0.0000109818,
-          "split": 1,
-          "br": [
-            1.0
-          ],
-	  "genwimpweighttarg": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx1000_Mmed10_LO.root",
-	  "genwimpweightref": "root://eoscms//eos/cms/store/user/trocino/MonoZ/MadGraphLHE/vectorMediator_V/20160530_2007/Output/output_MonoZ_vectorMediator_V_gDM1p00_gQ1p00_Mx10_Mmed10_LO.root" 
         }
       ],
       "fill": 0,
