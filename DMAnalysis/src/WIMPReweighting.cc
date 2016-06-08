@@ -32,7 +32,7 @@ WIMPReweighting::WIMPReweighting(const edm::ParameterSet &runProcess)
         TFile *wimpFileNum=TFile::Open(FileNum);
         gSystem->ExpandPathName(FileDen);
         TFile *wimpFileDen=TFile::Open(FileDen);
-	if(wimpFileDen!=0 && wimpFileDen->IsZombie() && wimpFileNum!=0 && !wimpFileNum->IsZombie()) { 
+	if(wimpFileDen!=0 && !wimpFileDen->IsZombie() && wimpFileNum!=0 && !wimpFileNum->IsZombie()) { 
 	  // One key is enough. The name will change and contain the signal parameters...
 	  TString key = "genmet_acc"; 
 	  TH1F *hden = (TH1F *)wimpFileDen->Get(key.Data()); 

@@ -4,13 +4,35 @@
       "isdata": false,
       "color": "809",
       "issignal": true,
-      "tag": "DM(1)MV(500)",
+      "tag": "DM(1)MV(5000)",
       "lwidth": 2,
       "marker": 809,
       "data": [
         {
-          "dtag": "MC13TeV_DM_V_Mx1Mv500",
-          "xsec": 0.027291,
+          "dtag": "MC13TeV_DM_V_Mx1Mv5000",
+          "xsec": 0.0000049242,
+          "split": 1,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "spimpose": true,
+      "lcolor": "809",
+      "lstyle": 8
+    },
+    {
+      "isdata": false,
+      "color": "809",
+      "issignal": true,
+      "tag": "DM(1)MV(200)",
+      "lwidth": 2,
+      "marker": 809,
+      "data": [
+        {
+          "dtag": "MC13TeV_DM_V_Mx1Mv200",
+          "xsec": 0.24152,
           "split": 1,
           "br": [
             1.0
@@ -48,13 +70,13 @@
       "isdata": false,
       "color": "809",
       "issignal": true,
-      "tag": "DM(10)MV(50)",
+      "tag": "DM(150)MV(200)",
       "lwidth": 2,
       "marker": 809,
       "data": [
         {
-          "dtag": "MC13TeV_DM_V_Mx10Mv50",
-          "xsec": 2.4185,
+          "dtag": "MC13TeV_DM_V_Mx150Mv200",
+          "xsec": 0.0189941,
           "split": 1,
           "br": [
             1.0
@@ -70,13 +92,13 @@
       "isdata": false,
       "color": "809",
       "issignal": true,
-      "tag": "DM(50)MV(50)",
+      "tag": "DM(1000)MV(10)",
       "lwidth": 2,
       "marker": 809,
       "data": [
         {
-          "dtag": "MC13TeV_DM_V_Mx50Mv50",
-          "xsec": 0.144129,
+          "dtag": "MC13TeV_DM_V_Mx1000Mv10",
+          "xsec": 0.0000109818,
           "split": 1,
           "br": [
             1.0
@@ -92,13 +114,35 @@
       "isdata": false,
       "color": "809",
       "issignal": true,
-      "tag": "DM(500)MV(500)",
+      "tag": "DM(1000)MV(1000)",
       "lwidth": 2,
       "marker": 809,
       "data": [
         {
-          "dtag": "MC13TeV_DM_V_Mx500Mv500",
-          "xsec": 0.000383387,
+          "dtag": "MC13TeV_DM_V_Mx1000Mv1000",
+          "xsec": 0.00001590609,
+          "split": 1,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "spimpose": true,
+      "lcolor": "809",
+      "lstyle": 8
+    },
+    {
+      "isdata": false,
+      "color": "809",
+      "issignal": true,
+      "tag": "DM(10)MV(10)",
+      "lwidth": 2,
+      "marker": 809,
+      "data": [
+        {
+          "dtag": "MC13TeV_DM_V_Mx10Mv10",
+          "xsec": 1.94108,
           "split": 1,
           "br": [
             1.0

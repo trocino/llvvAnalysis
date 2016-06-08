@@ -773,7 +773,8 @@ int main(int argc, char* argv[])
 
             //reweighting
             if(doWIMPreweighting) {
-                if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet");
+                if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet_acc");
+	        //if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet");
                 if(url.Contains("TeV_EWKDM_S_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"pt_chichi");
             }
             //if(doWIMPreweighting) weight *= myWIMPweights.get2DWeights(genmet.pt(),dphizmet,"dphi_vs_met");
