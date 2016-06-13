@@ -85,23 +85,6 @@
     },
     {
       "isdata": false,
-      "color": "400",
-      "lcolor": "1",
-      "tag": "W+jets",
-      "marker": 400,
-      "data": [
-        {
-          "dtag": "MC13TeV_WJetsmadgraphMLM",
-          "xsec": 61526.7,
-          "split": 20,
-          "br": [
-            1
-          ]
-        }
-      ]
-    },
-    {
-      "isdata": false,
       "color": "798",
       "lcolor": "1",
       "tag": "WW#rightarrow l#nul#nu",
