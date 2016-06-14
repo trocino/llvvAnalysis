@@ -257,6 +257,8 @@ bool DataEvtSummaryHandler::initTree(TTree *t)
     t_->Branch("metPuppi_pt",                &evSummary_.metPuppi_pt,                 "metPuppi_pt/F");
     t_->Branch("metPuppi_phi",               &evSummary_.metPuppi_phi,                "metPuppi_phi/F");
     t_->Branch("metPuppi_sumMET",            &evSummary_.metPuppi_sumMET,             "metPuppi_sumMET/F");
+    t_->Branch("trkMET_pt",            &evSummary_.trkMET_pt,             "trkMET_pt/F");
+    t_->Branch("trkMET_phi",            &evSummary_.trkMET_phi,             "trkMET_phi/F");
 
     /*
         t_->Branch("flag_HBHENoiseFilter",                      &evSummary_.flag_HBHENoiseFilter,                       "flag_HBHENoiseFilter/O");
@@ -531,6 +533,8 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
     t_->SetBranchAddress("metPuppi_phi",                 &evSummary_.metPuppi_phi);
     t_->SetBranchAddress("metPuppi_sumMET",              &evSummary_.metPuppi_sumMET);
 
+    t_->SetBranchAddress("trkMET_pt",                  &evSummary_.trkMET_pt);
+    t_->SetBranchAddress("trkMET_phi",                 &evSummary_.trkMET_phi);
 
     /*
         t_->SetBranchAddress("flag_HBHENoiseFilter",                      &evSummary_.flag_HBHENoiseFilter);
