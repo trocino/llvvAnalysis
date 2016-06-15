@@ -1088,11 +1088,16 @@ int main(int argc, char* argv[])
             if(abs(lepid)==11 && fabs(lep.eta()) > 2.5) continue;
             if(abs(lepid)==11 && fabs(lep.eta()) > 1.442 && fabs(lep.eta()) < 1.556) continue;
             //tau veto
-            //if(abs(lepid)==15 && fabs(lep.eta())> 2.4) continue;
+            if(abs(lepid)==15 && fabs(lep.eta())> 2.4) continue;
 
             bool isMatched(false);
-            isMatched |= (deltaR(lep1,lep) < 0.01);
-            isMatched |= (deltaR(lep2,lep) < 0.01);
+            if( abs(lepid)==15 ) {
+                isMatched |= (deltaR(lep1,lep) < 0.4);
+                isMatched |= (deltaR(lep2,lep) < 0.4);
+            } else {
+                isMatched |= (deltaR(lep1,lep) < 0.01);
+                isMatched |= (deltaR(lep2,lep) < 0.01);
+            }
             if(isMatched) continue;
 
             bool hasLooseIdandIso(true);
@@ -1107,11 +1112,10 @@ int main(int argc, char* argv[])
                 //
                 hasTightIdandIso &= ( phys.leptons[ilep].isElpassMedium && phys.leptons[ilep].pt()>10 );
 
-            //} else if(abs(lepid)==15) { //tau
-                //hasLooseIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsLooseIso && phys.leptons[ilep].pt()>20 );
+            } else if(abs(lepid)==15) { //tau
+                hasLooseIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsLooseIso && phys.leptons[ilep].pt()>20 );
                 //
-                //hasTightIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsTightIso && phys.leptons[ilep].pt()>20 );
-
+                hasTightIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsTightIso && phys.leptons[ilep].pt()>20 );
             } else continue;
 
 
