@@ -1175,7 +1175,7 @@ int main(int argc, char* argv[])
 
 
             //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X
-            if(corrJets[ijet].pt()>30 && fabs(corrJets[ijet].eta())<2.4)  {
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  {
 
                 nCSVLtags += (corrJets[ijet].btag0>CSVLooseWP);
                 nCSVMtags += (corrJets[ijet].btag0>CSVMediumWP);
