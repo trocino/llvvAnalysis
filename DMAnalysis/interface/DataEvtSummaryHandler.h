@@ -134,6 +134,7 @@ struct DataEvtSummary_t {
     Float_t metPuppi_pt,metPuppi_phi,metPuppi_sumMET;
     Float_t rawpfmet_pt,rawpfmet_phi,rawpfmet_sumMET;
     Float_t rawcalomet_pt,rawcalomet_phi,rawcalomet_sumMET;
+    Float_t trkMET_pt,trkMET_phi;
 /*
     Bool_t flag_HBHENoiseFilter,flag_CSCTightHaloFilter,flag_hcalLaserEventFilter,flag_EcalDeadCellTriggerPrimitiveFilter,flag_goodVertices;
     Bool_t flag_HBHENoiseIsoFilter;

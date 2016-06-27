@@ -48,6 +48,22 @@
           "br": [
             1
           ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo2e2nu",
+          "xsec": 0.00172,
+          "split": 1,
+          "br": [
+            1
+          ]
+        },
+        {
+          "dtag": "MC13TeV_ggToZZTo2mu2nu",
+          "xsec": 0.00172,
+          "split": 1,
+          "br": [
+            1
+          ]
         }
       ]
     },

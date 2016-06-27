@@ -94,6 +94,7 @@ public:
 
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
     const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *particle);
+    reco::MET computeTrkMet(const size_t &pv, edm::Handle<pat::PackedCandidateCollection> packedCandidates );
 
     enum ElectronMatchType {UNMATCHED = 0,
                             TRUE_PROMPT_ELECTRON,
@@ -122,6 +123,7 @@ private:
     edm::EDGetTokenT<pat::METCollection> metTag_;
     edm::EDGetTokenT<pat::METCollection> metNoHFTag_;
     edm::EDGetTokenT<pat::METCollection> metPuppiTag_;
+    edm::EDGetTokenT<pat::PackedCandidateCollection> packedCandidatesTag_;
 
     edm::EDGetTokenT<edm::TriggerResults> metFilterBitsTag_;
 
@@ -279,6 +281,7 @@ MainAnalyzer::MainAnalyzer(const edm::ParameterSet& iConfig):
     eleTightIdMapTokenTrig_(	consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleTightIdMapTrig"))	),
     mvaValuesMapTokenTrig_(	consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMapTrig"))	),
     mvaCategoriesMapTokenTrig_(	consumes<edm::ValueMap<int> >(iConfig.getParameter<edm::InputTag>("mvaCategoriesMapTrig"))	),
+
     curAvgInstLumi_(0),
     curIntegLumi_(0)
 
@@ -490,12 +493,18 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
     ev.vtx_y = PV.y();
     ev.vtx_z = PV.z();
 
-    ev.nvtx = 0;
     //select good vertices
+    ev.nvtx = 0;
+    size_t chosenVtx{9999};
     for(unsigned int i = 0; i < vertices->size(); i++) {
-        if(vertices->at(i).isValid() && !vertices->at(i).isFake()) ev.nvtx++;
+        if(vertices->at(i).isValid() && !vertices->at(i).isFake()) {
+            ev.nvtx++;
+            if(chosenVtx > i && vertices->at(i).ndof()>4. && abs(vertices->at(i).z()) <= 24. && vertices->at(i).position().Rho() <= 2.) {
+                chosenVtx = i;
+            }
+        }
     }
-    if(ev.nvtx == 0) return;
+    if(ev.nvtx == 0 || chosenVtx == 9999) return;
 
 
     //edm::Handle<double> rhoAll;
@@ -947,7 +956,6 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
     }
 
 
-
     /*
         //met filters
         edm::Handle<edm::TriggerResults> metFilterBits;
@@ -998,6 +1006,12 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
 
 
     */
+    // Trk MET
+    edm::Handle<pat::PackedCandidateCollection> packedCandidates;
+    event.getByToken(packedCandidatesTag_, packedCandidates);
+    const reco::MET trkMET = computeTrkMet(chosenVtx,packedCandidates);
+    ev.trkMET_pt = trkMET.pt();
+    ev.trkMET_phi = trkMET.phi();
 
     summaryHandler_.fillTree();
 }
@@ -1388,7 +1402,21 @@ void MainAnalyzer::findFirstNonElectronMother(const reco::Candidate *particle,
 }
 
 
-
+reco::MET MainAnalyzer::computeTrkMet(const size_t & pv,
+                                      edm::Handle<pat::PackedCandidateCollection> packedCandidates)
+{
+    using namespace std;
+    reco::Candidate::LorentzVector totalP4;
+    for(pat::PackedCandidateCollection::const_iterator it= packedCandidates->begin(), ed =packedCandidates->end(); it != ed; ++it){
+    if( it->charge() == 0 ) continue;
+    if( fabs(it->dz(pv)) <0.1){
+    totalP4 += it->p4();
+    }
+    }
+    reco::Candidate::LorentzVector invertedP4(-totalP4);
+    reco::MET met(invertedP4,reco::Candidate::Point(0,0,0));
+    return met;
+}
 
 
 

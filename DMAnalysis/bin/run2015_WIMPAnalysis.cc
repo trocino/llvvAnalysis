@@ -71,7 +71,16 @@ struct stPDFval {
     int id1;
     int id2;
 };
-
+struct cut_t{
+    cut_t( TString name_in, double value_in, bool pass_in  ) {
+        name = name_in;
+        value = value_in;
+        pass = pass_in;
+    }
+    TString name;
+    double value;
+    bool pass;
+};
 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation76X
 const float CSVLooseWP = 0.460;
 const float CSVMediumWP = 0.800;
@@ -352,7 +361,13 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "mt_met140",          ";#it{m}_{T} [GeV];Events / 100 GeV", 12,0,1200));
     mon.addHistogram( new TH1F( "mt2_met140",         ";#it{m}_{T} [GeV];Events / 1 GeV", nBinsMT2,MT2Bins));
 
-
+    mon.addHistogram( new TH1F( "nMinus_zpt"       , ";#it{p}_{T}^{ll} [GeV];Events", 50,0,500) );
+    mon.addHistogram( new TH1F( "nMinus_met"       , ";E_{T}^{miss} [GeV];Events", 50,0,500 ) );
+    mon.addHistogram( new TH1F( "nMinus_dphiZMet"  , ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
+    mon.addHistogram( new TH1F( "nMinus_balance"   , ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events",10,0,2.0) );
+    mon.addHistogram( new TH1F( "nMinus_dphiJetMET", ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
+    mon.addHistogram( new TH1F( "nMinus_response"  , ";Response(#it{l^{+}l^{-}},E_{T}^{miss});Events", 20,-1,1 ) );
+    mon.addHistogram( new TH1F( "nMinus_dPhiTrkMET",";#Delta#it{#phi}(E_{T}^{miss}(trk),E_{T}^{miss});Events", 10,0,TMath::Pi()) );
 
 
 
@@ -886,6 +901,9 @@ int main(int argc, char* argv[])
             bool hasTightIdandIso(true);
             if(abs(lepid)==13) { //muon
                 hasTightIdandIso &= phys.leptons[ilep].isMediumMu;
+                hasTightIdandIso &= ( fabs(phys.leptons[ilep].mn_dZ) < 0.1 );
+                hasTightIdandIso &= ( fabs(phys.leptons[ilep].mn_d0) < 0.02 );
+
                 //https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2?sortcol=1;table=7;up=0#Muon_Isolation
                 hasTightIdandIso &= ( phys.leptons[ilep].m_pfRelIsoDbeta() < 0.15 );
             } else if(abs(lepid)==11) { //electron
@@ -1088,11 +1106,16 @@ int main(int argc, char* argv[])
             if(abs(lepid)==11 && fabs(lep.eta()) > 2.5) continue;
             if(abs(lepid)==11 && fabs(lep.eta()) > 1.442 && fabs(lep.eta()) < 1.556) continue;
             //tau veto
-            //if(abs(lepid)==15 && fabs(lep.eta())> 2.4) continue;
+            if(abs(lepid)==15 && fabs(lep.eta())> 2.4) continue;
 
             bool isMatched(false);
-            isMatched |= (deltaR(lep1,lep) < 0.01);
-            isMatched |= (deltaR(lep2,lep) < 0.01);
+            if( abs(lepid)==15 ) {
+                isMatched |= (deltaR(lep1,lep) < 0.4);
+                isMatched |= (deltaR(lep2,lep) < 0.4);
+            } else {
+                isMatched |= (deltaR(lep1,lep) < 0.01);
+                isMatched |= (deltaR(lep2,lep) < 0.01);
+            }
             if(isMatched) continue;
 
             bool hasLooseIdandIso(true);
@@ -1101,17 +1124,20 @@ int main(int argc, char* argv[])
                 hasLooseIdandIso &= ( phys.leptons[ilep].isLooseMu && phys.leptons[ilep].m_pfRelIsoDbeta()<0.25 && phys.leptons[ilep].pt()>10 );
                 hasLooseIdandIso |= ( phys.leptons[ilep].isSoftMu  && phys.leptons[ilep].pt()>3 );
                 //
-                hasTightIdandIso &= ( phys.leptons[ilep].isMediumMu && phys.leptons[ilep].m_pfRelIsoDbeta()<0.15 && phys.leptons[ilep].pt()>10 );
+                hasTightIdandIso &= phys.leptons[ilep].pt()>10;
+                hasTightIdandIso &= phys.leptons[ilep].isMediumMu;
+                hasTightIdandIso &= fabs(phys.leptons[ilep].mn_dZ) < 0.1;
+                hasTightIdandIso &= fabs(phys.leptons[ilep].mn_d0) < 0.02;
+                hasTightIdandIso &= phys.leptons[ilep].m_pfRelIsoDbeta() < 0.15;
             } else if(abs(lepid)==11) { //electron
                 hasLooseIdandIso &= ( phys.leptons[ilep].isElpassVeto && phys.leptons[ilep].pt()>10 );
                 //
                 hasTightIdandIso &= ( phys.leptons[ilep].isElpassMedium && phys.leptons[ilep].pt()>10 );
 
-            //} else if(abs(lepid)==15) { //tau
-                //hasLooseIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsLooseIso && phys.leptons[ilep].pt()>20 );
+            } else if(abs(lepid)==15) { //tau
+                hasLooseIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsLooseIso && phys.leptons[ilep].pt()>20 );
                 //
-                //hasTightIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsTightIso && phys.leptons[ilep].pt()>20 );
-
+                hasTightIdandIso &= ( phys.leptons[ilep].isTauDM && phys.leptons[ilep].ta_IsTightIso && phys.leptons[ilep].pt()>20 );
             } else continue;
 
 
@@ -1164,7 +1190,7 @@ int main(int argc, char* argv[])
 
 
             //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X
-            if(corrJets[ijet].pt()>30 && fabs(corrJets[ijet].eta())<2.4)  {
+            if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  {
 
                 nCSVLtags += (corrJets[ijet].btag0>CSVLooseWP);
                 nCSVMtags += (corrJets[ijet].btag0>CSVMediumWP);
@@ -1436,6 +1462,28 @@ int main(int argc, char* argv[])
         } //passZmass
 
 
+    // N-1 plots
+    if( passZmass and pass3dLeptonVeto and passBveto ) {
+        std::vector<cut_t> cuts = { cut_t("zpt"       ,   zll.pt(),   passZpt             ),
+                                    cut_t("met"       ,   metP4.pt(), passMETcut          ),
+                                    cut_t("dphiZMet"  ,   dphiZMET,   passDphiZMETcut     ),
+                                    cut_t("balance"   ,   balanceDif, passBalanceCut      ),
+                                    cut_t("response"  ,   response,   passResponseCut     ) };
+        // Make N-1 plot for each cut
+        for ( unsigned int i = 0; i < cuts.size(); i++ ) {
+            // Fill the plot if all other cuts are passed
+            // Do not fill signal region in data
+            bool passOthers = true;
+            bool passThis = true;
+            for ( unsigned int j = 0; (j < cuts.size()); j++ ) {
+               if( i == j ) passThis = cuts[j].pass;
+               else passOthers &= cuts[j].pass;
+            }
+            if( passOthers and ( not passThis or isMC ) ) {
+                mon.fillHisto( ("nMinus_" + cuts[i].name).Data(),tags, (cuts[i].value), weight );
+            }
+        }
+    }
 
 
 

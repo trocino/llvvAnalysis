@@ -35,7 +35,7 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
                                                 ev.en_pileupIso[i],ev.en_chargedIso[i],ev.en_photonIso[i],ev.en_neutralHadIso[i],ev.en_relIsoWithEA[i],
                                                 ev.ta_IsLooseIso[i], ev.ta_IsMediumIso[i], ev.ta_IsTightIso[i]
                                                );
-            phys.leptons[nlep].setLeptonIPInfo(ev.mn_dZ[i], ev.mn_d0[i]);
+            phys.leptons[nlep].setLeptonIPInfo(ev.mn_d0[i], ev.mn_dZ[i], ev.mn_ip3d[i]);
             nlep++;
         }
     }
@@ -52,6 +52,7 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
                                                 ev.en_pileupIso[i],ev.en_chargedIso[i],ev.en_photonIso[i],ev.en_neutralHadIso[i],ev.en_relIsoWithEA[i],
                                                 ev.ta_IsLooseIso[i], ev.ta_IsMediumIso[i], ev.ta_IsTightIso[i]
                                                );
+            phys.leptons[nlep].setLeptonIPInfo(ev.mn_d0[i], ev.mn_dZ[i], ev.mn_ip3d[i]);
 
 
             nlep++;
@@ -71,6 +72,7 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
                                                 ev.en_pileupIso[i],ev.en_chargedIso[i],ev.en_photonIso[i],ev.en_neutralHadIso[i],ev.en_relIsoWithEA[i],
                                                 ev.ta_IsLooseIso[i], ev.ta_IsMediumIso[i], ev.ta_IsTightIso[i]
                                                );
+            phys.leptons[nlep].setLeptonIPInfo(ev.mn_d0[i], ev.mn_dZ[i], ev.mn_ip3d[i]);
 
             nlep++;
         }
@@ -83,6 +85,7 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
     // MET
     phys.met 	 = LorentzVector( ev.met_pt*cos(ev.met_phi), ev.met_pt*sin(ev.met_phi), 0, ev.met_pt );
     phys.metNoHF = LorentzVector( ev.metNoHF_pt*cos(ev.metNoHF_phi), ev.metNoHF_pt*sin(ev.metNoHF_phi), 0, ev.metNoHF_pt );
+    phys.trkMET = LorentzVector( ev.trkMET_pt*cos(ev.trkMET_phi), ev.trkMET_pt*sin(ev.trkMET_phi), 0, ev.trkMET_pt );
 
 
 

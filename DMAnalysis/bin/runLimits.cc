@@ -235,6 +235,7 @@ void initNormalizationSysts()
     normSysts["CMS_zllwimps_mumueq1jets_leptonVeto"] = 0.013;
     normSysts["CMS_zllwimps_eeeq1jets_leptonVeto"] = 0.013;
 
+    normSysts["norm_WZ"] = 0.03;
 
     //unparticle
     normSysts["QCDscale_UnPart1p01"]=1.027561608;
@@ -1149,6 +1150,17 @@ std::vector<TString>  buildDataCard(Int_t mass, TString histo, TString url, TStr
                 fprintf(pFile,"\n");
             }
 
+            // WZ Uncertainty
+            fprintf(pFile,"%45s %10s ", "norm_WZ", "lnN");
+            for(size_t j=1; j<=dci.procs.size(); j++) {
+                if(dci.rates.find(RateKey_t(dci.procs[j-1],dci.ch[i-1]))==dci.rates.end()) continue;
+                if(dci.procs[j-1].Contains("WZ") && !dci.procs[j-1].Contains("WWZ") && !dci.procs[j-1].Contains("WZZ") ) {
+                    fprintf(pFile,"%6.5f ",1.0+normSysts["norm_WZ"]);
+                } else {
+                    fprintf(pFile,"%6s ","-");
+                }
+            }
+            fprintf(pFile,"\n");
 
             for(std::map<TString, std::map<RateKey_t,Double_t> >::iterator it=dci.systs.begin(); it!=dci.systs.end(); it++) {
                 if(!runSystematics && string(it->first.Data()).find("stat")>0 )continue;
