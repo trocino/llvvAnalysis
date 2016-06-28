@@ -109,7 +109,7 @@ def main():
 
    all_files =  find_all_matching('.root',inputpath)
 
-   for dtag, split_out in split_dict:
+   for dtag, split_out in split_dict.items():
       input_files = [ x for x in all_files if dtag in x]
       split_in = len(input_files)                     # Number of input files
 
@@ -119,7 +119,7 @@ def main():
          log.error( '   %i input files vs %i output files' %(split_in,split_out) )
          log.info( 'Skipping.' )
          continue
-      log.info( 'Tag: %s. Found %i input files, will create %i output files.' % (tag,split_in,split_out) )
+      log.info( 'Tag: %s. Found %i input files, will create %i output files.' % (dtag,split_in,split_out) )
 
       commands = []
       # Make command stubs containing the hadd call and the output file name
