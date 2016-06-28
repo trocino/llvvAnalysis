@@ -107,65 +107,58 @@ def main():
    (options, inputpath) = parseCommandline()
    split_dict = get_split_dict( os.path.expandvars( options.json ) )
 
-   for part in inputpath.split('/'):
-      if( 'crab_' in part ):
-         dtag = part.replace('crab_','')
-         break;
+   all_files =  find_all_matching('.root',inputpath)
 
-   input_files =  find_all_matching('.root',inputpath)
+   for dtag, split_out in split_dict:
+      input_files = [ x for x in all_files if dtag in x]
+      split_in = len(input_files)                     # Number of input files
 
-   split_in = len(input_files)                     # Number of input files
-   split_out = split_dict[ dtag ]                  # Number of output files
+      if( split_in == 0 ): continue
+      if( split_in < split_out ):
+         log.error( "Found less input than output files for dtag '%s':" %dtag )
+         log.error( '   %i input files vs %i output files' %(split_in,split_out) )
+         log.info( 'Skipping.' )
+         continue
+      log.info( 'Tag: %s. Found %i input files, will create %i output files.' % (tag,split_in,split_out) )
 
-   if( split_in == 0 ):
-      log.error( 'No input files found.' )
-      log.info( 'Exiting.' )
-      sys.exit(1)
-   if( split_in < split_out ):
-      log.error( "Found less input than output files for dtag '%s':" %dtag )
-      log.error( '   %i input files vs %i output files' %(split_in,split_out) )
-      log.info( 'Exiting.' )
-      sys.exit(1)
-   log.info( 'Found %i input files, will create %i output files.' % (split_in,split_out) )
-
-   commands = []
-   # Make command stubs containing the hadd call and the output file name
-   # So each command corresponds to one output file
-   if( split_out == 1 ):
-      cmd = [ 'hadd', os.path.join(options.outpath, '%s.root' % (dtag) ) ]
-      commands.append(cmd)
-   else:
-      for count_out in range(split_out ):
-         cmd = [ 'hadd', os.path.join(options.outpath, '%s_%i.root' % (dtag,count_out) ) ]
+      commands = []
+      # Make command stubs containing the hadd call and the output file name
+      # So each command corresponds to one output file
+      if( split_out == 1 ):
+         cmd = [ 'hadd', os.path.join(options.outpath, '%s.root' % (dtag) ) ]
          commands.append(cmd)
+      else:
+         for count_out in range(split_out ):
+            cmd = [ 'hadd', os.path.join(options.outpath, '%s_%i.root' % (dtag,count_out) ) ]
+            commands.append(cmd)
 
 
-   # Distribute the input files to the output files
-   input_files_iter = iter( input_files )
-   commands_iter = iter( commands )
-   while(True):
-      # Iterate over input files until there are none left
-      try:
-         thisfile = input_files_iter.next()
-      except StopIteration:
-         break;
+      # Distribute the input files to the output files
+      input_files_iter = iter( input_files )
+      commands_iter = iter( commands )
+      while(True):
+         # Iterate over input files until there are none left
+         try:
+            thisfile = input_files_iter.next()
+         except StopIteration:
+            break;
 
-      # Iterate over commands/output files
-      # After reaching the last commandoutput file, go back to the first
-      try:
-         thiscommand = commands_iter.next()
-      except StopIteration:
-         commands_iter = iter( commands )
-         thiscommand = commands_iter.next()
+         # Iterate over commands/output files
+         # After reaching the last commandoutput file, go back to the first
+         try:
+            thiscommand = commands_iter.next()
+         except StopIteration:
+            commands_iter = iter( commands )
+            thiscommand = commands_iter.next()
 
-      # Add the input file to the command
-      thiscommand.append( thisfile )
+         # Add the input file to the command
+         thiscommand.append( thisfile )
 
-   if( options.dryrun ):
-      for cmd in commands: print cmd
-   else:
-      pool = multiprocessing.Pool(options.jobs)
-      pool.map_async( run, commands ).get(999999)
+      if( options.dryrun ):
+         for cmd in commands: print cmd
+      else:
+         pool = multiprocessing.Pool(options.jobs)
+         pool.map_async( run, commands ).get(999999)
 
 if __name__ == '__main__':
    main()
