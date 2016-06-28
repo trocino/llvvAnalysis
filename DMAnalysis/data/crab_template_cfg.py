@@ -12,7 +12,9 @@ config.General.transferLogs = True
 config.section_("JobType")
 config.JobType.pluginName = 'ANALYSIS'
 config.JobType.psetName = '@CONFIGFILE'
-config.JobType.pyCfgParams = []
+
+outFile = config.General.requestName.split('_ext')[0]
+config.JobType.pyCfgParams = ["outputFile="+outFile]
 
 config.section_("Data")
 config.Data.inputDataset = '@INPUTDATASET'

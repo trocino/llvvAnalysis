@@ -1,8 +1,12 @@
 import FWCore.ParameterSet.Config as cms
+from FWCore.ParameterSet.VarParsing import VarParsing
 
 from llvvAnalysis.DMAnalysis.mainAnalyzer_cfi import *
 
 process.mainAnalyzer.isMC = cms.bool(False)
+
+options = VarParsing('analysis')
+options.parseArguments()
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 5000
@@ -53,7 +57,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("analysis.root")
+                                   fileName = cms.string(options.outputFile)
                                   )
 
 process.p = cms.Path(
