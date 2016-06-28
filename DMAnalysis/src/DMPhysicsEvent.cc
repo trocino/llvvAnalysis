@@ -86,6 +86,7 @@ PhysicsEvent_t getPhysicsEventFrom(DataEvtSummary_t &ev)
     phys.met 	 = LorentzVector( ev.met_pt*cos(ev.met_phi), ev.met_pt*sin(ev.met_phi), 0, ev.met_pt );
     phys.metNoHF = LorentzVector( ev.metNoHF_pt*cos(ev.metNoHF_phi), ev.metNoHF_pt*sin(ev.metNoHF_phi), 0, ev.metNoHF_pt );
     phys.trkMET = LorentzVector( ev.trkMET_pt*cos(ev.trkMET_phi), ev.trkMET_pt*sin(ev.trkMET_phi), 0, ev.trkMET_pt );
+    phys.caloMET = LorentzVector( ev.rawcalomet_pt*cos(ev.rawcalomet_phi), ev.rawcalomet_pt*sin(ev.rawcalomet_phi), 0, ev.rawcalomet_pt );
 
 
 
