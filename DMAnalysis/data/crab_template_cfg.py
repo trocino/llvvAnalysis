@@ -1,3 +1,4 @@
+
 from WMCore.Configuration import Configuration 
 
 config = Configuration()
@@ -15,15 +16,16 @@ config.JobType.pyCfgParams = []
 
 config.section_("Data")
 config.Data.inputDataset = '@INPUTDATASET'
+config.Data.lumiMask ='@JSON'
 config.Data.inputDBS = 'global'
 config.Data.publication = False
-config.Data.splitting = 'FileBased'
+config.Data.splitting = '@Method'
 config.Data.unitsPerJob = @FILESPERJOB
 config.Data.outLFNDirBase = '@OUTPATH'       # e.g. /store/user/aalbert/myFolder 
 config.Data.outputDatasetTag = '@OUTTAG'     # e.g. 76X_mcRun2_asymptotic_RunIIFall15DR76_v1
 
 config.section_("Site")
-config.Site.storageSite = 'T2_DE_RWTH'
+config.Site.storageSite = '@STORAGESITE'
 
 config.section_("User")
-config.User.voGroup = 'dcms'
+#config.User.voGroup = 'dcms'
