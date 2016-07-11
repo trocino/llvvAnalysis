@@ -391,9 +391,11 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "zmass_Gen", ";#it{m}_{ll} [GeV] [GeV];Events", 250,0,250) );
     mon.addHistogram( new TH2F( "ptlep1vs2_Gen",";#it{p}_{T}^{l1} [GeV];#it{p}_{T}^{l2} [GeV];Events",250,0,500, 250,0,500) );
 
-    h=(TH1F *)mon.addHistogram( new TH1F ("acceptance", ";;Events", 2,0,2) );
+    h=(TH1F *)mon.addHistogram( new TH1F ("acceptance", ";;Events", 3,0,3) );
+
     h->GetXaxis()->SetBinLabel(1,"Gen");
     h->GetXaxis()->SetBinLabel(2,"Gen Acc");
+    h->GetXaxis()->SetBinLabel(3,"Rec Acc");
 
     // btaging efficiency
     std::vector<TString> CSVkey;
@@ -1438,6 +1440,7 @@ int main(int argc, char* argv[])
                                 mon.fillHisto("eventflow",  tags, 6, weight);
 
                                 if(passMETcut) {
+                                    mon.fillHisto("acceptance",tags,2,1.0);
                                     mon.fillHisto("eventflow",  tags, 7, weight);
                                     mon.fillHisto("mt_final",   tags, MT_massless, weight);
                                     mon.fillHisto("pfmet_final",tags, metP4.pt(), weight, true);
