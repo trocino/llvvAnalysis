@@ -4,6 +4,7 @@
 #include "FWCore/FWLite/interface/FWLiteEnabler.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/Exception.h"
 
 #include "llvvAnalysis/DMAnalysis/interface/MacroUtils.h"
 #include "llvvAnalysis/DMAnalysis/interface/DataEvtSummaryHandler.h"
@@ -183,7 +184,8 @@ int main(int argc, char* argv[])
 
 
 
-    WIMPReweighting myWIMPweights(runProcess);
+    //WIMPReweighting myWIMPweights(runProcess);
+    WIMPReweighting myWIMPweights; 
 
 
     //systematics
@@ -527,17 +529,26 @@ int main(int argc, char* argv[])
     //open the file and get events tree
     DataEvtSummaryHandler summaryHandler_;
     if(doWIMPreweighting) {
-        if(url.Contains("TeV_DM_V_Mx")) url = runProcess.getParameter<std::string>("WIMPreweighting_DM_V_Mx");
-        if(url.Contains("TeV_DM_A_Mx")) url = runProcess.getParameter<std::string>("WIMPreweighting_DM_A_Mx");
-
-        if(url.Contains("K1_0.1_K2_1")) url.ReplaceAll("K1_0.1_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_0.2_K2_1")) url.ReplaceAll("K1_0.2_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_0.3_K2_1")) url.ReplaceAll("K1_0.3_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_0.5_K2_1")) url.ReplaceAll("K1_0.5_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_2_K2_1"))   url.ReplaceAll("K1_2_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_3_K2_1"))   url.ReplaceAll("K1_3_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_5_K2_1"))   url.ReplaceAll("K1_5_K2_1","K1_1_K2_1");
-        if(url.Contains("K1_10_K2_1"))  url.ReplaceAll("K1_10_K2_1","K1_1_K2_1");
+        // Only for simplified models 
+        if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) { 
+	    bool isreweighted = myWIMPweights.Init(runProcess, url); 
+	    if(!isreweighted) { 
+	        cerr << " *** WARNING: WIMP re-weighting initialization failed! ***" << endl;
+		throw cms::Exception("WIMP initialization");
+	    } 
+	} 
+	// For EWK models 
+	else if(url.Contains("K1_") && url.Contains("_K2_")) {
+	    myWIMPweights.Init(runProcess); 
+	    if(url.Contains("K1_0.1_K2_1")) url.ReplaceAll("K1_0.1_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_0.2_K2_1")) url.ReplaceAll("K1_0.2_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_0.3_K2_1")) url.ReplaceAll("K1_0.3_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_0.5_K2_1")) url.ReplaceAll("K1_0.5_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_2_K2_1"))   url.ReplaceAll("K1_2_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_3_K2_1"))   url.ReplaceAll("K1_3_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_5_K2_1"))   url.ReplaceAll("K1_5_K2_1","K1_1_K2_1");
+	    if(url.Contains("K1_10_K2_1"))  url.ReplaceAll("K1_10_K2_1","K1_1_K2_1");
+	}
     }
     TFile *file = TFile::Open(url);
     printf("Looping on %s\n",url.Data());
@@ -749,7 +760,7 @@ int main(int argc, char* argv[])
 
             //reweighting
             if(doWIMPreweighting) {
-                if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet");
+                if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet_acc_simplmod");
                 if(url.Contains("TeV_EWKDM_S_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"pt_chichi");
             }
             //if(doWIMPreweighting) weight *= myWIMPweights.get2DWeights(genmet.pt(),dphizmet,"dphi_vs_met");

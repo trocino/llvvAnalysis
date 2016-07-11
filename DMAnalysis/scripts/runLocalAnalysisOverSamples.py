@@ -161,6 +161,12 @@ for proc in procList :
 		sedcmd += 's%@tag%' +str(getByLabel(desc,'tag',-1))+'%;'#RJ
 		sedcmd += 's%@genwimpweights%' +str(getByLabel(d,'genwimpweights',-1))+'%;'#RJ
 		sedcmd += 's%@doWIMPreweighting%' + str(doWIMPreweighting)+'%;'#RJ
+                if(origdtag.find('TeV_DM_V_')>=0): 
+                    sedcmd += 's%@referencepoints%refVPoints%;'
+                elif(origdtag.find('TeV_DM_A_')>=0): 
+                    sedcmd += 's%@referencepoints%refAPoints%;'
+                else: 
+                    sedcmd += 's%@referencepoints%cms.vstring()%;'
             	if(params.find('@useMVA')<0) :          params = '@useMVA=False ' + params
                 if(params.find('@weightsFile')<0) :     params = '@weightsFile= ' + params
                 if(params.find('@evStart')<0) :         params = '@evStart=0 ' + params
