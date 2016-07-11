@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
     h->GetXaxis()->SetBinLabel(3,"Trigger && 2 Tight Leptons && =2 Leptons in MEX/1");
 
     //for MC normalization (to 1/pb)
-    TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,6,0,6) ) ;
+    TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,10,0,10) ) ;
 
     mon.addHistogram( new TH1F( "nvtx_raw",	";Vertices;Events",50,0,50) );
     mon.addHistogram( new TH1F( "nvtxwgt_raw",	";Vertices;Events",50,0,50) );
@@ -1498,6 +1498,8 @@ int main(int argc, char* argv[])
 
         //Fill histogram for posterior optimization, or for control regions
         for(size_t ivar=0; ivar<nvarsToInclude; ivar++) {
+            if( ivar == 0 ) Hcutflow->Fill(5,genWeight);
+
             float iweight = weight;                                               //nominal
 
             //pileup
@@ -1516,8 +1518,13 @@ int main(int argc, char* argv[])
                             PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
                             PDFWeight_down = TMath::Min(PDFWeight_down,wgts[ipw]);
                         }
-                        if(varNames[ivar]=="_pdfup")    iweight *= PDFWeight_plus;
-                        else if(varNames[ivar]=="_pdfdown")  iweight *= PDFWeight_down;
+                        if(varNames[ivar]=="_pdfup") {
+                            Hcutflow->Fill(6,genWeight*PDFWeight_plus);
+                            iweight *= PDFWeight_plus;
+                        } else if(varNames[ivar]=="_pdfdown") {
+                            Hcutflow->Fill(7,genWeight*PDFWeight_down);
+                            iweight *= PDFWeight_down;
+                        }
                     }
                 } else {
                     // for POWHEG, MADGRAPH based samples
@@ -1539,9 +1546,15 @@ int main(int argc, char* argv[])
                     delete alphaS_h;
                     //cout << "alphaSError: " << alphaSError << endl;
                     double PDFalphaSWeight = sqrt(pdfError*pdfError + alphaSError*alphaSError);
-
-                    if(varNames[ivar]=="_pdfup")    iweight *= (1.+PDFalphaSWeight);
-                    else if(varNames[ivar]=="_pdfdown")  iweight *= (1.-PDFalphaSWeight);
+                    double PDFWeight_plus = 1.+PDFalphaSWeight;
+                    double PDFWeight_down = 1.-PDFalphaSWeight;
+                    if(varNames[ivar]=="_pdfup") {
+                        Hcutflow->Fill(6,genWeight*PDFWeight_plus);
+                        iweight *= PDFWeight_plus;
+                    } else if(varNames[ivar]=="_pdfdown") {
+                        Hcutflow->Fill(7,genWeight*PDFWeight_down);
+                        iweight *= PDFWeight_down;
+                    }
                 }
             }
 
@@ -1578,8 +1591,13 @@ int main(int argc, char* argv[])
                     }
                     //cout << "QCDscaleWgts[" << ipw << "]: " << QCDscaleWgts[ipw] << endl;
                 }
-                if(varNames[ivar]=="_qcdscaleup")    	   iweight *= QCDscaleWeight_plus;
-                else if(varNames[ivar]=="_qcdscaledown")   iweight *= QCDscaleWeight_down;
+                if(varNames[ivar]=="_qcdscaleup") {
+                    Hcutflow->Fill(8,genWeight*QCDscaleWeight_plus);
+                    iweight *= QCDscaleWeight_plus;
+                } else if(varNames[ivar]=="_qcdscaledown") {
+                    Hcutflow->Fill(9,genWeight*QCDscaleWeight_down);
+                    iweight *= QCDscaleWeight_down;
+                }
             }
 
             if( isMC_ZZ2L2Nu && (varNames[ivar]=="_qqZZewkup" || varNames[ivar]=="_qqZZewkdown") ) {
