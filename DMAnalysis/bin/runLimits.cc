@@ -2026,24 +2026,11 @@ void doDYextrapolation(std::vector<TString>& selCh,map<TString, Shape_t>& allSha
                 }
             }
 
-
-            //update  Feb 24
-            TString tag_dy = selCh[i]+AnalysisBins[b];
-            if(tag_dy=="eelesq1jets") sf = 0.936755;//1.02964;//1.49205;
-            else if(tag_dy=="mumulesq1jets") sf = 0.894015;//1.09576;//1.46399;
-            else sf = 1.;
-
             cout << "Scale Factor: " << sf << " DY MC: " << hChan_DATADY->Integral() << endl;
             hChan_DATADY->Scale(sf);
 
-            //assign Systematics
-            //if(tag_dy=="eelesq1jets") hChan_DATADY->SetBinError(0, 0.1251/*0.193361*/*hChan_DATADY->Integral());
-            //if(tag_dy=="mumulesq1jets") hChan_DATADY->SetBinError(0, 0.0876983/*0.48201*/*hChan_DATADY->Integral());
-
             // 100% systematics
-            if(tag_dy=="eelesq1jets") hChan_DATADY->SetBinError(0, 1.0/*0.193361*/*hChan_DATADY->Integral());
-            if(tag_dy=="mumulesq1jets") hChan_DATADY->SetBinError(0, 1.0/*0.48201*/*hChan_DATADY->Integral());
-
+            hChan_DATADY->SetBinError(0, 1.0*hChan_DATADY->Integral());
 
             cout << "DY Extrapolation: " << hChan_DATADY->Integral() << endl;
             if(hChan_DATADY->Integral() > 1E-6) shapeChan_SI.bckg.push_back(hChan_DATADY);
