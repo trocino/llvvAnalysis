@@ -76,7 +76,12 @@ float cutLine1, cutLine2;
 float leftcutLine, rightcutLine;
 
 
-struct stSampleInfo{ double PURescale_up; double PURescale_down; double initialNumberOfEvents;};
+struct stSampleInfo{
+   double PURescale_up, PURescale_down,
+          PDFRescale_up, PDFRescale_down,
+          QCDRescale_up, QCDRescale_down,
+          initialNumberOfEvents;
+};
 std::unordered_map<string, stSampleInfo> sampleInfoMap;
 std::unordered_map<string, bool> FileExist;
 TString getChannelName(std::string SaveName);
@@ -237,9 +242,23 @@ void GetInitialNumberOfEvents(JSONWrapper::Object& Root, std::string RootDir, Na
          double PUCentralnnorm =  1; if(tmphist->GetBinContent(3)>0)PUCentralnnorm = tmphist->GetBinContent(2) / tmphist->GetBinContent(3);
          double PUDownnorm     =  1; if(tmphist->GetBinContent(4)>0)PUDownnorm     = tmphist->GetBinContent(3) / tmphist->GetBinContent(4);
          double PUUpnorm       =  1; if(tmphist->GetBinContent(5)>0)PUUpnorm       = tmphist->GetBinContent(3) / tmphist->GetBinContent(5);
+         double PDFUpnorm      = 1; if(tmphist->GetBinContent(7)>0) PDFUpnorm = tmphist->GetBinContent(6) / tmphist->GetBinContent(7);
+         double PDFDownnorm    = 1; if(tmphist->GetBinContent(8)>0) PDFDownnorm = tmphist->GetBinContent(6) / tmphist->GetBinContent(8);
+         double QCDUpnorm      = 1; if(tmphist->GetBinContent(9)>0) QCDUpnorm = tmphist->GetBinContent(6) / tmphist->GetBinContent(9);
+         double QCDDownnorm    = 1; if(tmphist->GetBinContent(10)>0) QCDDownnorm = tmphist->GetBinContent(6) / tmphist->GetBinContent(10);
+
          sampleInfo.PURescale_down = PUDownnorm;
          sampleInfo.PURescale_up   = PUUpnorm;
-         if(isMC)printf("\033[35mPU Renormalization %30s Shift Down --> %6.2f  Central = %6.2f  Up Down --> %6.2f\033[0m\n",(Samples[j])["dtag"].toString().c_str(),PUDownnorm, PUCentralnnorm, PUUpnorm);
+
+         sampleInfo.PDFRescale_down = PDFDownnorm;
+         sampleInfo.PDFRescale_up = PDFUpnorm;
+
+         sampleInfo.QCDRescale_down = QCDDownnorm;
+         sampleInfo.QCDRescale_up = QCDUpnorm;
+
+         if(isMC)printf("\033[35mPU Renormalization %30s Shift Down --> %6.2f  Central = %6.2f  Up --> %6.2f\033[0m\n",(Samples[j])["dtag"].toString().c_str(),PUDownnorm, PUCentralnnorm, PUUpnorm);
+         if(isMC)printf("\033[35mPDF Renormalization %30s Shift Down --> %6.2f  Central = %6.2f  Up --> %6.2f\033[0m\n",(Samples[j])["dtag"].toString().c_str(),PDFDownnorm, 1.0, PDFUpnorm);
+         if(isMC)printf("\033[35mQCD Renormalization %30s Shift Down --> %6.2f  Central = %6.2f  Up --> %6.2f\033[0m\n",(Samples[j])["dtag"].toString().c_str(),QCDDownnorm, 1.0, QCDUpnorm);
 
 
          double cnorm = 1.0;
@@ -282,6 +301,19 @@ void SavingToFile(JSONWrapper::Object& Root, std::string RootDir, NameAndType Hi
          if(HistoProperties.name.find("puup"  )!=string::npos){Weight *= sampleInfo.PURescale_up;}
          if(HistoProperties.name.find("pudown")!=string::npos){Weight *= sampleInfo.PURescale_down;}
 
+         // If the sample is a signal, we rescale so that PDF/QCD do not change the cross-section
+         std::string dtag = (Samples[j])["dtag"].toString();
+         if( dtag.find("DM_V") != std::string::npos
+          or dtag.find("DM_A") != std::string::npos
+          or dtag.find("DM_EWK") != std::string::npos
+          or dtag.find("Unpart") != std::string::npos
+          or dtag.find("ADD") != std::string::npos )
+         {
+            if(HistoProperties.name.find("pdfdown")!=string::npos){Weight *= sampleInfo.PDFRescale_down;}
+            if(HistoProperties.name.find("pdfup")!=string::npos){Weight *= sampleInfo.PDFRescale_down;}
+            if(HistoProperties.name.find("qcdscaledown")!=string::npos){Weight *= sampleInfo.QCDRescale_down;}
+            if(HistoProperties.name.find("qcdscaleup")!=string::npos){Weight *= sampleInfo.QCDRescale_down;}
+         }
          if(HistoProperties.name.find("optim_cut")!=string::npos){Weight=1.0;}
 
          int split = 1;

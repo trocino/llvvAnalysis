@@ -289,7 +289,7 @@ int main(int argc, char* argv[])
     h->GetXaxis()->SetBinLabel(3,"Trigger && 2 Tight Leptons && =2 Leptons in MEX/1");
 
     //for MC normalization (to 1/pb)
-    TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,6,0,6) ) ;
+    TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,10,0,10) ) ;
 
     mon.addHistogram( new TH1F( "nvtx_raw",	";Vertices;Events",50,0,50) );
     mon.addHistogram( new TH1F( "nvtxwgt_raw",	";Vertices;Events",50,0,50) );
@@ -347,11 +347,17 @@ int main(int argc, char* argv[])
 
     mon.addHistogram( new TH1F( "pfmet_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV",15,0,1200));
     mon.addHistogram( new TH1F( "pfmet2_presel",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, MET2Bins));
+    mon.addHistogram( new TH1F( "calomet_presel",     ";Calo E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, MET2Bins));
     mon.addHistogram( new TH1F( "dphiZMET_presel",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
     mon.addHistogram( new TH1F( "balancedif_presel", ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events", 5,0,1.0) );
     mon.addHistogram( new TH1F( "mt_presel",         ";#it{m}_{T} [GeV];Events", 12,0,1200) );
     mon.addHistogram( new TH1F( "mt2_presel",         ";#it{m}_{T} [GeV];Events", nBinsMT2,MT2Bins) );
     mon.addHistogram( new TH1F( "axialpfmet_presel", ";Axial E_{T}^{miss} [GeV];Events", 50,-150,150) );
+    mon.addHistogram( new TH1F( "transpfmet_presel", ";Transv. E_{T}^{miss} [GeV];Events", 25,0,150) );
+    mon.addHistogram( new TH1F( "axialpfmet_rel_presel", ";Axial/PFMET;Events", 20,-1,1) );
+    mon.addHistogram( new TH1F( "transpfmet_rel_presel", ";Transv/PFMET;Events", 10,0,1) );
+    mon.addHistogram( new TH1F( "met_pfMinusCalo_presel",     ";|Calo/PF - 1|;Events / 1 GeV", 10,0,2));
+    mon.addHistogram( new TH1F( "dphiJetMET_presel",    ";#Delta#it{#phi}(#it{jet},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
 
     //adding N-1 plots
     mon.addHistogram( new TH1F( "pfmet_nm1",       ";E_{T}^{miss} [GeV];Events / 80 GeV", 15,0,1200));
@@ -399,9 +405,11 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "zmass_Gen", ";#it{m}_{ll} [GeV] [GeV];Events", 250,0,250) );
     mon.addHistogram( new TH2F( "ptlep1vs2_Gen",";#it{p}_{T}^{l1} [GeV];#it{p}_{T}^{l2} [GeV];Events",250,0,500, 250,0,500) );
 
-    h=(TH1F *)mon.addHistogram( new TH1F ("acceptance", ";;Events", 2,0,2) );
+    h=(TH1F *)mon.addHistogram( new TH1F ("acceptance", ";;Events", 3,0,3) );
+
     h->GetXaxis()->SetBinLabel(1,"Gen");
     h->GetXaxis()->SetBinLabel(2,"Gen Acc");
+    h->GetXaxis()->SetBinLabel(3,"Rec Acc");
 
     // btaging efficiency
     std::vector<TString> CSVkey;
@@ -426,6 +434,12 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "mt_final120",             ";#it{m}_{T} [GeV];Events", 12,0,1200) );
     mon.addHistogram( new TH1F( "pfmet_final",      ";E_{T}^{miss} [GeV];Events / 1 GeV", 15,0,1200));
     mon.addHistogram( new TH1F( "pfmet2_final",     ";E_{T}^{miss} [GeV];Events / 1 GeV", nBinsMET2, MET2Bins));
+    mon.addHistogram( new TH1F( "met_pfMinusCalo_final",     ";|Calo/PF - 1|;Events / 1 GeV", 10,0,2));
+    mon.addHistogram( new TH1F( "axialpfmet_final", ";Axial E_{T}^{miss} [GeV];Events", 50,-150,150) );
+    mon.addHistogram( new TH1F( "transpfmet_final", ";Transv. E_{T}^{miss} [GeV];Events", 25,0,150) );
+    mon.addHistogram( new TH1F( "axialpfmet_rel_final", ";Axial/PFMET;Events", 20,-1,1) );
+    mon.addHistogram( new TH1F( "transpfmet_rel_final", ";Transv/PFMET;Events", 10,0,1) );
+    mon.addHistogram( new TH1F( "dphiJetMET_final",    ";#Delta#it{#phi}(#it{jet},E_{T}^{miss});Events", 10,0,TMath::Pi()) );
 
 
 
@@ -464,7 +478,19 @@ int main(int argc, char* argv[])
     mon.addHistogram( new TH1F( "balancedif_DYctrlN_3", ";|E_{T}^{miss}-#it{q}_{T}|/#it{q}_{T};Events", 20,0,1.0) );
     mon.addHistogram( new TH1F( "dphiZMET_DYctrlN_3",   ";#Delta#it{#phi}(#it{l^{+}l^{-}},E_{T}^{miss});Events", 100,0,TMath::Pi()) );
 
+    //// MET Control
+    std::vector<std::string> allregions = {"presel","sanity_1","sanity_2","sanity_3","sanity_4","final"};
+    double pfcalobins[] = {0.,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0};
+    const int nBinspfcalo = sizeof(pfcalobins)/sizeof(double) - 1;
 
+    double dphibins[] = {0,0.1*TMath::Pi(),0.2*TMath::Pi(),0.3*TMath::Pi(),0.4*TMath::Pi(),0.5*TMath::Pi(),0.6*TMath::Pi(),0.7*TMath::Pi(),0.8*TMath::Pi(),0.9*TMath::Pi(),TMath::Pi()};
+    const int nBinsdphi = sizeof(dphibins)/sizeof(double) - 1;
+    for( auto const & reg:allregions ) {
+        mon.addHistogram( new TH1F( ("metctrl_pfcalo_"+reg).c_str(),       ";Calo/PFMET;PFMET(GeV);Events", nBinspfcalo, pfcalobins ) );
+        mon.addHistogram( new TH2F( ("metctrl_pfcalo_v_pfmet_"+reg).c_str(),       ";Calo/PFMET;PFMET(GeV);Events", nBinspfcalo, pfcalobins, nBinsMET2,MET2Bins) );
+        mon.addHistogram( new TH1F( ("metctrl_dPhiJetMET_"+reg).c_str(),   ";#Delta#it{#phi}(Jet},E_{T}^{miss});Events", nBinsdphi,dphibins) );
+        mon.addHistogram( new TH2F( ("metctrl_dPhiJetMET_v_pfmet_"+reg).c_str(),   ";#Delta#it{#phi}(Jet},E_{T}^{miss});Events", nBinsdphi,dphibins, nBinsMET2,MET2Bins) );
+    }
 
 
 
@@ -1196,6 +1222,7 @@ int main(int argc, char* argv[])
         int nJetsGood30(0);
         int nCSVLtags(0),nCSVMtags(0),nCSVTtags(0);
         double BTagWeights(1.0);
+        double dphiJetMET(999);
         for(size_t ijet=0; ijet<corrJets.size(); ijet++) {
 
             if(corrJets[ijet].pt()<20) continue;
@@ -1217,6 +1244,9 @@ int main(int argc, char* argv[])
             GoodIdJets.push_back(corrJets[ijet]);
             if(corrJets[ijet].pt()>30) nJetsGood30++;
 
+            if(corrJets[ijet].pt()>30) {
+               dphiJetMET = std::min(fabs(deltaPhi(corrJets[ijet].phi(),metP4.phi())), dphiJetMET );
+            }
 
             //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X
             if(corrJets[ijet].pt()>20 && fabs(corrJets[ijet].eta())<2.4)  {
@@ -1289,7 +1319,9 @@ int main(int argc, char* argv[])
         TVector2 met2(metP4.px(),metP4.py());
         double axialmet=dil2*met2;
         axialmet /= -zll.pt();
-
+        double axialmet_rel = axialmet/metP4.pt();
+        double transmet = sqrt(pow(metP4.pt(),2)-pow(axialmet,2));
+        double transmet_rel = transmet/metP4.pt();
         //missing ET
         bool passMETcut=(metP4.pt()>80);
         bool passMETcut120=(metP4.pt()>120);
@@ -1305,6 +1337,9 @@ int main(int argc, char* argv[])
         //transverse mass
         double MT_massless = METUtils::transverseMass(zll,metP4,false);
 
+        // Calo MET
+        double caloMET = phys.caloMET.pt();
+        double met_pfMinusCalo = fabs( metP4.pt()/caloMET - 1 );
         //#########################################################
         //####  RUN PRESELECTION AND CONTROL REGION PLOTS  ########
         //#########################################################
@@ -1425,12 +1460,17 @@ int main(int argc, char* argv[])
                         //preselection plots
                         mon.fillHisto("pfmet_presel",       tags, metP4.pt(),  weight, true);
                         mon.fillHisto("pfmet2_presel",      tags, metP4.pt(),  weight, true);
+                        mon.fillHisto("calomet_presel",     tags, phys.caloMET.pt(),  weight, true);
                         mon.fillHisto("mt_presel",          tags, MT_massless, weight);
                         mon.fillHisto("mt2_presel",         tags, MT_massless, weight, true);
                         mon.fillHisto("dphiZMET_presel",    tags, dphiZMET,    weight);
                         mon.fillHisto("balancedif_presel",  tags, balanceDif,  weight);
                         mon.fillHisto("axialpfmet_presel",  tags, axialmet,    weight);
-
+                        mon.fillHisto("transpfmet_presel",  tags, transmet,    weight);
+                        mon.fillHisto("axialpfmet_rel_presel",  tags, axialmet_rel,    weight);
+                        mon.fillHisto("transpfmet_rel_presel",  tags, transmet_rel,    weight);
+                        mon.fillHisto("met_pfMinusCalo_presel",tags, met_pfMinusCalo , weight);
+                        mon.fillHisto("dphiJetMET_presel",tags, dphiJetMET, weight);
                         //forDY ctrl
                         if(passResponseCut) {
                             mon.fillHisto("pfmet_DYctrlN_3", tags, metP4.pt(), weight);
@@ -1467,10 +1507,17 @@ int main(int argc, char* argv[])
                                 mon.fillHisto("eventflow",  tags, 6, weight);
 
                                 if(passMETcut) {
+                                    mon.fillHisto("acceptance",tags,2,1.0);
                                     mon.fillHisto("eventflow",  tags, 7, weight);
                                     mon.fillHisto("mt_final",   tags, MT_massless, weight);
                                     mon.fillHisto("pfmet_final",tags, metP4.pt(), weight, true);
                                     mon.fillHisto("pfmet2_final",tags, metP4.pt(), weight, true);
+                                    mon.fillHisto("axialpfmet_final",  tags, axialmet, weight);
+                                    mon.fillHisto("transpfmet_final",  tags, transmet,    weight);
+                                    mon.fillHisto("axialpfmet_rel_final",  tags, axialmet_rel,    weight);
+                                    mon.fillHisto("transpfmet_rel_final",  tags, transmet_rel,    weight);
+                                    mon.fillHisto("met_pfMinusCalo_final",tags, met_pfMinusCalo, weight);
+                                    mon.fillHisto("dphiJetMET_final",tags, dphiJetMET, weight);
 
                                     if(passMETcut120) mon.fillHisto("mt_final120",   tags, MT_massless, weight);
 
@@ -1513,12 +1560,32 @@ int main(int argc, char* argv[])
             }
         }
     }
+    //// MET Control Plots
+    // Calo MET
+    double met_pfcalo = metP4.pt()/caloMET;
 
+    bool passPresel = pass3dLeptonVeto && passBveto &&  nJetsGood30 < 2 && passZmass && passZpt;
+    bool passFinal = passPresel && passMETcut  && passDphiZMETcut && passBalanceCut && passResponseCut;
 
+    bool passSanity1 = passPresel && passMETcut;
+    bool passSanity2 = passPresel && passMETcut && !passBalanceCut && !passResponseCut;
 
+    bool passSanity3 = passSanity1 && passDphiZMETcut;
+    bool passSanity4 = passSanity2 && passDphiZMETcut;
 
-
-
+    std::vector<std::string> regions;
+    if(passPresel) regions.push_back("presel");
+    if(passSanity1) regions.push_back("sanity_1");
+    if(passSanity2) regions.push_back("sanity_2");
+    if(passSanity3) regions.push_back("sanity_3");
+    if(passSanity4) regions.push_back("sanity_4");
+    if(passFinal) regions.push_back("final");
+    for( auto const & reg:regions ) {
+        mon.fillHisto(("metctrl_dPhiJetMET_"+reg).c_str(),tags, dphiJetMET,   weight);
+        mon.fillHisto(("metctrl_dPhiJetMET_v_pfmet_"+reg).c_str(),tags, dphiJetMET, metP4.pt(),   weight);
+        mon.fillHisto(("metctrl_pfcalo_"+reg).c_str(),tags, met_pfcalo,   weight);
+        mon.fillHisto(("metctrl_pfcalo_v_pfmet_"+reg).c_str(),tags, dphiJetMET, metP4.pt(),  weight);
+    }
 
         //##############################################################################
         //### HISTOS FOR STATISTICAL ANALYSIS (include systematic variations)
@@ -1527,6 +1594,8 @@ int main(int argc, char* argv[])
 
         //Fill histogram for posterior optimization, or for control regions
         for(size_t ivar=0; ivar<nvarsToInclude; ivar++) {
+            if( ivar == 0 ) Hcutflow->Fill(5,genWeight);
+
             float iweight = weight;                                               //nominal
 
             //pileup
@@ -1545,8 +1614,13 @@ int main(int argc, char* argv[])
                             PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
                             PDFWeight_down = TMath::Min(PDFWeight_down,wgts[ipw]);
                         }
-                        if(varNames[ivar]=="_pdfup")    iweight *= PDFWeight_plus;
-                        else if(varNames[ivar]=="_pdfdown")  iweight *= PDFWeight_down;
+                        if(varNames[ivar]=="_pdfup") {
+                            Hcutflow->Fill(6,genWeight*PDFWeight_plus);
+                            iweight *= PDFWeight_plus;
+                        } else if(varNames[ivar]=="_pdfdown") {
+                            Hcutflow->Fill(7,genWeight*PDFWeight_down);
+                            iweight *= PDFWeight_down;
+                        }
                     }
                 } else {
                     // for POWHEG, MADGRAPH based samples
@@ -1568,9 +1642,15 @@ int main(int argc, char* argv[])
                     delete alphaS_h;
                     //cout << "alphaSError: " << alphaSError << endl;
                     double PDFalphaSWeight = sqrt(pdfError*pdfError + alphaSError*alphaSError);
-
-                    if(varNames[ivar]=="_pdfup")    iweight *= (1.+PDFalphaSWeight);
-                    else if(varNames[ivar]=="_pdfdown")  iweight *= (1.-PDFalphaSWeight);
+                    double PDFWeight_plus = 1.+PDFalphaSWeight;
+                    double PDFWeight_down = 1.-PDFalphaSWeight;
+                    if(varNames[ivar]=="_pdfup") {
+                        Hcutflow->Fill(6,genWeight*PDFWeight_plus);
+                        iweight *= PDFWeight_plus;
+                    } else if(varNames[ivar]=="_pdfdown") {
+                        Hcutflow->Fill(7,genWeight*PDFWeight_down);
+                        iweight *= PDFWeight_down;
+                    }
                 }
             }
 
@@ -1607,8 +1687,13 @@ int main(int argc, char* argv[])
                     }
                     //cout << "QCDscaleWgts[" << ipw << "]: " << QCDscaleWgts[ipw] << endl;
                 }
-                if(varNames[ivar]=="_qcdscaleup")    	   iweight *= QCDscaleWeight_plus;
-                else if(varNames[ivar]=="_qcdscaledown")   iweight *= QCDscaleWeight_down;
+                if(varNames[ivar]=="_qcdscaleup") {
+                    Hcutflow->Fill(8,genWeight*QCDscaleWeight_plus);
+                    iweight *= QCDscaleWeight_plus;
+                } else if(varNames[ivar]=="_qcdscaledown") {
+                    Hcutflow->Fill(9,genWeight*QCDscaleWeight_down);
+                    iweight *= QCDscaleWeight_down;
+                }
             }
 
             if( isMC_ZZ2L2Nu && (varNames[ivar]=="_qqZZewkup" || varNames[ivar]=="_qqZZewkdown") ) {
