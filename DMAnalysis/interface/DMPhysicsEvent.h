@@ -78,6 +78,15 @@ public :
         mn_ip3d = mn_ip3d_;
     }
 
+    void setLeptonTrackInfo(Int_t mn_tkLayers_) {
+        mn_tkLayers = mn_tkLayers_;
+    }
+
+    void setSCInfo(float en_EtaSC_, float en_R9_) {
+        en_EtaSC = en_EtaSC_; 
+	en_R9 = en_R9_; 
+    } 
+
     float e_pfRelIsoDbeta() {
         return (en_chargedIso + TMath::Max(0., en_neutralHadIso + en_photonIso - 0.5 * en_pileupIso) )/pt();
     }
@@ -90,12 +99,13 @@ public :
         return (mn_chargedIso + TMath::Max(0., mn_neutralHadIso + mn_photonIso - 0.5 * mn_pileupIso) )/pt();
     }
 
-    Int_t id;
+    Int_t id, mn_tkLayers;
     bool isLooseMu, isTightMu, isMediumMu, isSoftMu, isHighPtMu;
     bool isElpassVeto, isElpassLoose, isElpassMedium, isElpassTight;
     bool isTauDM;
     float mn_pileupIso, mn_chargedIso, mn_photonIso, mn_neutralHadIso;
     float en_pileupIso, en_chargedIso, en_photonIso, en_neutralHadIso;
+    float en_EtaSC, en_R9; 
     float en_relIsoWithEA;
     float mn_dZ, mn_d0, mn_ip3d;
     bool ta_IsLooseIso, ta_IsMediumIso, ta_IsTightIso;

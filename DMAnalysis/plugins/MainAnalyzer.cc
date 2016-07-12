@@ -250,6 +250,7 @@ MainAnalyzer::MainAnalyzer(const edm::ParameterSet& iConfig):
     metTag_(		consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metsTag"))			),
     metNoHFTag_(        consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metsNoHFTag"))                ),
     metPuppiTag_(       consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metsPuppiTag"))               ),
+    packedCandidatesTag_(consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("packedCandidatesTag"))),
     metFilterBitsTag_(	consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("metFilterBitsTag"))		),
     prunedGenTag_(	consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("prunedTag"))	),
     puInfoTag_(         consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("puInfoTag"))     ),
@@ -572,6 +573,7 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
 
         ev.mn_d0[ev.mn] = -mu.muonBestTrack()->dxy(PV.position());
         ev.mn_dZ[ev.mn] = mu.muonBestTrack()->dz(PV.position());
+        ev.mn_tkLayers[ev.mn] = (mu.innerTrack().get()!=0) ? mu.innerTrack()->hitPattern().trackerLayersWithMeasurement() : -1; 
         ev.mn_ip3d[ev.mn] = mu.dB(pat::Muon::PV3D);
         ev.mn_ip3dsig[ev.mn] = mu.dB(pat::Muon::PV3D)/mu.edB(pat::Muon::PV3D);
 
@@ -661,6 +663,10 @@ MainAnalyzer::analyze(const edm::Event& event, const edm::EventSetup& iSetup)
         ev.en_pz[ev.en] = el->pz();
         ev.en_en[ev.en] = el->energy();
         ev.en_id[ev.en] = 11*el->charge();
+
+	// Needed for energy scale and resolution corrections 
+	ev.en_EtaSC[ev.en] = el->superCluster()->eta();
+	ev.en_R9[ev.en] = el->r9();
 
         /*
                 ev.en_EtaSC[ev.en] = el->superCluster()->eta();

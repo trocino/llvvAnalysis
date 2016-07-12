@@ -66,7 +66,7 @@ struct DataEvtSummary_t {
     //muon
     Int_t mn;
     Float_t mn_px[MAXPARTICLES],mn_py[MAXPARTICLES],mn_pz[MAXPARTICLES],mn_en[MAXPARTICLES];
-    Int_t mn_id[MAXPARTICLES], mn_type[MAXPARTICLES];
+    Int_t mn_id[MAXPARTICLES], mn_type[MAXPARTICLES],mn_tkLayers[MAXPARTICLES];
     Float_t mn_d0[MAXPARTICLES],mn_dZ[MAXPARTICLES],mn_ip3d[MAXPARTICLES],mn_ip3dsig[MAXPARTICLES];
     Bool_t mn_IsLoose[MAXPARTICLES],mn_IsMedium[MAXPARTICLES],mn_IsTight[MAXPARTICLES],mn_IsSoft[MAXPARTICLES],mn_IsHighPt[MAXPARTICLES];
     Float_t mn_pileupIsoR03[MAXPARTICLES],mn_chargedIsoR03[MAXPARTICLES],mn_photonIsoR03[MAXPARTICLES],mn_neutralHadIsoR03[MAXPARTICLES];
@@ -78,6 +78,7 @@ struct DataEvtSummary_t {
     Int_t en;
     Float_t en_px[MAXPARTICLES],en_py[MAXPARTICLES],en_pz[MAXPARTICLES],en_en[MAXPARTICLES];
     Int_t en_id[MAXPARTICLES];
+    Float_t en_EtaSC[MAXPARTICLES],en_R9[MAXPARTICLES];
     //Float_t en_d0[MAXPARTICLES],en_dZ[MAXPARTICLES];
     //Float_t en_EtaSC[MAXPARTICLES],en_PhiSC[MAXPARTICLES],en_EnSC[MAXPARTICLES];
     //Float_t en_dEtaIn[MAXPARTICLES],en_dPhiIn[MAXPARTICLES],en_hOverE[MAXPARTICLES],en_R9[MAXPARTICLES],en_sigmaIetaIeta[MAXPARTICLES],en_sigmaIetaIeta5x5[MAXPARTICLES],en_ooEmooP[MAXPARTICLES];

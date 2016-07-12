@@ -41,6 +41,12 @@
 
 #include "llvvAnalysis/DMAnalysis/interface/LeptonEfficiencySF.h"
 
+// Utilities for muon momentum and resolution corrections (Rochester) 
+/*
+#include <rochcor2015.h> 
+#include <RoccoR.h>
+*/
+
 using namespace std;
 
 
@@ -904,6 +910,18 @@ int main(int argc, char* argv[])
         for(size_t ilep=0; ilep<phys.leptons.size(); ilep++) {
             LorentzVector lep=phys.leptons[ilep];
             int lepid = phys.leptons[ilep].id;
+
+	    /*
+	    // Scale & resolution corrections 
+	    // - Muons 
+	    if(abs(lepid)==13) { 
+	      TLorentzVector corrmu; 
+	      corrmu.SetPtEtaPhiM(lep.pt(), lep.eta(), lep.phi(), 0.105658);
+	      float qter = 1.0; // Useless for us 
+	      
+	    } 
+	    */ 
+
             if(lep.pt()<20) continue;
             if(abs(lepid)==13 && fabs(lep.eta())> 2.4) continue;
             if(abs(lepid)==11 && fabs(lep.eta())> 2.5) continue;
