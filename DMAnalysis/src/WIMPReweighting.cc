@@ -107,6 +107,11 @@ bool WIMPReweighting::Init(const edm::ParameterSet &runProcess, TString &url)
     // Retrieve names of reference full-sim samples 
     refPoints_ = runProcess.getParameter<std::vector<std::string> >("ReferencePoints"); 
 
+    // Allow re-weighting between points with same DM and Med masses? 
+    // Default is true, it allows for reweighting from gQ=1 to gQ=0.25 for same-mass points 
+    allowReweightWithSameMasses_ = runProcess.existsAs<bool>("AllowReweightWithSameMasses") ? 
+      runProcess.getParameter<bool>("AllowReweightWithSameMasses") : true; 
+
     // Name of target gen-distribution plot 
     TString hnumlabel = exctractDistrNameFromUrl(url); 
 
@@ -171,7 +176,8 @@ bool WIMPReweighting::selectReferenceWIMPurl(TString &url) {
     for(size_t i=0; i<refPoints_.size(); ++i) { 
         std::pair<float, float> imxmv = extractMassesFromUrl( TString(refPoints_[i].c_str()) ); 
 	if(imxmv.first<1e-6 || imxmv.second<1e-6) continue; 
-	if(imxmv.first<mxmv.first || imxmv.second<mxmv.second || (imxmv.first==mxmv.first && imxmv.second==mxmv.second)) continue; 
+	if(allowReweightWithSameMasses_==false && imxmv.first==mxmv.first && imxmv.second==mxmv.second) continue; 
+	if(imxmv.first<mxmv.first || imxmv.second<mxmv.second) continue; 
 	float diff = sqrt( pow(std::log10(imxmv.first/mxmv.first), 2) + pow(std::log10(imxmv.second/mxmv.second), 2) ); 
 	if(diff<mindist) { 
 	    mindist = diff; 
@@ -208,7 +214,7 @@ TString WIMPReweighting::exctractDistrNameFromUrl(TString aurl) {
     //   "MC13TeV_DM_V_Mx1000Mv10.root" (for gQ = 1)  or 
     //   "MC13TeV_DM_V_GQ0p25_Mx1000Mv10.root" (for gQ = 0.25) 
     // 
-    TString gqstr = aurl.Contains("_GQ0p25_") ? "0.25" : "1";
+    TString gqstr = aurl.Contains("_GQ0p25_") ? "0p25" : "1";
 
     // Get the values of Mx and Mv 
     size_t mxidx0 = 3 + aurl.Index("_Mx"); 

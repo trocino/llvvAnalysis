@@ -55,6 +55,8 @@ private:
     std::map<TString, TH2F *> wimpWeights2DH_;
 
     std::vector<std::string> refPoints_;
+
+    bool allowReweightWithSameMasses_;
 };
 
 #endif /* defined(____WIMPReweighting__) */
