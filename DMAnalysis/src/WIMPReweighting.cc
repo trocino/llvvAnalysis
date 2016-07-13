@@ -125,6 +125,7 @@ bool WIMPReweighting::Init(const edm::ParameterSet &runProcess, TString &url)
     TString hdenlabel = exctractDistrNameFromUrl(url); 
 
     std::string genDistrFileName = runProcess.getParameter<std::string>("GenDistributionsFileName"); 
+    gSystem->ExpandPathName(genDistrFileName.c_str()); 
     TFile *genDistrFile = TFile::Open(genDistrFileName.c_str()); 
 
     if(genDistrFile!=0 && !genDistrFile->IsZombie()) { 
@@ -207,7 +208,7 @@ std::pair<float, float> WIMPReweighting::extractMassesFromUrl(TString aurl) {
 TString WIMPReweighting::exctractDistrNameFromUrl(TString aurl) { 
     // Is it vector or axial-vector? (To be updated when new scenaria become available)
     // For now if it's not vector, just assume it's axial-vector 
-    int isVect = aurl.Contains("TeV_DM_V_Mx") ? 1 : 0; 
+    int isVect = aurl.Contains("TeV_DM_V_") ? 1 : 0; 
 
     // Get the value of gQ
     //   For now just assume dtag is
@@ -223,7 +224,7 @@ TString WIMPReweighting::exctractDistrNameFromUrl(TString aurl) {
     TString mxstr = aurl(mxidx0,   mxidx1-mxidx0  ); 
     TString mvstr = aurl(mxidx1+2, mvidx1-mxidx1-2); 
 
-    return TString::Format("monoz_weights_cV%d_cA%d_gDM1_gQ%s_Mx%s_Mmed%s",
+    return TString::Format("monoz_genmet_acc15_cV%d_cA%d_gDM1_gQ%s_Mx%s_Mmed%s", 
 			   isVect, 1-isVect, gqstr.Data(), mxstr.Data(), mvstr.Data()); 
 } 
 
@@ -233,11 +234,10 @@ TString WIMPReweighting::exctractDistrNameFromUrl(TString aurl) {
 //
 double WIMPReweighting::get1DWeights(double xval, TString key)
 {
-    double weight_ = 1.;
     TH1F* h_ = wimpWeights1DH_[key];
     if(h_==0) {
 	//cout << "cannot find hist: " << key << " weight will be return as 1" << endl;
-	return weight_;
+	return 1.;
     }
 
     // 
@@ -246,18 +246,22 @@ double WIMPReweighting::get1DWeights(double xval, TString key)
     // and there shouldn't be events in the underflow
     // in final distributions
     // 
-    if(key.EqualTo("genmet_acc_simplmod"))  
-      return h_->GetBinContent( h_->GetXaxis()->FindBin(xval) ); 
+    // if(key.EqualTo("genmet_acc_simplmod"))  
+    //   return h_->GetBinContent( h_->GetXaxis()->FindBin(xval) ); 
 
     // This is only for EWKDM 
-    int xbins = h_->GetXaxis()->GetNbins();
-    if(xval > h_->GetXaxis()->GetBinUpEdge(xbins)    ) xval = h_->GetXaxis()->GetBinUpEdge(xbins);
-    if(xval < h_->GetXaxis()->GetBinLowEdge(1)       ) xval = h_->GetXaxis()->GetBinLowEdge(1);
+    // int xbins = h_->GetXaxis()->GetNbins();
+    // if(xval > h_->GetXaxis()->GetBinUpEdge(xbins)) xval = h_->GetXaxis()->GetBinUpEdge(xbins); // NO!! This will give you the overflow! 
+    // if(xval < h_->GetXaxis()->GetBinLowEdge(1)   ) xval = h_->GetXaxis()->GetBinLowEdge(1);
 
-    int binx = h_->GetXaxis()->FindBin(xval);
-    weight_ = h_->GetBinContent(binx);
+    // int binx = h_->GetXaxis()->FindBin(xval);
+    // weight_ = h_->GetBinContent(binx);
 
-    return weight_;
+    int binx = h_->FindBin(xval);
+    if     ( binx == h_->GetNbinsX()+1 ) binx = h_->GetNbinsX(); 
+    else if( binx == 0                 ) binx = 1; 
+
+    return h_->GetBinContent(binx);
 }
 
 

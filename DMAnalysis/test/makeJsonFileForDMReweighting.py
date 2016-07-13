@@ -99,6 +99,8 @@ cnt = 0
 
 for imd in mds: 
     for igq in gqs: 
+        gqstr = '1.00'
+        if igq == '_GQ0p25': gqstr = '0.25'
         for imx in mxs:
             for imv in mvs:
                 idtag = 'MC13TeV_DM_'+imd+igq+'_Mx'+str(imx)+'Mv'+str(imv) 
@@ -133,7 +135,7 @@ for imd in mds:
                 print '      "isdata": false,'
                 print '      "color": "809",'
                 print '      "issignal": true,'
-                print '      "tag": "DM('+str(imx)+')M'+imd+'('+str(imv)+')",'
+                print '      "tag": "DM('+str(imx)+')M'+imd+'('+str(imv)+')gQ('+gqstr+')",'
                 print '      "lwidth": 2,' 
                 print '      "marker": 809,'
                 print '      "data": ['

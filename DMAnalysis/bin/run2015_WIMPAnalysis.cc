@@ -164,8 +164,8 @@ int main(int argc, char* argv[])
 
     bool isMC_ttbar = isMC && (string(url.Data()).find("TeV_TT")  != string::npos);
     bool isMC_stop  = isMC && (string(url.Data()).find("TeV_SingleT")  != string::npos);
-    bool isMC_WIMP  = isMC && (string(url.Data()).find("TeV_DM_V_Mx") != string::npos
-                               || string(url.Data()).find("TeV_DM_A_Mx") != string::npos
+    bool isMC_WIMP  = isMC && (string(url.Data()).find("TeV_DM_") != string::npos
+			       //|| string(url.Data()).find("TeV_DM_A") != string::npos
                                || string(url.Data()).find("TeV_EWKDM_S_Mx") != string::npos
                                || string(url.Data()).find("TeV_EWKDM_P_Mx") != string::npos);
     bool isMC_ADD  = isMC && (string(url.Data()).find("TeV_ADD_D") != string::npos);
@@ -562,7 +562,7 @@ int main(int argc, char* argv[])
     DataEvtSummaryHandler summaryHandler_;
     if(doWIMPreweighting) {
         // Only for simplified models 
-        if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) { 
+        if(url.Contains("TeV_DM_")) { 
 	    bool isreweighted = myWIMPweights.Init(runProcess, url); 
 	    if(!isreweighted) { 
 	        cerr << " *** WARNING: WIMP re-weighting initialization failed! ***" << endl;
@@ -792,7 +792,7 @@ int main(int argc, char* argv[])
 
             //reweighting
             if(doWIMPreweighting) {
-                if(url.Contains("TeV_DM_V_Mx") || url.Contains("TeV_DM_A_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet_acc_simplmod");
+                if(url.Contains("TeV_DM_")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"genmet_acc_simplmod");
                 if(url.Contains("TeV_EWKDM_S_Mx")) weight *= myWIMPweights.get1DWeights(genmet.pt(),"pt_chichi");
             }
             //if(doWIMPreweighting) weight *= myWIMPweights.get2DWeights(genmet.pt(),dphizmet,"dphi_vs_met");
